@@ -42,8 +42,8 @@ export function HeldScreen() {
             <Headline>Choose who holds you.</Headline>
             <Subhead>
               Pick one or two people from your tribe. If you go quiet for 10
-              days, we&apos;ll gently let them know — never broadcast, never
-              shame.
+              days, we&apos;ll gently let them know to check on you to make sure
+              you&apos;re okay.
             </Subhead>
           </div>
 

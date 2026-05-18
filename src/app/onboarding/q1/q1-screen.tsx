@@ -7,6 +7,9 @@ import { NameChipList } from "@/components/onboarding/NameChipList";
 import { ReflectionStepShell } from "@/components/onboarding/ReflectionStepShell";
 import { useOnboarding } from "@/contexts/onboarding-context";
 
+const REFLECTION_COPY_CLASS =
+  "font-inter text-sm italic leading-[1.5] text-[rgba(31,26,20,0.65)]";
+
 export function Q1Screen() {
   const { q1People, addQ1Person, removeQ1Person, hydrated } = useOnboarding();
 
@@ -45,15 +48,21 @@ export function Q1Screen() {
     >
       <div className="space-y-2">
         <Eyebrow>Q1 · your tribe so far · {count}</Eyebrow>
-        <Headline>Who&apos;s in your life right now?</Headline>
+        <Headline>Who are your people?</Headline>
+        <p className={REFLECTION_COPY_CLASS}>
+          The friends and close family you actually spend time with — the ones
+          you&apos;d describe as your inner circle.
+        </p>
       </div>
 
       <NameChipList people={q1People} onRemove={removeQ1Person} />
 
       <AddNameInput placeholder="Add another name…" onAdd={addQ1Person} />
 
-      <p className="font-inter text-sm italic text-ink-soft">
-        5 to 10 people is a good start.
+      <p className={REFLECTION_COPY_CLASS}>
+        5 to 10 people is a good start. Skip casual acquaintances and
+        &ldquo;we should hang out sometime&rdquo; contacts — we&apos;ll get to
+        those next.
       </p>
     </ReflectionStepShell>
   );

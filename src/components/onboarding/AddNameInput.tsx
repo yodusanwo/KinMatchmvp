@@ -6,12 +6,15 @@ import { cn } from "@/lib/cn";
 type AddNameInputProps = {
   placeholder: string;
   onAdd: (name: string) => boolean;
+  /** Return a message to block add (shown instead of the default duplicate copy). */
+  getAddError?: (name: string) => string | null;
   className?: string;
 };
 
 export function AddNameInput({
   placeholder,
   onAdd,
+  getAddError,
   className,
 }: AddNameInputProps) {
   const [value, setValue] = useState("");
@@ -22,6 +25,11 @@ export function AddNameInput({
     const trimmed = value.trim();
     if (trimmed.length < 3) {
       setError("Use at least 3 characters");
+      return;
+    }
+    const blocked = getAddError?.(trimmed);
+    if (blocked) {
+      setError(blocked);
       return;
     }
     const added = onAdd(trimmed);

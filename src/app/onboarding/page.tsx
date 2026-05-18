@@ -10,24 +10,9 @@ import { NumberedSteps } from "@/components/onboarding/NumberedSteps";
 import { OnboardingStartedTracker } from "@/components/onboarding/OnboardingStartedTracker";
 
 const REFLECTION_STEPS = [
-  {
-    number: 1,
-    title: "Who you spend time with",
-    description:
-      "Name the people in your life right now — the ones who show up.",
-  },
-  {
-    number: 2,
-    title: "Who you wish were closer",
-    description:
-      "Mark the connections you want to deepen.",
-  },
-  {
-    number: 3,
-    title: "What gets in the way",
-    description:
-      "Tell us what makes staying in touch hard for you. Based on what you share, KinMatch helps make keeping in touch easier.",
-  },
+  { number: 1, title: "Who are your people?" },
+  { number: 2, title: "Who do you wish were closer?" },
+  { number: 3, title: "What gets in the way?" },
 ];
 
 export default function OnboardingIntroPage() {
@@ -41,12 +26,16 @@ export default function OnboardingIntroPage() {
           <Headline>A small reflection, first.</Headline>
         </div>
 
-        <Subhead className="text-center">
-          Next, we need you to answer three short questions. It&apos;ll take about
-          two minutes.
+        <Subhead>
+          Three quick questions help us tune KinMatch to your relationships.
+          Most people finish in under two minutes.
         </Subhead>
 
         <NumberedSteps steps={REFLECTION_STEPS} />
+
+        <p className="text-center font-inter text-sm italic leading-relaxed text-ink-soft">
+          Your answers stay private. We only use them to shape your prompts.
+        </p>
 
         <PrimaryLink href="/onboarding/q1" className="mt-2">
           Begin reflection →

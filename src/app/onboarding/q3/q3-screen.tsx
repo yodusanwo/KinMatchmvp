@@ -34,7 +34,7 @@ export function Q3Screen() {
             disabled={!canContinue}
             variant="terracotta"
           >
-            See my tribe →
+            See my people →
           </ContinueButton>
           <p className="text-center">
             <TextLink href="/onboarding/q2">← Back to step 2</TextLink>

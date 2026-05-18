@@ -5,14 +5,12 @@ import { useRouter } from "next/navigation";
 import { BrandBar, Eyebrow, Headline, Subhead } from "@/components/brand";
 import { AppShell } from "@/components/layout/AppShell";
 import { BottomNav } from "@/components/nav/BottomNav";
-import { SpotlightCard } from "@/components/today/SpotlightCard";
 import { TribeList } from "@/components/today/TribeList";
 import { TodayPageSkeleton } from "@/components/ui/Skeleton";
 import { fetchJson } from "@/lib/api/fetch-client";
 import type { TodayResponse } from "@/lib/api/types";
-import { dayEyebrow } from "@/lib/today/format";
 
-export function TodayScreen() {
+export function TribeScreen() {
   const router = useRouter();
   const [data, setData] = useState<TodayResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -22,7 +20,7 @@ export function TodayScreen() {
     async function load() {
       const result = await fetchJson<TodayResponse>("/api/today");
       if (result.status === 401) {
-        router.replace("/signin?next=/today");
+        router.replace("/signin?next=/tribe");
         return;
       }
       if (!result.ok) {
@@ -42,10 +40,13 @@ export function TodayScreen() {
     <AppShell>
       <BrandBar />
       <div className="flex min-h-screen flex-col px-5 pb-28 pt-6">
-        <Eyebrow>{dayEyebrow()}</Eyebrow>
+        <Eyebrow>Your tribe</Eyebrow>
         <Headline className="mt-2">
-          Who you can build community with today.
+          {tribeCount === 1 ? "1 person" : `${tribeCount} people`}
         </Headline>
+        <Subhead className="mt-2">
+          Everyone you&apos;re tending this season. Tap a name for their profile.
+        </Subhead>
 
         {loading && <TodayPageSkeleton />}
 
@@ -56,27 +57,8 @@ export function TodayScreen() {
         )}
 
         {!loading && !error && data && (
-          <div className="mt-8 space-y-8">
-            {data.spotlight ? (
-              <SpotlightCard spotlight={data.spotlight} />
-            ) : (
-              <div className="rounded-2xl border border-ink/[0.12] bg-cream-deep/60 p-5">
-                <Subhead>
-                  Everyone in your tribe is on rhythm. Take a quiet day.
-                </Subhead>
-              </div>
-            )}
-
-            <section>
-              <Eyebrow className="mb-1">
-                your tribe · {tribeCount}{" "}
-                {tribeCount === 1 ? "person" : "people"}
-              </Eyebrow>
-              <p className="mb-4 font-inter text-sm italic text-ink-soft">
-                Tap a name to open their profile.
-              </p>
-              <TribeList tribe={data.tribe} />
-            </section>
+          <div className="mt-8">
+            <TribeList tribe={data.tribe} />
           </div>
         )}
       </div>

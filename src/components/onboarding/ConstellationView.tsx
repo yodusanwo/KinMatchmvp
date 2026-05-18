@@ -25,6 +25,7 @@ type ConstellationViewProps = {
   selectedIds?: string[];
   onToggleSelect?: (id: string) => void;
   heartBadge?: boolean;
+  avatarSize?: "sm" | "md" | "lg";
   className?: string;
 };
 
@@ -33,6 +34,7 @@ export function ConstellationView({
   selectable = false,
   selectedIds = [],
   heartBadge = false,
+  avatarSize = "md",
   onToggleSelect,
   className,
 }: ConstellationViewProps) {
@@ -70,7 +72,7 @@ export function ConstellationView({
                 <MiniAvatar
                   name={face.name}
                   avatarColor={face.avatarColor}
-                  size="md"
+                  size={avatarSize}
                   className={cn(
                     "ring-2 ring-transparent",
                     selected && selectable && "ring-terracotta"

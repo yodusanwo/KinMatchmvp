@@ -2,6 +2,20 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseAnonKey, getSupabaseUrl } from "@/lib/env";
 
+/** Pilot invite: /onboarding?token=xxx → verify session before layout runs. */
+export function redirectPilotInviteToken(
+  request: NextRequest
+): NextResponse | null {
+  const { pathname, searchParams } = request.nextUrl;
+  if (pathname !== "/onboarding") return null;
+  if (!searchParams.get("token") && !searchParams.get("token_hash")) {
+    return null;
+  }
+  const url = request.nextUrl.clone();
+  url.pathname = "/api/auth/pilot-invite";
+  return NextResponse.redirect(url);
+}
+
 /** Supabase sometimes lands on Site URL root with ?code= instead of /auth/callback. */
 export function redirectAuthCodeToCallback(
   request: NextRequest

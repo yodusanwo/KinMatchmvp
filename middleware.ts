@@ -1,10 +1,13 @@
 import { type NextRequest } from "next/server";
 import {
   redirectAuthCodeToCallback,
+  redirectPilotInviteToken,
   updateSession,
 } from "@/lib/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
+  const pilotRedirect = redirectPilotInviteToken(request);
+  if (pilotRedirect) return pilotRedirect;
   const authRedirect = redirectAuthCodeToCallback(request);
   if (authRedirect) return authRedirect;
   return await updateSession(request);

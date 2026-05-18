@@ -11,7 +11,12 @@ type BottomNavProps = {
 
 const NAV_ITEMS = [
   { href: "/today", label: "Home", icon: Home, match: /^\/today/ },
-  { href: "/today", label: "Tribe", icon: Users, match: /^\/friends/ },
+  {
+    href: "/tribe",
+    label: "Tribe",
+    icon: Users,
+    match: /^\/(tribe|friends)/,
+  },
   {
     href: "/voice-notes",
     label: "Voice",

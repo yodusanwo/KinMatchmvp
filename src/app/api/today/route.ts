@@ -2,10 +2,11 @@ import { createClient } from "@/lib/supabase/server";
 import type { TodayResponse } from "@/lib/api/types";
 import {
   daysQuiet,
-  defaultSpotlightPrompt,
   isDrifting,
   type FriendRow,
 } from "@/lib/friends/utils";
+import { formatPersonalizedSpotlightPrompt, isBarrierKey } from "@/lib/personalization";
+import type { BarrierKey } from "@/lib/personalization";
 import { todayDateString } from "@/lib/today/format";
 import { NextResponse } from "next/server";
 
@@ -32,6 +33,16 @@ export async function GET() {
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const { data: profile } = await supabase
+    .from("users")
+    .select("barriers")
+    .eq("id", user.id)
+    .single();
+
+  const rawBarriers = (profile?.barriers ?? []) as string[];
+  const barriers = rawBarriers.filter((b): b is BarrierKey => isBarrierKey(b));
+  const personalizableUser = { barriers };
 
   const { data: friends, error: friendsError } = await supabase
     .from("friends")
@@ -80,7 +91,11 @@ export async function GET() {
       name: top.name,
       avatar_color: top.avatar_color,
       days_quiet: top.days_quiet,
-      prompt_text: defaultSpotlightPrompt(top.name, top.days_quiet),
+      prompt_text: formatPersonalizedSpotlightPrompt(
+        personalizableUser,
+        top.name,
+        top.days_quiet
+      ),
       suggested_action: "voice_note",
     };
   }

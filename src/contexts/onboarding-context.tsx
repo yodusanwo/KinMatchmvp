@@ -123,11 +123,16 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     if (trimmed.length < 3) return false;
     let added = false;
     setState((s) => {
-      if (s.q2People.some((p) => p.name.toLowerCase() === trimmed.toLowerCase())) {
+      const lower = trimmed.toLowerCase();
+      if (s.q2People.some((p) => p.name.toLowerCase() === lower)) {
         return s;
       }
+      const fromQ1 = s.q1People.find((p) => p.name.toLowerCase() === lower);
       added = true;
-      return { ...s, q2People: [...s.q2People, createPerson(trimmed)] };
+      return {
+        ...s,
+        q2People: [...s.q2People, fromQ1 ?? createPerson(trimmed)],
+      };
     });
     return added;
   }, []);
