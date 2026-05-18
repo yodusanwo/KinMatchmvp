@@ -29,12 +29,13 @@ export function getAppOrigin(fallback = "http://localhost:3000") {
   return fallback;
 }
 
-/** Local testing only: skip Supabase email OTP rate limits via admin generateLink. */
+/**
+ * Pilot/testing only: skip Supabase email OTP rate limits via admin generateLink.
+ * Set NEXT_PUBLIC_DEV_AUTH_BYPASS=true in .env.local or Vercel, then redeploy.
+ * Remove before a public launch.
+ */
 export function isDevAuthBypassEnabled() {
-  return (
-    process.env.NODE_ENV === "development" &&
-    process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS === "true"
-  );
+  return process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS === "true";
 }
 
 export function hasVercelBlob() {

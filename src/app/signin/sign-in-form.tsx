@@ -73,7 +73,11 @@ export function SignInForm({
       const data = (await res.json()) as { url?: string; error?: string };
       if (!res.ok || !data.url) {
         setStatus("error");
-        setMessage(data.error ?? "Dev sign-in failed");
+        setMessage(
+          data.error === "Not available"
+            ? "Dev bypass is off on the server. Set NEXT_PUBLIC_DEV_AUTH_BYPASS=true in Vercel and redeploy."
+            : (data.error ?? "Dev sign-in failed")
+        );
         return;
       }
       window.location.href = data.url;
