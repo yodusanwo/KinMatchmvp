@@ -17,6 +17,17 @@ type SignInFormProps = {
   initialError?: boolean;
 };
 
+function friendlyAuthError(message: string): string {
+  const lower = message.toLowerCase();
+  if (lower.includes("rate limit") || lower.includes("too many")) {
+    return "Too many sign-in emails sent recently. Wait about an hour, or set up custom SMTP in Supabase for higher limits.";
+  }
+  if (lower.includes("redirect") || lower.includes("url")) {
+    return "Sign-in link misconfigured. Check Supabase redirect URLs match your Vercel site.";
+  }
+  return message;
+}
+
 export function SignInForm({
   authOrigin,
   nextPath = "/today",
@@ -46,7 +57,7 @@ export function SignInForm({
 
     if (error) {
       setStatus("error");
-      setMessage(error.message);
+      setMessage(friendlyAuthError(error.message));
       return;
     }
 
@@ -82,14 +93,14 @@ export function SignInForm({
         <Headline>Welcome back</Headline>
         <Subhead>
           {finishingOnboarding
-            ? "One last step: we&apos;ll email you a magic link to save your tribe and open Today."
+            ? "One last step: we'll email you a magic link to save your tribe and open Today."
             : "We'll email you a magic link. Calm, no password required."}
         </Subhead>
       </div>
 
       {authError && (
         <p className="font-inter text-sm italic text-terracotta-deep" role="alert">
-          That link didn&apos;t work. Try again.
+          That link didn't work. Try again.
         </p>
       )}
 

@@ -30,6 +30,19 @@ Items intentionally skipped during the pilot build. Check these off when done.
 - [ ] **Authentication → Email templates** — customize magic link email copy to match KinMatch voice (optional)
 - [ ] Confirm **Email** provider enabled (magic link / OTP)
 
+### “Email rate limit exceeded” (Supabase built-in mail)
+
+Supabase’s default auth email is capped (often **~4 emails/hour per address** on free tier). Hitting it during testing is normal.
+
+**Right now:**
+- Wait **30–60 minutes**, then request **one** new link from production `/signin`
+- Avoid clicking “send” repeatedly while testing
+
+**For pilot / production (recommended):**
+- [ ] Supabase → **Project Settings → Authentication → SMTP Settings** → enable **custom SMTP**
+- [ ] Use [Resend](https://resend.com), SendGrid, or Postmark (free tiers are enough for pilot)
+- [ ] Optional: **Authentication → Rate limits** — review OTP/email limits after SMTP is connected
+
 ---
 
 ## Vercel / production
