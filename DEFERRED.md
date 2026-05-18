@@ -1,0 +1,97 @@
+# KinMatch — Come back to later
+
+Items intentionally skipped during the pilot build. Check these off when done.
+
+---
+
+## Authentication
+
+### Google sign-in
+- [ ] Create OAuth client in [Google Cloud Console](https://console.cloud.google.com/) (Web application)
+- [ ] **Authorized redirect URI:** `https://zlhbfhmwawqdewaotxkq.supabase.co/auth/v1/callback`
+- [ ] **Authorized JavaScript origins:** `http://localhost:3000`, your production URL
+- [ ] Paste **Client ID** + **Client secret** in Supabase → **Authentication → Providers → Google**
+- [ ] Add `signInWithOAuth({ provider: 'google' })` button on `/signin` (below email form or divider)
+- [ ] Add production callback URL to Supabase **Redirect URLs** when deployed
+
+**Why deferred:** Email magic link is enough for the pilot; Google requires Cloud Console setup.
+
+---
+
+## Supabase dashboard
+
+- [ ] **Authentication → URL configuration**
+  - Site URL: `http://localhost:3000` (dev)
+  - Redirect URLs: `http://localhost:3000/auth/callback`, plus Vercel URL when live
+- [ ] **Authentication → Email templates** — customize magic link email copy to match KinMatch voice (optional)
+- [ ] Confirm **Email** provider enabled (magic link / OTP)
+
+---
+
+## Vercel / production
+
+- [ ] Add env vars on Vercel: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- [ ] Add production redirect URL in Supabase after first deploy
+- [ ] Custom domain (`kinmatch.app` / `kinmatch.co`) when ready
+
+### Voice notes & email (when you deploy to Vercel)
+
+Locally, voice note audio uploads to **Supabase Storage** using `SUPABASE_SECRET_KEY` (no Vercel deploy required).
+
+When you deploy to Vercel later, set `BLOB_READ_WRITE_TOKEN` and uploads will use **Vercel Blob** instead of Supabase Storage.
+
+Add these env vars in the Vercel dashboard:
+
+| Variable | Purpose |
+|----------|---------|
+| `BLOB_READ_WRITE_TOKEN` | Vercel Blob (optional; Supabase Storage works without it) |
+| `KLAVIYO_PRIVATE_API_KEY` | Voice-note-received emails |
+| `NEXT_PUBLIC_APP_URL` | e.g. `https://your-app.vercel.app` for listen links |
+
+### Klaviyo — Voice note received email (Day 10)
+
+Dashboard setup (not in code):
+
+- [ ] Create Klaviyo account / use existing
+- [ ] Create flow triggered by metric `kinmatch_voice_note_received`
+- [ ] Email template: subject `[Sender] sent you a voice note`, body with play link to `{{ event.voice_note_url }}` (or equivalent property from the API event)
+- [ ] Test: record → send with recipient email → open link → lands on `/v/[share_token]`
+
+---
+
+## Repo / tooling
+
+- [ ] Commit `supabase/config.toml` + link state (if not already pushed)
+- [ ] Homebrew Supabase CLI install failed (macOS CLT issue) — using `npx supabase` works; optional: fix CLT and `brew install supabase/tap/supabase`
+
+### Dev server "Internal Server Error" on `/signin`
+
+Usually a **stale Turbopack cache** or **two `npm run dev` processes** (one on 3000, one on 3002).
+
+```bash
+# Stop dev server (Ctrl+C), then:
+lsof -ti:3000 | xargs kill -9   # free port 3000
+rm -rf .next
+npm run dev
+```
+
+If it persists, try without Turbopack: `npx next dev` (no `--turbopack`).
+
+---
+
+## Build plan — next days (not deferred, just queued)
+
+| Day | Focus |
+|-----|--------|
+| ~~Day 4~~ | ~~Reflection Q1, Q2, Q3~~ — done |
+| ~~Day 5~~ | ~~Tribe reveal, Held, email prefs, complete API~~ — done |
+| ~~Day 6~~ | ~~Today screen + Person Profile (begin)~~ — done |
+| **Day 7** | Finish profile + memory capture modal |
+| **Day 5** | Tribe reveal, Held setup, email prefs, account creation |
+| **Day 6+** | Today screen, profiles, voice notes |
+
+---
+
+## Security note
+
+Never commit `.env.local`. `SUPABASE_SECRET_KEY` is server-only — do not expose as `NEXT_PUBLIC_*`.

@@ -1,0 +1,21 @@
+-- Optional pilot seed: run in Supabase SQL Editor after onboarding.
+-- Replace USER_ID and FRIEND_ID with your values from the users and friends tables.
+
+-- Example:
+-- INSERT INTO public.today_spotlights (
+--   user_id,
+--   friend_id,
+--   trigger_type,
+--   priority_score,
+--   prompt_text,
+--   suggested_action,
+--   generated_for_date
+-- ) VALUES (
+--   'YOUR_USER_UUID',
+--   'FRIEND_UUID',
+--   'drift',
+--   90,
+--   'Her chemo session was Thursday. A voice note might mean more than you think.',
+--   'voice_note',
+--   CURRENT_DATE
+-- );

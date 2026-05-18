@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Instrument_Sans } from "next/font/google";
+import { OnboardingProvider } from "@/contexts/onboarding-context";
 import "./globals.css";
 
 const inter = Inter({
@@ -28,7 +29,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${instrumentSans.variable} font-sans antialiased`}
       >
-        {children}
+        <OnboardingProvider>{children}</OnboardingProvider>
       </body>
     </html>
   );

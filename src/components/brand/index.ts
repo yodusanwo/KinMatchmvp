@@ -4,5 +4,6 @@ export { Eyebrow } from "./Eyebrow";
 export { Headline } from "./Headline";
 export { Subhead } from "./Subhead";
 export { PrimaryButton } from "./PrimaryButton";
+export { PrimaryLink } from "./PrimaryLink";
 export { SecondaryButton } from "./SecondaryButton";
 export { TextLink } from "./TextLink";
