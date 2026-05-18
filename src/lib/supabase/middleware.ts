@@ -2,6 +2,19 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseAnonKey, getSupabaseUrl } from "@/lib/env";
 
+/** Supabase sometimes lands on Site URL root with ?code= instead of /auth/callback. */
+export function redirectAuthCodeToCallback(
+  request: NextRequest
+): NextResponse | null {
+  const { pathname, searchParams } = request.nextUrl;
+  if (!searchParams.get("code") || pathname.startsWith("/auth/callback")) {
+    return null;
+  }
+  const url = request.nextUrl.clone();
+  url.pathname = "/auth/callback";
+  return NextResponse.redirect(url);
+}
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 

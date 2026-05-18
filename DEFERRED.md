@@ -20,9 +20,13 @@ Items intentionally skipped during the pilot build. Check these off when done.
 
 ## Supabase dashboard
 
-- [ ] **Authentication → URL configuration**
-  - Site URL: `http://localhost:3000` (dev)
-  - Redirect URLs: `http://localhost:3000/auth/callback`, plus Vercel URL when live
+- [ ] **Authentication → URL configuration** (fixes magic links going to `localhost`)
+  - **Site URL:** your production URL, e.g. `https://kin-matchmvp.vercel.app` (not localhost — that is why email links open `localhost:3000/?code=...`)
+  - **Redirect URLs** (add all of these):
+    - `https://YOUR-VERCEL-URL/auth/callback`
+    - `http://localhost:3000/auth/callback` (local dev only)
+  - In **Vercel → Environment Variables**, set `NEXT_PUBLIC_APP_URL` to the same production URL, then redeploy
+  - Request a **new** magic link from the live site after saving (old emails still point at localhost)
 - [ ] **Authentication → Email templates** — customize magic link email copy to match KinMatch voice (optional)
 - [ ] Confirm **Email** provider enabled (magic link / OTP)
 

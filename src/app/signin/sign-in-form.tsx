@@ -12,11 +12,13 @@ import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/cn";
 
 type SignInFormProps = {
+  authOrigin: string;
   nextPath?: string;
   initialError?: boolean;
 };
 
 export function SignInForm({
+  authOrigin,
   nextPath = "/today",
   initialError = false,
 }: SignInFormProps) {
@@ -35,7 +37,7 @@ export function SignInForm({
     setMessage(null);
 
     const supabase = createClient();
-    const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
+    const redirectTo = `${authOrigin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
 
     const { error } = await supabase.auth.signInWithOtp({
       email: email.trim(),
