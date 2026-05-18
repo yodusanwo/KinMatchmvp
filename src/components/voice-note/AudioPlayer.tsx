@@ -74,7 +74,13 @@ export function AudioPlayer({
 
   return (
     <div className={cn("w-full", className)}>
-      <audio ref={audioRef} src={audioUrl} preload="metadata" className="sr-only" />
+      <audio
+        ref={audioRef}
+        src={audioUrl}
+        preload="metadata"
+        playsInline
+        className="sr-only"
+      />
 
       <div className="flex items-center gap-4">
         <button

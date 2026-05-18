@@ -7,6 +7,8 @@ import { AppShell } from "@/components/layout/AppShell";
 import { BottomNav } from "@/components/nav/BottomNav";
 import { SpotlightCard } from "@/components/today/SpotlightCard";
 import { TribeList } from "@/components/today/TribeList";
+import { TodayPageSkeleton } from "@/components/ui/Skeleton";
+import { fetchJson } from "@/lib/api/fetch-client";
 import type { TodayResponse } from "@/lib/api/types";
 import { dayEyebrow } from "@/lib/today/format";
 
@@ -18,21 +20,20 @@ export function TodayScreen() {
 
   useEffect(() => {
     async function load() {
-      const res = await fetch("/api/today");
-      if (res.status === 401) {
+      const result = await fetchJson<TodayResponse>("/api/today");
+      if (result.status === 401) {
         router.replace("/signin?next=/today");
         return;
       }
-      if (!res.ok) {
-        setError("Couldn't load your tribe. Try again in a moment.");
+      if (!result.ok) {
+        setError(result.error);
         setLoading(false);
         return;
       }
-      const json = (await res.json()) as TodayResponse;
-      setData(json);
+      setData(result.data);
       setLoading(false);
     }
-    load();
+    void load();
   }, [router]);
 
   const tribeCount = data?.tribe.length ?? 0;
@@ -44,14 +45,10 @@ export function TodayScreen() {
         <Eyebrow>{dayEyebrow()}</Eyebrow>
         <Headline className="mt-2">Who needs you today?</Headline>
 
-        {loading && (
-          <p className="mt-8 font-inter text-sm italic text-ink-soft">
-            Loading your tribe…
-          </p>
-        )}
+        {loading && <TodayPageSkeleton />}
 
         {error && (
-          <p className="mt-8 font-inter text-sm italic text-terracotta-deep">
+          <p className="mt-8 font-inter text-sm italic text-terracotta-deep" role="alert">
             {error}
           </p>
         )}

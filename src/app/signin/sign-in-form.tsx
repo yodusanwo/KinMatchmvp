@@ -17,6 +17,13 @@ type SignInFormProps = {
   initialError?: boolean;
 };
 
+function isNewUserFlow(nextPath: string): boolean {
+  return (
+    nextPath === "/onboarding" ||
+    (nextPath.startsWith("/onboarding/") && nextPath !== "/onboarding/finish")
+  );
+}
+
 function friendlyAuthError(message: string): string {
   const lower = message.toLowerCase();
   if (lower.includes("rate limit") || lower.includes("too many")) {
@@ -35,12 +42,46 @@ export function SignInForm({
 }: SignInFormProps) {
   const authError = initialError;
   const finishingOnboarding = nextPath === "/onboarding/finish";
+  const gettingStarted = isNewUserFlow(nextPath);
 
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "sent" | "error">(
     "idle"
   );
   const [message, setMessage] = useState<string | null>(null);
+
+  const devBypassEnabled =
+    process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS === "true";
+
+  async function handleDevBypass() {
+    const trimmed = email.trim();
+    if (!trimmed) {
+      setMessage("Enter your email above first.");
+      setStatus("error");
+      return;
+    }
+
+    setStatus("loading");
+    setMessage(null);
+
+    try {
+      const res = await fetch("/api/dev/sign-in", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: trimmed, next: nextPath }),
+      });
+      const data = (await res.json()) as { url?: string; error?: string };
+      if (!res.ok || !data.url) {
+        setStatus("error");
+        setMessage(data.error ?? "Dev sign-in failed");
+        return;
+      }
+      window.location.href = data.url;
+    } catch {
+      setStatus("error");
+      setMessage("Dev sign-in failed");
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -73,7 +114,9 @@ export function SignInForm({
           We emailed a sign-in link to <span className="text-ink">{email}</span>.
           {finishingOnboarding
             ? " Click it to finish setup and open your Today view — no password needed."
-            : " Click it to continue — no password needed."}
+            : gettingStarted
+              ? " Click it to begin your reflection — no password needed."
+              : " Click it to continue — no password needed."}
         </Subhead>
         <button
           type="button"
@@ -89,18 +132,20 @@ export function SignInForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-6 px-5 py-10">
       <div className="space-y-2">
-        <Eyebrow>Sign in</Eyebrow>
-        <Headline>Welcome back</Headline>
+        <Eyebrow>{gettingStarted ? "Get started" : "Sign in"}</Eyebrow>
+        <Headline>{gettingStarted ? "Create your account" : "Welcome back"}</Headline>
         <Subhead>
           {finishingOnboarding
             ? "One last step: we'll email you a magic link to save your tribe and open Today."
-            : "We'll email you a magic link. Calm, no password required."}
+            : gettingStarted
+              ? "We'll email you a magic link to get you started."
+              : "We'll email you a magic link, no password required."}
         </Subhead>
       </div>
 
       {authError && (
         <p className="font-inter text-sm italic text-terracotta-deep" role="alert">
-          That link didn't work. Try again.
+          That link didn&apos;t work. Try again.
         </p>
       )}
 
@@ -133,6 +178,17 @@ export function SignInForm({
       <PrimaryButton type="submit" disabled={status === "loading"}>
         {status === "loading" ? "Sending link…" : "Email me a sign-in link"}
       </PrimaryButton>
+
+      {devBypassEnabled && (
+        <button
+          type="button"
+          onClick={() => void handleDevBypass()}
+          disabled={status === "loading"}
+          className="w-full rounded-xl border border-dashed border-ink/25 py-3 font-inter text-sm text-ink-soft hover:border-terracotta/40 hover:text-ink"
+        >
+          Continue without email (dev only)
+        </button>
+      )}
 
       <p className="text-center">
         <TextLink href="/">← Back to welcome</TextLink>

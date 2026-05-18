@@ -29,10 +29,22 @@ export function getAppOrigin(fallback = "http://localhost:3000") {
   return fallback;
 }
 
+/** Local testing only: skip Supabase email OTP rate limits via admin generateLink. */
+export function isDevAuthBypassEnabled() {
+  return (
+    process.env.NODE_ENV === "development" &&
+    process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS === "true"
+  );
+}
+
 export function hasVercelBlob() {
   return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
 }
 
 export function hasKlaviyo() {
   return Boolean(process.env.KLAVIYO_PRIVATE_API_KEY);
+}
+
+export function hasAnthropic() {
+  return Boolean(process.env.ANTHROPIC_API_KEY);
 }

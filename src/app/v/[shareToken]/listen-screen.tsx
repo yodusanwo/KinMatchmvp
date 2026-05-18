@@ -5,7 +5,9 @@ import { useEffect, useState } from "react";
 import { BrandBar, Headline, PrimaryLink, Subhead } from "@/components/brand";
 import { AppShell } from "@/components/layout/AppShell";
 import { MiniAvatar } from "@/components/onboarding/MiniAvatar";
+import { ListenPageSkeleton } from "@/components/ui/Skeleton";
 import { AudioPlayer } from "@/components/voice-note/AudioPlayer";
+import { fetchJson } from "@/lib/api/fetch-client";
 import type { PublicVoiceNote } from "@/lib/api/public-voice-note";
 
 type ListenScreenProps = {
@@ -27,13 +29,17 @@ export function ListenScreen({ shareToken }: ListenScreenProps) {
 
   useEffect(() => {
     async function load() {
-      const res = await fetch(`/api/v/${shareToken}`);
-      if (!res.ok) {
-        setError("This voice note is unavailable or has expired.");
+      const result = await fetchJson<PublicVoiceNote>(`/api/v/${shareToken}`);
+      if (!result.ok) {
+        setError(
+          result.status === 404
+            ? "This voice note is unavailable or has expired."
+            : result.error
+        );
         setLoading(false);
         return;
       }
-      setNote((await res.json()) as PublicVoiceNote);
+      setNote(result.data);
       setLoading(false);
     }
     void load();
@@ -43,9 +49,9 @@ export function ListenScreen({ shareToken }: ListenScreenProps) {
     return (
       <AppShell>
         <BrandBar className="py-3" />
-        <p className="px-5 py-16 text-center font-inter text-sm italic text-ink-soft">
-          Loading voice note…
-        </p>
+        <div className="px-5">
+          <ListenPageSkeleton />
+        </div>
       </AppShell>
     );
   }

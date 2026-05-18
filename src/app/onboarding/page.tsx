@@ -7,31 +7,33 @@ import {
 } from "@/components/brand";
 import { AppShell } from "@/components/layout/AppShell";
 import { NumberedSteps } from "@/components/onboarding/NumberedSteps";
+import { OnboardingStartedTracker } from "@/components/onboarding/OnboardingStartedTracker";
 
 const REFLECTION_STEPS = [
   {
     number: 1,
     title: "Who you spend time with",
     description:
-      "Name the people in your life right now — the ones who show up, even quietly.",
+      "Name the people in your life right now — the ones who show up.",
   },
   {
     number: 2,
     title: "Who you wish were closer",
     description:
-      "Mark the connections you want to deepen. No judgment, just honesty.",
+      "Mark the connections you want to deepen.",
   },
   {
     number: 3,
     title: "What gets in the way",
     description:
-      "Tell us what makes staying in touch hard. KinMatch works around it, not against you.",
+      "Tell us what makes staying in touch hard for you. Based on what you share, KinMatch helps make keeping in touch easier.",
   },
 ];
 
 export default function OnboardingIntroPage() {
   return (
     <AppShell>
+      <OnboardingStartedTracker />
       <BrandBar />
       <div className="space-y-8 px-5 py-8">
         <div className="space-y-2">
@@ -40,8 +42,8 @@ export default function OnboardingIntroPage() {
         </div>
 
         <Subhead className="text-center">
-          Three short questions — about two minutes. The list below is a preview;
-          you&apos;ll answer each one on the next screens.
+          Next, we need you to answer three short questions. It&apos;ll take about
+          two minutes.
         </Subhead>
 
         <NumberedSteps steps={REFLECTION_STEPS} />

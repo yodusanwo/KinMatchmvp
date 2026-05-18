@@ -63,7 +63,18 @@ Add these env vars in the Vercel dashboard:
 |----------|---------|
 | `BLOB_READ_WRITE_TOKEN` | Vercel Blob private store (optional; Supabase Storage works without it) |
 | `KLAVIYO_PRIVATE_API_KEY` | Voice-note-received emails |
+| `ANTHROPIC_API_KEY` | Paste-to-memory extraction (Day 11) |
+| `ANTHROPIC_MODEL` | Optional; defaults to `claude-sonnet-4-5-20250929` |
 | `NEXT_PUBLIC_APP_URL` | e.g. `https://your-app.vercel.app` for listen links |
+| `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` | Optional; e.g. `kin-matchmvp.vercel.app` for Day 13 analytics |
+
+### Plausible analytics (Day 13)
+
+Optional. Without `NEXT_PUBLIC_PLAUSIBLE_DOMAIN`, the app works normally — events are no-ops.
+
+- [ ] Create a site in [Plausible](https://plausible.io/) (or self-hosted)
+- [ ] Set **Vercel env:** `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` to your domain (no `https://`)
+- [ ] Redeploy; confirm custom events in Plausible: `onboarding_started`, `onboarding_completed`, `voice_note_sent`, `memory_added`, `capture_from_paste_used`
 
 ### Klaviyo — Voice note received email (Day 10)
 

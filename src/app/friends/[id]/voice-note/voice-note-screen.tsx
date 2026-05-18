@@ -15,7 +15,10 @@ import { MiniAvatar } from "@/components/onboarding/MiniAvatar";
 import { LiveWaveform } from "@/components/voice-note/LiveWaveform";
 import { RecordButton } from "@/components/voice-note/RecordButton";
 import { formatDuration } from "@/components/voice-note/format-duration";
+import { VoiceNotePageSkeleton } from "@/components/ui/Skeleton";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
+import { REACHABILITY_ERROR, fetchJson } from "@/lib/api/fetch-client";
+import { trackEvent } from "@/lib/analytics/events";
 import type { FriendProfile } from "@/lib/api/types";
 import type {
   CreateVoiceNoteResponse,
@@ -42,16 +45,16 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
   const recorder = useVoiceRecorder();
 
   const loadFriend = useCallback(async () => {
-    const res = await fetch(`/api/friends/${friendId}`);
-    if (res.status === 401) {
+    const result = await fetchJson<FriendProfile>(`/api/friends/${friendId}`);
+    if (result.status === 401) {
       router.replace(`/signin?next=/friends/${friendId}/voice-note`);
       return;
     }
-    if (!res.ok) {
+    if (!result.ok) {
       router.replace("/today");
       return;
     }
-    const data = (await res.json()) as FriendProfile;
+    const data = result.data;
     setFriend({
       id: data.id,
       name: data.name,
@@ -70,22 +73,22 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
     setSendStatus("uploading");
     setSendError(null);
 
-    const createRes = await fetch("/api/voice-notes", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ friend_id: friend.id }),
-    });
+    const createResult = await fetchJson<CreateVoiceNoteResponse>(
+      "/api/voice-notes",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ friend_id: friend.id }),
+      }
+    );
 
-    if (!createRes.ok) {
-      const data = await createRes.json().catch(() => ({}));
+    if (!createResult.ok) {
       setSendStatus("error");
-      setSendError(
-        (data as { error?: string }).error ?? "Could not start the upload."
-      );
+      setSendError(createResult.error);
       return;
     }
 
-    const { id } = (await createRes.json()) as CreateVoiceNoteResponse;
+    const { id } = createResult.data;
 
     const formData = new FormData();
     formData.append("audio", recorder.audioBlob, "voice-note.webm");
@@ -95,38 +98,47 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
     );
     formData.append("peaks", JSON.stringify(recorder.peaks));
 
-    const finalizeRes = await fetch(`/api/voice-notes/${id}/finalize`, {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!finalizeRes.ok) {
-      const data = await finalizeRes.json().catch(() => ({}));
+    try {
+      const finalizeRes = await fetch(`/api/voice-notes/${id}/finalize`, {
+        method: "POST",
+        body: formData,
+      });
+      if (!finalizeRes.ok) {
+        const data = await finalizeRes.json().catch(() => ({}));
+        setSendStatus("error");
+        setSendError(
+          (data as { error?: string }).error ?? REACHABILITY_ERROR
+        );
+        return;
+      }
+    } catch {
       setSendStatus("error");
-      setSendError(
-        (data as { error?: string }).error ?? "Could not save your recording."
-      );
+      setSendError(REACHABILITY_ERROR);
       return;
     }
 
-    const sendRes = await fetch(`/api/voice-notes/${id}/send`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        recipient_email: recipientEmail.trim() || undefined,
-      }),
-    });
+    const sendResult = await fetchJson<SendVoiceNoteResponse>(
+      `/api/voice-notes/${id}/send`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          recipient_email: recipientEmail.trim() || undefined,
+        }),
+      }
+    );
 
-    if (!sendRes.ok) {
-      const data = await sendRes.json().catch(() => ({}));
+    if (!sendResult.ok) {
       setSendStatus("error");
-      setSendError(
-        (data as { error?: string }).error ?? "Recording saved but send failed."
-      );
+      setSendError(sendResult.error);
       return;
     }
 
-    const sendData = (await sendRes.json()) as SendVoiceNoteResponse;
+    const sendData = sendResult.data;
+
+    trackEvent("voice_note_sent", {
+      has_email: recipientEmail.trim() ? "1" : "0",
+    });
 
     if (recipientEmail.trim() && sendData.error) {
       router.push(
@@ -142,9 +154,9 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
     return (
       <AppShell>
         <BrandBar />
-        <p className="px-5 py-10 font-inter text-sm italic text-ink-soft">
-          Loading…
-        </p>
+        <div className="px-5">
+          <VoiceNotePageSkeleton />
+        </div>
       </AppShell>
     );
   }

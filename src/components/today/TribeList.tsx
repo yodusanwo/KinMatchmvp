@@ -14,8 +14,7 @@ export function TribeList({ tribe, className }: TribeListProps) {
   if (tribe.length === 0) {
     return (
       <p className="font-inter text-sm italic text-ink-soft">
-        Your tribe will show up here once you finish onboarding and save your
-        connections. If you already signed in, try{" "}
+        Add your first connection to begin. If you already signed in, try{" "}
         <Link href="/onboarding/finish" className="text-terracotta underline">
           completing setup
         </Link>

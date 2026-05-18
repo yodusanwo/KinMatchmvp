@@ -18,9 +18,9 @@ export type VoiceRecorderState = {
 
 function pickMimeType(): string | undefined {
   const types = [
+    "audio/mp4",
     "audio/webm;codecs=opus",
     "audio/webm",
-    "audio/mp4",
     "audio/ogg;codecs=opus",
   ];
   return types.find((type) => MediaRecorder.isTypeSupported(type));
@@ -96,10 +96,16 @@ export function useVoiceRecorder() {
     }));
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+        },
+      });
       streamRef.current = stream;
 
       const audioContext = new AudioContext();
+      await audioContext.resume();
       audioContextRef.current = audioContext;
       const source = audioContext.createMediaStreamSource(stream);
       const analyser = audioContext.createAnalyser();

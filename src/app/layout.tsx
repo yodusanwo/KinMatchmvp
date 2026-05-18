@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Instrument_Sans } from "next/font/google";
+import { PlausibleScript } from "@/components/analytics/PlausibleScript";
 import { OnboardingProvider } from "@/contexts/onboarding-context";
 import "./globals.css";
 
@@ -29,6 +30,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${instrumentSans.variable} font-sans antialiased`}
       >
+        <PlausibleScript />
         <OnboardingProvider>{children}</OnboardingProvider>
       </body>
     </html>

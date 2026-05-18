@@ -17,7 +17,10 @@ import {
   SuggestedNextStepCard,
 } from "@/components/profile";
 import { VoiceNoteSentToast } from "@/components/profile/VoiceNoteSentToast";
+import { ProfilePageSkeleton } from "@/components/ui/Skeleton";
+import { fetchJson } from "@/lib/api/fetch-client";
 import type { FriendProfile, MemoryNote } from "@/lib/api/types";
+import { trackEvent } from "@/lib/analytics/events";
 import { defaultSpotlightPrompt } from "@/lib/friends/utils";
 
 type ProfileScreenProps = {
@@ -34,34 +37,35 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
   );
 
   const loadProfile = useCallback(async () => {
-    const res = await fetch(`/api/friends/${friendId}`);
-    if (res.status === 401) {
+    const result = await fetchJson<FriendProfile>(`/api/friends/${friendId}`);
+    if (result.status === 401) {
       router.replace(`/signin?next=/friends/${friendId}`);
       return null;
     }
-    if (!res.ok) {
+    if (!result.ok) {
       router.replace("/today");
       return null;
     }
-    const data = (await res.json()) as FriendProfile;
-    setFriend(data);
+    setFriend(result.data);
     setLoading(false);
-    return data;
+    return result.data;
   }, [friendId, router]);
 
   useEffect(() => {
     loadProfile();
   }, [loadProfile]);
 
-  function handleMemorySaved(note: MemoryNote) {
+  function handleMemoriesSaved(notes: MemoryNote[]) {
+    if (notes.length === 0) return;
+    trackEvent("memory_added", { count: String(notes.length) });
     setFriend((current) => {
       if (!current) return current;
       return {
         ...current,
-        memories: [note, ...current.memories],
+        memories: [...notes, ...current.memories],
       };
     });
-    setHighlightMemoryId(note.id);
+    setHighlightMemoryId(notes[0].id);
     window.setTimeout(() => setHighlightMemoryId(null), 2000);
   }
 
@@ -69,9 +73,9 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
     return (
       <AppShell>
         <ProfileTopBar friendName="…" />
-        <p className="px-5 py-10 font-inter text-sm italic text-ink-soft">
-          Loading…
-        </p>
+        <div className="px-5">
+          <ProfilePageSkeleton />
+        </div>
       </AppShell>
     );
   }
@@ -124,7 +128,7 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
         friendName={friend.name}
         avatarColor={friend.avatar_color}
         onClose={() => setMemoryModalOpen(false)}
-        onSaved={handleMemorySaved}
+        onSaved={handleMemoriesSaved}
       />
     </AppShell>
   );

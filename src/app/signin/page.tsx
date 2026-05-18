@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
+import { BrandBar } from "@/components/brand";
 import { AppShell } from "@/components/layout/AppShell";
 import { SignInForm } from "./sign-in-form";
 import { createClient } from "@/lib/supabase/server";
@@ -22,6 +23,7 @@ export default async function SignInPage({ searchParams }: PageProps) {
 
   return (
     <AppShell>
+      <BrandBar />
       <Suspense fallback={<div className="px-5 py-10 text-ink-soft">Loading…</div>}>
         <SignInForm
           authOrigin={getAppOrigin()}
