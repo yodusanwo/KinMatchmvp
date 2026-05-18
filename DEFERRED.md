@@ -38,13 +38,13 @@ Items intentionally skipped during the pilot build. Check these off when done.
 
 Locally, voice note audio uploads to **Supabase Storage** using `SUPABASE_SECRET_KEY` (no Vercel deploy required).
 
-When you deploy to Vercel later, set `BLOB_READ_WRITE_TOKEN` and uploads will use **Vercel Blob** instead of Supabase Storage.
+When you deploy to Vercel later, set `BLOB_READ_WRITE_TOKEN` and uploads will use **Vercel Blob** (private store) instead of Supabase Storage. Audio is served via `/api/v/[shareToken]/audio` — not a direct blob URL.
 
 Add these env vars in the Vercel dashboard:
 
 | Variable | Purpose |
 |----------|---------|
-| `BLOB_READ_WRITE_TOKEN` | Vercel Blob (optional; Supabase Storage works without it) |
+| `BLOB_READ_WRITE_TOKEN` | Vercel Blob private store (optional; Supabase Storage works without it) |
 | `KLAVIYO_PRIVATE_API_KEY` | Voice-note-received emails |
 | `NEXT_PUBLIC_APP_URL` | e.g. `https://your-app.vercel.app` for listen links |
 

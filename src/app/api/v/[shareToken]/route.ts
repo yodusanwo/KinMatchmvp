@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { PublicVoiceNote } from "@/lib/api/public-voice-note";
 import { avatarColorFromUserId } from "@/lib/voice-notes/avatar-from-user";
+import { listenPageAudioUrl } from "@/lib/voice-notes/blob-url";
 import type { AvatarColor } from "@/lib/onboarding/types";
 import { NextResponse } from "next/server";
 
@@ -64,7 +65,7 @@ export async function GET(_request: Request, context: RouteContext) {
     sender_avatar_color: avatarColorFromUserId(
       voiceNote.sender_user_id
     ) as AvatarColor,
-    audio_url: voiceNote.audio_url,
+    audio_url: listenPageAudioUrl(shareToken, voiceNote.audio_url),
     duration_seconds: voiceNote.duration_seconds,
     peaks: normalizePeaks(voiceNote.waveform_peaks),
     transcript: voiceNote.transcript,
