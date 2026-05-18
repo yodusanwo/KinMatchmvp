@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
   Eyebrow,
@@ -40,6 +41,7 @@ export function SignInForm({
   nextPath = "/today",
   initialError = false,
 }: SignInFormProps) {
+  const router = useRouter();
   const authError = initialError;
   const finishingOnboarding = nextPath === "/onboarding/finish";
   const gettingStarted = isNewUserFlow(nextPath);
@@ -68,10 +70,18 @@ export function SignInForm({
       const res = await fetch("/api/dev/sign-in", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: trimmed, next: nextPath }),
+        body: JSON.stringify({
+          email: trimmed,
+          next: nextPath,
+          origin: window.location.origin,
+        }),
       });
-      const data = (await res.json()) as { url?: string; error?: string };
-      if (!res.ok || !data.url) {
+      const data = (await res.json()) as {
+        ok?: boolean;
+        next?: string;
+        error?: string;
+      };
+      if (!res.ok || !data.ok) {
         setStatus("error");
         setMessage(
           data.error === "Not available"
@@ -80,7 +90,8 @@ export function SignInForm({
         );
         return;
       }
-      window.location.href = data.url;
+      router.push(data.next ?? nextPath);
+      router.refresh();
     } catch {
       setStatus("error");
       setMessage("Dev sign-in failed");

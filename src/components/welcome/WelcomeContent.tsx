@@ -29,8 +29,8 @@ export function WelcomeContent({ auth }: { auth: WelcomeAuthState }) {
                 Stay close to the people who matter most.
               </Headline>
               <Subhead className="mt-4 max-w-xs text-center">
-                A behavioral science based way to tend the friendships you&apos;re
-                building in life.
+                A science-based way to deepen the friendships you&apos;re building
+                in life.
               </Subhead>
             </>
           ) : auth.status === "onboarding" ? (

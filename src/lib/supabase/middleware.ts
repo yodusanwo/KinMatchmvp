@@ -12,6 +12,7 @@ export function redirectAuthCodeToCallback(
   }
   const url = request.nextUrl.clone();
   url.pathname = "/auth/callback";
+  // Keep ?code= and ?next= (Supabase may land on Site URL root without /auth/callback).
   return NextResponse.redirect(url);
 }
 
