@@ -14,12 +14,18 @@ import {
   ProfileTopBar,
   RecentInteractionsList,
   RitualList,
+  SharedInterestModal,
   SuggestedNextStepCard,
 } from "@/components/profile";
 import { VoiceNoteSentToast } from "@/components/profile/VoiceNoteSentToast";
 import { ProfilePageSkeleton } from "@/components/ui/Skeleton";
 import { fetchJson } from "@/lib/api/fetch-client";
-import type { FriendProfile, MemoryCategory, MemoryNote } from "@/lib/api/types";
+import type {
+  FriendProfile,
+  MemoryCategory,
+  MemoryNote,
+  SharedInterest,
+} from "@/lib/api/types";
 import { trackEvent } from "@/lib/analytics/events";
 import { defaultSpotlightPrompt } from "@/lib/friends/utils";
 
@@ -35,6 +41,8 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
   const [memoryModalCategory, setMemoryModalCategory] = useState<
     MemoryCategory | undefined
   >(undefined);
+  const [sharedInterestModalOpen, setSharedInterestModalOpen] =
+    useState(false);
   const [highlightMemoryId, setHighlightMemoryId] = useState<string | null>(
     null
   );
@@ -70,6 +78,22 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
     });
     setHighlightMemoryId(notes[0].id);
     window.setTimeout(() => setHighlightMemoryId(null), 2000);
+  }
+
+  function handleSharedInterestSaved(interest: SharedInterest) {
+    setFriend((current) => {
+      if (!current) return current;
+      const exists = current.shared_interests.some(
+        (existing) => existing.id === interest.id
+      );
+      if (exists) return current;
+      return {
+        ...current,
+        shared_interests: [...current.shared_interests, interest].sort((a, b) =>
+          a.label.localeCompare(b.label)
+        ),
+      };
+    });
   }
 
   if (loading || !friend) {
@@ -112,7 +136,11 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
               setMemoryModalOpen(true);
             }}
           />
-          <InterestPills interests={friend.shared_interests} />
+          <InterestPills
+            friendName={friend.name}
+            interests={friend.shared_interests}
+            onAdd={() => setSharedInterestModalOpen(true)}
+          />
           <RitualList rituals={friend.rituals} />
           <RecentInteractionsList interactions={friend.interactions} />
         </div>
@@ -139,6 +167,15 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
           setMemoryModalCategory(undefined);
         }}
         onSaved={handleMemoriesSaved}
+      />
+
+      <SharedInterestModal
+        open={sharedInterestModalOpen}
+        friendId={friend.id}
+        friendName={friend.name}
+        avatarColor={friend.avatar_color}
+        onClose={() => setSharedInterestModalOpen(false)}
+        onSaved={handleSharedInterestSaved}
       />
     </AppShell>
   );

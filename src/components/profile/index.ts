@@ -6,4 +6,5 @@ export { ProfileHeader } from "./ProfileHeader";
 export { ProfileTopBar } from "./ProfileTopBar";
 export { RecentInteractionsList } from "./RecentInteractionsList";
 export { RitualList } from "./RitualList";
+export { SharedInterestModal } from "./SharedInterestModal";
 export { SuggestedNextStepCard } from "./SuggestedNextStepCard";
