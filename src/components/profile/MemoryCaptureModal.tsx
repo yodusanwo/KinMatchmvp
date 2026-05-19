@@ -93,7 +93,8 @@ export function MemoryCaptureModal({
   const [category, setCategory] = useState<MemoryCategory>("current");
   const [dateEventKind, setDateEventKind] = useState<DateEventKind>("birthday");
   const [dateEventContext, setDateEventContext] = useState("");
-  const [eventDate, setEventDate] = useState("");
+  const [eventMonth, setEventMonth] = useState("");
+  const [eventDay, setEventDay] = useState("");
   const [status, setStatus] = useState<"idle" | "saving" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const saveInFlight = useRef(false);
@@ -104,7 +105,8 @@ export function MemoryCaptureModal({
     setCategory(initialCategory ?? "current");
     setDateEventKind("birthday");
     setDateEventContext("");
-    setEventDate("");
+    setEventMonth("");
+    setEventDay("");
     setStatus("idle");
     setErrorMessage(null);
     saveInFlight.current = false;
@@ -152,8 +154,8 @@ export function MemoryCaptureModal({
       event_date?: string;
     } = { text: trimmed, category };
 
-    if (category === "dates" && eventDate) {
-      body.event_date = eventDate;
+    if (category === "dates" && eventMonth && eventDay) {
+      body.event_date = `2000-${eventMonth}-${eventDay}`;
     }
 
     const result = await fetchJson<MemoryNote>(
@@ -264,11 +266,13 @@ export function MemoryCaptureModal({
           {isDates ? (
             <DatesCaptureFields
               eventKind={dateEventKind}
-              eventDate={eventDate}
+              eventMonth={eventMonth}
+              eventDay={eventDay}
               context={dateEventContext}
               friendFirstName={name}
               onEventKindChange={handleDateEventKindChange}
-              onEventDateChange={setEventDate}
+              onEventMonthChange={setEventMonth}
+              onEventDayChange={setEventDay}
               onContextChange={setDateEventContext}
             />
           ) : (

@@ -29,59 +29,51 @@ const MONTH_OPTIONS = [
   { value: "12", label: "Dec" },
 ];
 
-function parseMonthDay(eventDate: string): { month: string; day: string } {
-  const match = eventDate.match(/^\d{4}-(\d{2})-(\d{2})$/);
-  return {
-    month: match?.[1] ?? "",
-    day: match?.[2] ?? "",
-  };
-}
-
 function daysInMonth(month: string): number {
   if (!month) return 31;
   // Year 2000 is intentional so February includes leap day without asking for a year.
   return new Date(2000, Number(month), 0).getDate();
 }
 
-function buildStoredDate(month: string, day: string): string {
-  if (!month || !day) return "";
-  return `2000-${month}-${day}`;
-}
-
 type DatesCaptureFieldsProps = {
   eventKind: DateEventKind;
-  eventDate: string;
+  eventMonth: string;
+  eventDay: string;
   context: string;
   friendFirstName: string;
   onEventKindChange: (kind: DateEventKind) => void;
-  onEventDateChange: (date: string) => void;
+  onEventMonthChange: (month: string) => void;
+  onEventDayChange: (day: string) => void;
   onContextChange: (context: string) => void;
 };
 
 export function DatesCaptureFields({
   eventKind,
-  eventDate,
+  eventMonth,
+  eventDay,
   context,
   friendFirstName,
   onEventKindChange,
-  onEventDateChange,
+  onEventMonthChange,
+  onEventDayChange,
   onContextChange,
 }: DatesCaptureFieldsProps) {
   const contextConfig = getDateEventContextConfig(eventKind);
-  const { month, day } = parseMonthDay(eventDate);
-  const dayOptions = Array.from({ length: daysInMonth(month) }, (_, index) => {
+  const dayOptions = Array.from({ length: daysInMonth(eventMonth) }, (_, index) => {
     const value = String(index + 1).padStart(2, "0");
     return { value, label: String(index + 1) };
   });
 
   function handleMonthChange(nextMonth: string) {
     const maxDay = daysInMonth(nextMonth);
-    const nextDay = day && Number(day) <= maxDay ? day : "";
-    onEventDateChange(buildStoredDate(nextMonth, nextDay));
+    onEventMonthChange(nextMonth);
+    if (eventDay && Number(eventDay) > maxDay) {
+      onEventDayChange("");
+    }
   }
 
   function handleDayChange(nextDay: string) {
-    onEventDateChange(buildStoredDate(month, nextDay));
+    onEventDayChange(nextDay);
   }
 
   return (
@@ -115,9 +107,12 @@ export function DatesCaptureFields({
         <div className="flex min-w-0 flex-1 gap-2">
           <div className="relative min-w-0 flex-[1.2]">
             <select
-              value={month}
+              value={eventMonth}
               onChange={(event) => handleMonthChange(event.target.value)}
-              className={cn(fieldClassName, "appearance-none pl-3 pr-8")}
+              className={cn(
+                fieldClassName,
+                "relative z-10 appearance-none pl-3 pr-8"
+              )}
               aria-label="Month"
             >
               <option value="">Month</option>
@@ -135,9 +130,9 @@ export function DatesCaptureFields({
 
           <div className="relative min-w-0 flex-1">
             <select
-              value={day}
+              value={eventDay}
               onChange={(event) => handleDayChange(event.target.value)}
-              disabled={!month}
+              disabled={!eventMonth}
               className={cn(
                 fieldClassName,
                 "appearance-none pl-3 pr-8 disabled:opacity-50"
