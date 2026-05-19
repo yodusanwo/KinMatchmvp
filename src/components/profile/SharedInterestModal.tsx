@@ -23,7 +23,7 @@ type SharedInterestModalProps = {
   onSaved: (interest: SharedInterest) => void;
 };
 
-const suggestions = ["running", "sci-fi books", "church", "married with kids"];
+const suggestions = ["coffee", "walking", "TV shows", "parenting", "Other"];
 
 export function SharedInterestModal({
   open,
@@ -36,6 +36,7 @@ export function SharedInterestModal({
   const [label, setLabel] = useState("");
   const [status, setStatus] = useState<"idle" | "saving" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const saveInFlight = useRef(false);
 
   useEffect(() => {
@@ -135,8 +136,9 @@ export function SharedInterestModal({
             <input
               value={label}
               onChange={(event) => setLabel(event.target.value)}
-              placeholder="sci-fi books, Sunday walks, being first-gen…"
+              placeholder="coffee, walking, parenting, same hometown…"
               maxLength={60}
+              ref={inputRef}
               className={cn(
                 "h-12 w-full rounded-2xl border border-ink/[0.2] bg-cream-deep/60 px-4",
                 "font-inter text-base italic text-ink placeholder:text-ink-soft/50",
@@ -150,7 +152,14 @@ export function SharedInterestModal({
               <button
                 key={suggestion}
                 type="button"
-                onClick={() => setLabel(suggestion)}
+                onClick={() => {
+                  if (suggestion === "Other") {
+                    setLabel("");
+                    window.setTimeout(() => inputRef.current?.focus(), 0);
+                    return;
+                  }
+                  setLabel(suggestion);
+                }}
                 className="rounded-full border border-ink/[0.16] px-3 py-1 font-inter text-xs italic text-ink-soft transition-colors hover:border-terracotta/40 hover:text-terracotta"
               >
                 {suggestion}
