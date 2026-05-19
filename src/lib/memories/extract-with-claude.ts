@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
-import type { ExtractedMemoryCandidate, MemoryTag } from "@/lib/memories/types";
-import { isMemoryTag } from "@/lib/memories/types";
+import type { ExtractedMemoryCandidate, MemoryCategory } from "@/lib/memories/types";
+import { isMemoryCategory } from "@/lib/memories/types";
 
 const DEFAULT_MODEL = "claude-sonnet-4-5-20250929";
 
@@ -20,10 +20,17 @@ function parseCandidates(raw: string): ExtractedMemoryCandidate[] {
     const text = typeof record.text === "string" ? record.text.trim() : "";
     if (text.length < 2) continue;
 
-    const tagRaw = typeof record.tag === "string" ? record.tag : "other";
-    const tag: MemoryTag = isMemoryTag(tagRaw) ? tagRaw : "other";
+    const categoryRaw =
+      typeof record.category === "string"
+        ? record.category
+        : typeof record.tag === "string"
+          ? record.tag
+          : "other";
+    const category: MemoryCategory = isMemoryCategory(categoryRaw)
+      ? categoryRaw
+      : "other";
 
-    const candidate: ExtractedMemoryCandidate = { text, tag };
+    const candidate: ExtractedMemoryCandidate = { text, category };
 
     if (
       typeof record.event_date === "string" &&
@@ -57,11 +64,21 @@ export async function extractMemoriesWithClaude(params: {
       : "(none yet)";
 
   const prompt = `You are extracting distinct memorable facts from a conversation a user had with their friend ${params.friendName}.
-Focus on facts worth remembering long-term: health updates, family milestones, work changes, personal interests, life transitions, plans, emotional state.
-Avoid: small talk, greetings, logistics, generic platitudes.
+Focus on facts worth remembering long-term. Avoid small talk, greetings, logistics, and generic platitudes.
 Existing memory notes about this friend (avoid duplicates):
 ${existingList}
-Return a JSON array of up to 3 objects: { "text": string, "tag": "health"|"family"|"work"|"milestone"|"interest"|"other", "event_date"?: "YYYY-MM-DD" }
+Return a JSON array of up to 3 objects:
+{ "text": string, "category": "people"|"dates"|"current"|"loves"|"shared"|"trusted"|"other", "event_date"?: "YYYY-MM-DD" }
+
+Categorization heuristics:
+- people: family, partner, kids, pets, named friends
+- dates: birthdays, anniversaries, memorial dates with explicit dates (include event_date when known)
+- current: health updates, job changes, recent events, "right now"
+- loves: hobbies, interests, preferences, foods, music, books
+- shared: shared experiences, inside jokes, "remember when"
+- trusted: vulnerable disclosures, fears, dreams, struggles
+- other: anything that doesn't fit cleanly
+
 Respond with JSON only — no markdown, no explanation.
 
 Conversation:

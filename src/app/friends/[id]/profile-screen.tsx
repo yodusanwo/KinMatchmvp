@@ -19,7 +19,7 @@ import {
 import { VoiceNoteSentToast } from "@/components/profile/VoiceNoteSentToast";
 import { ProfilePageSkeleton } from "@/components/ui/Skeleton";
 import { fetchJson } from "@/lib/api/fetch-client";
-import type { FriendProfile, MemoryNote } from "@/lib/api/types";
+import type { FriendProfile, MemoryCategory, MemoryNote } from "@/lib/api/types";
 import { trackEvent } from "@/lib/analytics/events";
 import { defaultSpotlightPrompt } from "@/lib/friends/utils";
 
@@ -32,6 +32,9 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
   const [friend, setFriend] = useState<FriendProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [memoryModalOpen, setMemoryModalOpen] = useState(false);
+  const [memoryModalCategory, setMemoryModalCategory] = useState<
+    MemoryCategory | undefined
+  >(undefined);
   const [highlightMemoryId, setHighlightMemoryId] = useState<string | null>(
     null
   );
@@ -104,7 +107,10 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
             friendName={friend.name}
             memories={friend.memories}
             highlightId={highlightMemoryId}
-            onAdd={() => setMemoryModalOpen(true)}
+            onAddCategory={(category) => {
+              setMemoryModalCategory(category);
+              setMemoryModalOpen(true);
+            }}
           />
           <InterestPills interests={friend.shared_interests} />
           <RitualList rituals={friend.rituals} />
@@ -127,7 +133,11 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
         friendId={friend.id}
         friendName={friend.name}
         avatarColor={friend.avatar_color}
-        onClose={() => setMemoryModalOpen(false)}
+        initialCategory={memoryModalCategory}
+        onClose={() => {
+          setMemoryModalOpen(false);
+          setMemoryModalCategory(undefined);
+        }}
         onSaved={handleMemoriesSaved}
       />
     </AppShell>

@@ -25,12 +25,28 @@ export type TodayResponse = {
   tribe: FriendSummary[];
 };
 
+export type MemoryCategory =
+  | "people"
+  | "dates"
+  | "current"
+  | "loves"
+  | "shared"
+  | "trusted"
+  | "other";
+
 export type MemoryNote = {
   id: string;
+  friend_id: string;
   text: string;
-  tag: string;
-  event_date: string | null;
+  category: MemoryCategory;
+  event_date?: string;
+  source:
+    | "manual"
+    | "voice_extraction"
+    | "paste_extraction"
+    | "add_connection";
   created_at: string;
+  last_surfaced_at?: string;
 };
 
 export type SharedInterest = {

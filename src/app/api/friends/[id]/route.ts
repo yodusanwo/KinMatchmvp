@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import type { FriendProfile } from "@/lib/api/types";
+import { mapMemoryNoteRow } from "@/lib/memories/map-note";
 import {
   cadenceLabel,
   daysQuiet,
@@ -44,7 +45,9 @@ export async function GET(_request: Request, context: RouteContext) {
     await Promise.all([
       supabase
         .from("memory_notes")
-        .select("id, text, tag, event_date, created_at")
+        .select(
+          "id, friend_id, text, tag, event_date, source, created_at, last_surfaced_at"
+        )
         .eq("friend_id", id)
         .order("created_at", { ascending: false }),
       supabase
@@ -84,7 +87,7 @@ export async function GET(_request: Request, context: RouteContext) {
     is_wished_closer: row.is_wished_closer,
     cadence_label: cadenceLabel(row.cadence_days),
     vibe_label: vibeLabel(row.vibe),
-    memories: memoriesRes.data ?? [],
+    memories: (memoriesRes.data ?? []).map(mapMemoryNoteRow),
     shared_interests: interestsRes.data ?? [],
     rituals: ritualsRes.data ?? [],
     interactions: interactionsRes.data ?? [],

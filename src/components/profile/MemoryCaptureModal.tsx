@@ -9,10 +9,21 @@ import {
   PrimaryButton,
   Subhead,
 } from "@/components/brand";
+import { DatesCaptureFields } from "@/components/profile/DatesCaptureFields";
 import { MiniAvatar } from "@/components/onboarding/MiniAvatar";
 import type { AvatarColor } from "@/lib/onboarding/types";
 import { fetchJson } from "@/lib/api/fetch-client";
-import type { MemoryNote } from "@/lib/api/types";
+import type { MemoryCategory, MemoryNote } from "@/lib/api/types";
+import {
+  MEMORY_CATEGORIES,
+  MEMORY_MODAL_CATEGORIES,
+  firstName,
+} from "@/lib/memories/categories";
+import {
+  buildDateNoteText,
+  dateEventNeedsContext,
+  type DateEventKind,
+} from "@/lib/memories/date-events";
 import { cn } from "@/lib/cn";
 
 type MemoryCaptureModalProps = {
@@ -20,6 +31,7 @@ type MemoryCaptureModalProps = {
   friendId: string;
   friendName: string;
   avatarColor: AvatarColor;
+  initialCategory?: MemoryCategory;
   onClose: () => void;
   onSaved: (notes: MemoryNote[]) => void;
 };
@@ -30,15 +42,58 @@ const textareaClassName = cn(
   "focus:border-terracotta focus:outline-none focus:ring-1 focus:ring-terracotta/30"
 );
 
+function noteTextForSave(
+  category: MemoryCategory,
+  name: string,
+  text: string,
+  dateEventKind: DateEventKind,
+  dateEventContext: string
+): string {
+  if (category === "dates") {
+    return buildDateNoteText(name, dateEventKind, dateEventContext);
+  }
+  return text.trim();
+}
+
+function canSaveNote(
+  category: MemoryCategory,
+  text: string,
+  dateEventKind: DateEventKind,
+  dateEventContext: string,
+  name: string
+): boolean {
+  const noteText = noteTextForSave(
+    category,
+    name,
+    text,
+    dateEventKind,
+    dateEventContext
+  );
+  if (noteText.length < 2) return false;
+  if (
+    category === "dates" &&
+    dateEventNeedsContext(dateEventKind) &&
+    dateEventContext.trim().length < 2
+  ) {
+    return false;
+  }
+  return true;
+}
+
 export function MemoryCaptureModal({
   open,
   friendId,
   friendName,
   avatarColor,
+  initialCategory,
   onClose,
   onSaved,
 }: MemoryCaptureModalProps) {
   const [text, setText] = useState("");
+  const [category, setCategory] = useState<MemoryCategory>("current");
+  const [dateEventKind, setDateEventKind] = useState<DateEventKind>("birthday");
+  const [dateEventContext, setDateEventContext] = useState("");
+  const [eventDate, setEventDate] = useState("");
   const [status, setStatus] = useState<"idle" | "saving" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const saveInFlight = useRef(false);
@@ -46,10 +101,14 @@ export function MemoryCaptureModal({
   useEffect(() => {
     if (!open) return;
     setText("");
+    setCategory(initialCategory ?? "current");
+    setDateEventKind("birthday");
+    setDateEventContext("");
+    setEventDate("");
     setStatus("idle");
     setErrorMessage(null);
     saveInFlight.current = false;
-  }, [open]);
+  }, [open, initialCategory]);
 
   useEffect(() => {
     if (!open) return;
@@ -70,19 +129,39 @@ export function MemoryCaptureModal({
   }, [open, onClose]);
 
   async function handleSaveNote() {
-    const trimmed = text.trim();
-    if (!trimmed || saveInFlight.current) return;
+    const name = firstName(friendName);
+    const trimmed = noteTextForSave(
+      category,
+      name,
+      text,
+      dateEventKind,
+      dateEventContext
+    );
+    if (!canSaveNote(category, text, dateEventKind, dateEventContext, name)) {
+      return;
+    }
+    if (saveInFlight.current) return;
 
     saveInFlight.current = true;
     setStatus("saving");
     setErrorMessage(null);
+
+    const body: {
+      text: string;
+      category: MemoryCategory;
+      event_date?: string;
+    } = { text: trimmed, category };
+
+    if (category === "dates" && eventDate) {
+      body.event_date = eventDate;
+    }
 
     const result = await fetchJson<MemoryNote>(
       `/api/friends/${friendId}/memories`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: trimmed }),
+        body: JSON.stringify(body),
       }
     );
 
@@ -98,6 +177,25 @@ export function MemoryCaptureModal({
   }
 
   if (!open) return null;
+
+  const name = firstName(friendName);
+  const placeholder =
+    MEMORY_CATEGORIES[category].capturePlaceholder(name);
+  const isDates = category === "dates";
+  const saveEnabled = canSaveNote(
+    category,
+    text,
+    dateEventKind,
+    dateEventContext,
+    name
+  );
+
+  function handleDateEventKindChange(kind: DateEventKind) {
+    setDateEventKind(kind);
+    if (!dateEventNeedsContext(kind)) {
+      setDateEventContext("");
+    }
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex justify-center bg-cream-deep">
@@ -127,32 +225,73 @@ export function MemoryCaptureModal({
 
           <div id="memory-capture-title">
             <Headline as="h2" className="mt-6">
-              What&apos;s worth remembering?
+              {isDates ? "What date should we remember?" : "What's worth remembering?"}
             </Headline>
           </div>
           <Subhead className="mt-2">
-            Anything small or specific. KinMatch will surface it at the right
-            moment.
+            {isDates
+              ? "We'll surface it when it's coming up."
+              : "Anything small or specific. KinMatch will surface it at the right moment."}
           </Subhead>
 
-          <div className="relative mt-6">
-            <textarea
-              value={text}
-              onChange={(event) => setText(event.target.value)}
-              placeholder="She's training for a half marathon in October…"
-              rows={8}
-              className={cn(textareaClassName, "pr-12")}
-            />
-            <button
-              type="button"
-              disabled
-              title="Voice notes coming soon"
-              className="absolute bottom-4 right-4 text-ink-soft/40"
-              aria-label="Add note by voice (coming soon)"
-            >
-              <Mic className="h-5 w-5" strokeWidth={1.5} />
-            </button>
+          <div className="-mx-5 mt-5 overflow-x-auto px-5">
+            <div className="flex gap-2 pb-1">
+              {MEMORY_MODAL_CATEGORIES.map((categoryId) => {
+                const config = MEMORY_CATEGORIES[categoryId];
+                const Icon = config.icon;
+                const selected = category === categoryId;
+
+                return (
+                  <button
+                    key={categoryId}
+                    type="button"
+                    onClick={() => setCategory(categoryId)}
+                    className={cn(
+                      "flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 font-inter text-xs font-medium transition-colors",
+                      selected
+                        ? "bg-terracotta text-cream"
+                        : "border border-ink/[0.2] text-ink-soft"
+                    )}
+                  >
+                    <Icon className="h-3.5 w-3.5" strokeWidth={1.75} />
+                    {config.chipLabel}
+                  </button>
+                );
+              })}
+            </div>
           </div>
+
+          {isDates ? (
+            <DatesCaptureFields
+              eventKind={dateEventKind}
+              eventDate={eventDate}
+              context={dateEventContext}
+              friendFirstName={name}
+              onEventKindChange={handleDateEventKindChange}
+              onEventDateChange={setEventDate}
+              onContextChange={setDateEventContext}
+            />
+          ) : (
+            <div className="relative mt-6">
+              <textarea
+                key={category}
+                value={text}
+                onChange={(event) => setText(event.target.value)}
+                placeholder={placeholder}
+                rows={8}
+                className={cn(textareaClassName, "pr-12")}
+              />
+              <button
+                type="button"
+                disabled
+                title="Voice notes coming soon"
+                className="absolute bottom-4 right-4 text-ink-soft/40"
+                aria-label="Add note by voice (coming soon)"
+              >
+                <Mic className="h-5 w-5" strokeWidth={1.5} />
+              </button>
+            </div>
+          )}
 
           {errorMessage && (
             <p
@@ -166,7 +305,7 @@ export function MemoryCaptureModal({
           <div className="mt-6 space-y-4">
             <PrimaryButton
               type="button"
-              disabled={!text.trim() || status === "saving"}
+              disabled={!saveEnabled || status === "saving"}
               onClick={() => void handleSaveNote()}
               className="w-full"
             >
