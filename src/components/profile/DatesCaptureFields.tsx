@@ -2,9 +2,8 @@
 
 import { ChevronDown } from "lucide-react";
 import {
-  DATE_EVENT_CONTEXT_FIELDS,
   DATE_EVENT_KINDS,
-  dateEventNeedsContext,
+  getDateEventContextConfig,
   type DateEventKind,
 } from "@/lib/memories/date-events";
 import { cn } from "@/lib/cn";
@@ -34,9 +33,7 @@ export function DatesCaptureFields({
   onEventDateChange,
   onContextChange,
 }: DatesCaptureFieldsProps) {
-  const contextConfig = dateEventNeedsContext(eventKind)
-    ? DATE_EVENT_CONTEXT_FIELDS[eventKind]
-    : null;
+  const contextConfig = getDateEventContextConfig(eventKind);
 
   return (
     <div className="mt-6 space-y-3">

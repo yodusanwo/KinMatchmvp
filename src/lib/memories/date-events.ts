@@ -8,14 +8,21 @@ export const DATE_EVENT_KINDS = [
 
 export type DateEventKind = (typeof DATE_EVENT_KINDS)[number]["value"];
 
-const DATE_KINDS_NEEDING_CONTEXT: DateEventKind[] = [
-  "memorial",
-  "milestone",
-  "other",
-];
+export type DateEventKindWithContext = "memorial" | "milestone" | "other";
+
+export function isDateEventWithContext(
+  kind: DateEventKind
+): kind is DateEventKindWithContext {
+  return kind === "memorial" || kind === "milestone" || kind === "other";
+}
 
 export function dateEventNeedsContext(kind: DateEventKind): boolean {
-  return DATE_KINDS_NEEDING_CONTEXT.includes(kind);
+  return isDateEventWithContext(kind);
+}
+
+export function getDateEventContextConfig(kind: DateEventKind) {
+  if (!isDateEventWithContext(kind)) return null;
+  return DATE_EVENT_CONTEXT_FIELDS[kind];
 }
 
 export const DATE_EVENT_CONTEXT_FIELDS: Record<
