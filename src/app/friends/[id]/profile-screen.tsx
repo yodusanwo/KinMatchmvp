@@ -123,7 +123,7 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
         />
 
         <div className="mt-6">
-          <ActionRow />
+          <ActionRow friendId={friend.id} />
         </div>
 
         <div className="mt-8 space-y-8">

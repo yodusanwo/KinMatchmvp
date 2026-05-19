@@ -162,10 +162,10 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
   }
 
   const helperText = recorder.isRecording
-    ? "Recording… release to stop"
+    ? "Recording… tap to stop"
     : recorder.audioBlob
       ? "Tap send when you're ready"
-      : "Hold to speak";
+      : "Tap to start recording";
 
   return (
     <AppShell>
@@ -202,16 +202,14 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
           <RecordButton
             isRecording={recorder.isRecording}
             disabled={sendStatus === "uploading"}
-            onPointerDown={() => {
-              if (!recorder.isRecording && !recorder.audioBlob) {
+            onPress={() => {
+              if (recorder.isRecording) {
+                recorder.stopRecording();
+                return;
+              }
+              if (!recorder.audioBlob) {
                 void recorder.startRecording();
               }
-            }}
-            onPointerUp={() => {
-              if (recorder.isRecording) recorder.stopRecording();
-            }}
-            onPointerLeave={() => {
-              if (recorder.isRecording) recorder.stopRecording();
             }}
           />
 
