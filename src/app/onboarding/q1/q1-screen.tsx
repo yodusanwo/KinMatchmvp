@@ -47,11 +47,11 @@ export function Q1Screen() {
       }
     >
       <div className="space-y-2">
-        <Eyebrow>Q1 · your tribe so far · {count}</Eyebrow>
-        <Headline>Who are your people?</Headline>
+        <Eyebrow>Q1 · people in your life · {count}</Eyebrow>
+        <Headline>Who comes to mind?</Headline>
         <p className={REFLECTION_COPY_CLASS}>
-          The friends and close family you actually spend time with — the ones
-          you&apos;d describe as your inner circle.
+          Brain-dump as many names as you can: close friends, family, regular
+          community, coworkers, neighbors, and people you cross paths with.
         </p>
       </div>
 
@@ -60,9 +60,8 @@ export function Q1Screen() {
       <AddNameInput placeholder="Add another name…" onAdd={addQ1Person} />
 
       <p className={REFLECTION_COPY_CLASS}>
-        5 to 10 people is a good start. Skip casual acquaintances and
-        &ldquo;we should hang out sometime&rdquo; contacts — we&apos;ll get to
-        those next.
+        Don&apos;t classify yet. The next step will help you sort each person
+        into inner circle, village, or acquaintance.
       </p>
     </ReflectionStepShell>
   );

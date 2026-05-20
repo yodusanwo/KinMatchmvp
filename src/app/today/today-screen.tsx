@@ -5,12 +5,44 @@ import { useRouter } from "next/navigation";
 import { BrandBar, Eyebrow, Headline, Subhead } from "@/components/brand";
 import { AppShell } from "@/components/layout/AppShell";
 import { BottomNav } from "@/components/nav/BottomNav";
-import { SpotlightCard } from "@/components/today/SpotlightCard";
-import { TribeList } from "@/components/today/TribeList";
+import { CaptureSpotlight, SendSpotlight } from "@/components/today/DailySpotlight";
+import { TribeCircleGraphic } from "@/components/today/TribeCircleGraphic";
 import { TodayPageSkeleton } from "@/components/ui/Skeleton";
 import { fetchJson } from "@/lib/api/fetch-client";
-import type { TodayResponse } from "@/lib/api/types";
+import type { TodayDailyState, TodayResponse } from "@/lib/api/types";
 import { dayEyebrow } from "@/lib/today/format";
+
+function firstName(name: string) {
+  return name.trim().split(/\s+/)[0] ?? name;
+}
+
+function dayLabel(state: TodayDailyState | null | undefined) {
+  const base = dayEyebrow();
+  if (!state || state.kind === "send_algorithmic" || !state.day_number) return base;
+  return `${base} · day ${state.day_number}`;
+}
+
+function reachOutPeriod() {
+  const hour = new Date().getHours();
+  return hour >= 17 ? "Tonight" : "Today";
+}
+
+function headlineForState(state: TodayDailyState | null | undefined) {
+  if (!state) return "Who you can build community with today.";
+  const name = firstName(state.friend.name).toLowerCase();
+  if (state.kind === "capture") return `What did ${name} share?`;
+  return `${reachOutPeriod()}, reach out to ${name}.`;
+}
+
+function tomorrowHint(state: TodayDailyState | null | undefined) {
+  if (!state) return null;
+  const name = firstName(state.friend.name).toLowerCase();
+  if (state.kind === "capture") {
+    const nextDepth = Math.min((state.cycle_number ?? 1) + 1, 5);
+    return `A new question for your tribe — depth ${nextDepth} of 5.`;
+  }
+  return `Capture what ${name} says — and their profile starts filling in.`;
+}
 
 export function TodayScreen() {
   const router = useRouter();
@@ -18,8 +50,7 @@ export function TodayScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function load() {
+  async function load() {
       const result = await fetchJson<TodayResponse>("/api/today");
       if (result.status === 401) {
         router.replace("/signin?next=/today");
@@ -32,19 +63,24 @@ export function TodayScreen() {
       }
       setData(result.data);
       setLoading(false);
-    }
+  }
+
+  useEffect(() => {
     void load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
 
   const tribeCount = data?.tribe.length ?? 0;
+  const state = data?.dailyState ?? null;
+  const hint = tomorrowHint(state);
 
   return (
     <AppShell>
-      <BrandBar />
-      <div className="flex min-h-screen flex-col px-5 pb-28 pt-6">
-        <Eyebrow>{dayEyebrow()}</Eyebrow>
-        <Headline className="mt-2">
-          Who you can build community with today.
+      <BrandBar className="py-2" />
+      <div className="flex h-[calc(100dvh-49px)] flex-col overflow-hidden px-5 pb-20 pt-3">
+        <Eyebrow>{dayLabel(state)}</Eyebrow>
+        <Headline className="mt-1 text-[23px] leading-tight">
+          {headlineForState(state)}
         </Headline>
 
         {loading && <TodayPageSkeleton />}
@@ -56,9 +92,19 @@ export function TodayScreen() {
         )}
 
         {!loading && !error && data && (
-          <div className="mt-8 space-y-8">
-            {data.spotlight ? (
-              <SpotlightCard spotlight={data.spotlight} />
+          <div className="mt-4 space-y-4">
+            {state ? (
+              state.kind === "capture" ? (
+                <CaptureSpotlight
+                  state={state}
+                  onRefresh={() => {
+                    setLoading(true);
+                    void load();
+                  }}
+                />
+              ) : (
+                <SendSpotlight state={state} />
+              )
             ) : (
               <div className="rounded-2xl border border-ink/[0.12] bg-cream-deep/60 p-5">
                 <Subhead>
@@ -67,15 +113,27 @@ export function TodayScreen() {
               </div>
             )}
 
+            {hint && (
+              <section>
+                <Eyebrow className="mb-1">tomorrow</Eyebrow>
+                <p className="font-inter text-sm italic leading-relaxed text-ink-soft">
+                  {hint}
+                </p>
+              </section>
+            )}
+
             <section>
               <Eyebrow className="mb-1">
                 your tribe · {tribeCount}{" "}
                 {tribeCount === 1 ? "person" : "people"}
               </Eyebrow>
-              <p className="mb-4 font-inter text-sm italic text-ink-soft">
-                Tap a name to open their profile.
+              <p className="mb-1.5 font-inter text-xs italic text-ink-soft">
+                Tap a circle to open their profile.
               </p>
-              <TribeList tribe={data.tribe} />
+              <TribeCircleGraphic
+                tribe={data.tribe}
+                highlightFriendId={state?.friend.id}
+              />
             </section>
           </div>
         )}

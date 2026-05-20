@@ -2,19 +2,13 @@
 
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { TextLink } from "@/components/brand";
 import { AppShell } from "@/components/layout/AppShell";
 import { BottomNav } from "@/components/nav/BottomNav";
 import {
-  ActionRow,
-  InterestPills,
   MemoryCaptureModal,
   MemorySection,
   ProfileHeader,
   ProfileTopBar,
-  RecentInteractionsList,
-  RitualList,
-  SharedInterestModal,
   SuggestedNextStepCard,
 } from "@/components/profile";
 import { VoiceNoteSentToast } from "@/components/profile/VoiceNoteSentToast";
@@ -24,10 +18,9 @@ import type {
   FriendProfile,
   MemoryCategory,
   MemoryNote,
-  SharedInterest,
 } from "@/lib/api/types";
 import { trackEvent } from "@/lib/analytics/events";
-import { defaultSpotlightPrompt } from "@/lib/friends/utils";
+import { firstName } from "@/lib/memories/categories";
 
 type ProfileScreenProps = {
   friendId: string;
@@ -41,11 +34,6 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
   const [memoryModalCategory, setMemoryModalCategory] = useState<
     MemoryCategory | undefined
   >(undefined);
-  const [sharedInterestModalOpen, setSharedInterestModalOpen] =
-    useState(false);
-  const [highlightMemoryId, setHighlightMemoryId] = useState<string | null>(
-    null
-  );
 
   const loadProfile = useCallback(async () => {
     const result = await fetchJson<FriendProfile>(`/api/friends/${friendId}`);
@@ -76,24 +64,6 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
         memories: [...notes, ...current.memories],
       };
     });
-    setHighlightMemoryId(notes[0].id);
-    window.setTimeout(() => setHighlightMemoryId(null), 2000);
-  }
-
-  function handleSharedInterestSaved(interest: SharedInterest) {
-    setFriend((current) => {
-      if (!current) return current;
-      const exists = current.shared_interests.some(
-        (existing) => existing.id === interest.id
-      );
-      if (exists) return current;
-      return {
-        ...current,
-        shared_interests: [...current.shared_interests, interest].sort((a, b) =>
-          a.label.localeCompare(b.label)
-        ),
-      };
-    });
   }
 
   if (loading || !friend) {
@@ -107,46 +77,50 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
     );
   }
 
-  const prompt = defaultSpotlightPrompt(friend.name, friend.days_quiet);
+  const name = firstName(friend.name);
+  const prompt = friend.profile_prompt;
 
   return (
     <AppShell>
       <ProfileTopBar friendName={friend.name} />
 
-      <div className="px-5 pb-28 pt-6">
+      <div className="px-5 pb-24 pt-4">
         <ProfileHeader friend={friend} />
 
         <SuggestedNextStepCard
-          friendId={friend.id}
-          prompt={prompt}
-          className="mt-8"
+          href={prompt.cta_href}
+          quote={prompt.quote}
+          whyThisWorks={prompt.kind === "send" ? prompt.why_this_works : null}
+          capturePrompt={prompt.kind === "capture" ? prompt.prompt : undefined}
+          ctaLabel={prompt.cta_label}
+          className="mt-4"
         />
 
-        <div className="mt-6">
-          <ActionRow friendId={friend.id} />
-        </div>
-
-        <div className="mt-8 space-y-8">
-          <MemorySection
-            friendName={friend.name}
-            memories={friend.memories}
-            highlightId={highlightMemoryId}
-            onAddCategory={(category) => {
-              setMemoryModalCategory(category);
-              setMemoryModalOpen(true);
-            }}
-          />
-          <InterestPills
-            friendName={friend.name}
-            interests={friend.shared_interests}
-            onAdd={() => setSharedInterestModalOpen(true)}
-          />
-          <RitualList rituals={friend.rituals} />
-          <RecentInteractionsList interactions={friend.interactions} />
-        </div>
+        {friend.memories.length > 0 && (
+          <div className="mt-5">
+            <MemorySection
+              friendName={friend.name}
+              memories={friend.memories}
+              showAddControls={false}
+              onAddCategory={(category) => {
+                setMemoryModalCategory(category);
+                setMemoryModalOpen(true);
+              }}
+            />
+          </div>
+        )}
 
         <p className="mt-8 text-center">
-          <TextLink href="/today">← Back to Today</TextLink>
+          <button
+            type="button"
+            onClick={() => {
+              setMemoryModalCategory("current");
+              setMemoryModalOpen(true);
+            }}
+            className="font-inter text-sm text-terracotta underline decoration-terracotta/60 underline-offset-2"
+          >
+            + add a note about {name}
+          </button>
         </p>
       </div>
 
@@ -169,14 +143,6 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
         onSaved={handleMemoriesSaved}
       />
 
-      <SharedInterestModal
-        open={sharedInterestModalOpen}
-        friendId={friend.id}
-        friendName={friend.name}
-        avatarColor={friend.avatar_color}
-        onClose={() => setSharedInterestModalOpen(false)}
-        onSaved={handleSharedInterestSaved}
-      />
     </AppShell>
   );
 }

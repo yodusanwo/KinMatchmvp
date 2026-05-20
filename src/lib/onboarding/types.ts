@@ -16,9 +16,12 @@ export type BarrierId =
   | "unsure_how"
   | "one_sided";
 
+export type CircleId = "inner" | "village" | "acquaintance";
+
 export type OnboardingState = {
   q1People: PersonChip[];
   q2People: PersonChip[];
+  circleAssignments: Record<string, CircleId>;
   q3Barriers: BarrierId[];
   watchers: string[];
 };

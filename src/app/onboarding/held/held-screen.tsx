@@ -1,27 +1,43 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Eyebrow, Headline, Subhead } from "@/components/brand";
 import { ConstellationView } from "@/components/onboarding/ConstellationView";
 import { ContinueButton } from "@/components/onboarding/ContinueButton";
 import { AppShell } from "@/components/layout/AppShell";
 import { BrandBar } from "@/components/brand";
 import { useOnboarding } from "@/contexts/onboarding-context";
+import { splitReflectionRevealGroups } from "@/lib/onboarding/person-utils";
 
 export function HeldScreen() {
   const router = useRouter();
-  const { q1People, watchers, toggleWatcher, setWatchers, hydrated } =
-    useOnboarding();
+  const {
+    q1People,
+    circleAssignments,
+    watchers,
+    toggleWatcher,
+    setWatchers,
+    hydrated,
+  } = useOnboarding();
+  const { innerCircle } = useMemo(
+    () => splitReflectionRevealGroups(q1People, circleAssignments),
+    [q1People, circleAssignments]
+  );
 
-  const selectedCount = watchers.length;
+  const selectedCount = watchers.filter((id) =>
+    innerCircle.some((person) => person.id === id)
+  ).length;
   const canContinue = selectedCount >= 1;
 
   useEffect(() => {
     if (hydrated && q1People.length === 0) {
       router.replace("/onboarding/q1");
     }
-  }, [hydrated, q1People.length, router]);
+    if (hydrated && q1People.length > 0 && innerCircle.length === 0) {
+      router.replace("/onboarding/q2");
+    }
+  }, [hydrated, innerCircle.length, q1People.length, router]);
 
   if (!hydrated) {
     return (
@@ -41,14 +57,14 @@ export function HeldScreen() {
             <Eyebrow>One last thing</Eyebrow>
             <Headline>Choose who holds you.</Headline>
             <Subhead>
-              Pick one or two people from your tribe. If you go quiet for 10
-              days, we&apos;ll gently let them know to check on you to make sure
-              you&apos;re okay.
+              Pick one or two people from your inner circle. If you pass your
+              quiet window, we&apos;ll gently let them know to check on you.
+              You can adjust the number of days later.
             </Subhead>
           </div>
 
           <ConstellationView
-            faces={q1People}
+            faces={innerCircle}
             selectable
             heartBadge
             selectedIds={watchers}

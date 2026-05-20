@@ -17,7 +17,7 @@ export function HeldByRow({ entry }: HeldByRowProps) {
       <div>
         <p className="font-sans text-sm font-medium text-ink">{entry.name}</p>
         <p className="font-inter text-xs italic text-ink-soft">
-          Holding you · alerts at {entry.threshold_days}d quiet
+          Holding you · quiet window {entry.threshold_days}d
         </p>
       </div>
     </li>

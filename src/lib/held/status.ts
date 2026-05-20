@@ -4,9 +4,9 @@ export function heldQuietStatus(
   atThreshold: boolean
 ): string {
   if (atThreshold) {
-    return `${daysQuiet}d quiet · at threshold`;
+    return `${daysQuiet}d quiet · notify now`;
   }
-  return `${daysQuiet}d quiet · alerts at ${thresholdDays}d`;
+  return `${daysQuiet}d quiet · quiet window ${thresholdDays}d`;
 }
 
 export function formatHeldEventType(type: string): string {

@@ -11,16 +11,18 @@ import {
 import { createPerson } from "@/lib/onboarding/person-utils";
 import type {
   BarrierId,
+  CircleId,
   OnboardingState,
   PersonChip,
 } from "@/lib/onboarding/types";
-export type { BarrierId, OnboardingState, PersonChip };
+export type { BarrierId, CircleId, OnboardingState, PersonChip };
 
 const STORAGE_KEY = "kinmatch-onboarding";
 
 const defaultState: OnboardingState = {
   q1People: [],
   q2People: [],
+  circleAssignments: {},
   q3Barriers: [],
   watchers: [],
 };
@@ -33,6 +35,7 @@ type OnboardingContextValue = OnboardingState & {
   addQ2Person: (name: string) => boolean;
   removeQ1Person: (id: string) => void;
   removeQ2Person: (id: string) => void;
+  setCircleAssignment: (personId: string, circle: CircleId) => void;
   toggleBarrier: (id: BarrierId) => void;
   setWatchers: (watchers: string[]) => void;
   toggleWatcher: (personId: string) => void;
@@ -46,10 +49,16 @@ function migrateLegacyState(parsed: Record<string, unknown>): OnboardingState {
   const q2Names = (parsed.q2Names as string[] | undefined) ?? [];
   const q3Barriers = (parsed.q3Barriers as BarrierId[] | undefined) ?? [];
   const watchers = (parsed.watchers as string[] | undefined) ?? [];
+  const innerPeople = q1Names.map((name) => createPerson(name));
+  const villagePeople = q2Names.map((name) => createPerson(name));
 
   return {
-    q1People: q1Names.map((name) => createPerson(name)),
-    q2People: q2Names.map((name) => createPerson(name)),
+    q1People: [...innerPeople, ...villagePeople],
+    q2People: villagePeople,
+    circleAssignments: {
+      ...Object.fromEntries(innerPeople.map((person) => [person.id, "inner"])),
+      ...Object.fromEntries(villagePeople.map((person) => [person.id, "village"])),
+    },
     q3Barriers,
     watchers,
   };
@@ -62,7 +71,23 @@ function loadState(): OnboardingState {
     if (!raw) return defaultState;
     const parsed = JSON.parse(raw) as Record<string, unknown>;
     if (Array.isArray(parsed.q1People)) {
-      return { ...defaultState, ...parsed } as OnboardingState;
+      const state = { ...defaultState, ...parsed } as OnboardingState;
+      if (!parsed.circleAssignments) {
+        const q1Ids = new Set(state.q1People.map((person) => person.id));
+        const people = [
+          ...state.q1People,
+          ...state.q2People.filter((person) => !q1Ids.has(person.id)),
+        ];
+        return {
+          ...state,
+          q1People: people,
+          circleAssignments: {
+            ...Object.fromEntries(state.q1People.map((person) => [person.id, "inner"])),
+            ...Object.fromEntries(state.q2People.map((person) => [person.id, "village"])),
+          },
+        };
+      }
+      return state;
     }
     return migrateLegacyState(parsed);
   } catch {
@@ -124,14 +149,16 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     let added = false;
     setState((s) => {
       const lower = trimmed.toLowerCase();
-      if (s.q2People.some((p) => p.name.toLowerCase() === lower)) {
+      if (
+        s.q1People.some((p) => p.name.toLowerCase() === lower) ||
+        s.q2People.some((p) => p.name.toLowerCase() === lower)
+      ) {
         return s;
       }
-      const fromQ1 = s.q1People.find((p) => p.name.toLowerCase() === lower);
       added = true;
       return {
         ...s,
-        q2People: [...s.q2People, fromQ1 ?? createPerson(trimmed)],
+        q2People: [...s.q2People, createPerson(trimmed)],
       };
     });
     return added;
@@ -141,6 +168,10 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     setState((s) => ({
       ...s,
       q1People: s.q1People.filter((p) => p.id !== id),
+      watchers: s.watchers.filter((personId) => personId !== id),
+      circleAssignments: Object.fromEntries(
+        Object.entries(s.circleAssignments).filter(([personId]) => personId !== id)
+      ),
     }));
   }, []);
 
@@ -148,6 +179,20 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     setState((s) => ({
       ...s,
       q2People: s.q2People.filter((p) => p.id !== id),
+    }));
+  }, []);
+
+  const setCircleAssignment = useCallback((personId: string, circle: CircleId) => {
+    setState((s) => ({
+      ...s,
+      circleAssignments: {
+        ...s.circleAssignments,
+        [personId]: circle,
+      },
+      watchers:
+        circle === "inner"
+          ? s.watchers
+          : s.watchers.filter((id) => id !== personId),
     }));
   }, []);
 
@@ -198,6 +243,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       addQ2Person,
       removeQ1Person,
       removeQ2Person,
+      setCircleAssignment,
       toggleBarrier,
       setWatchers,
       toggleWatcher,
@@ -212,6 +258,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       addQ2Person,
       removeQ1Person,
       removeQ2Person,
+      setCircleAssignment,
       toggleBarrier,
       setWatchers,
       toggleWatcher,

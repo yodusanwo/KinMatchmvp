@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { BrandBar, Eyebrow, Headline, Subhead } from "@/components/brand";
 import { AppShell } from "@/components/layout/AppShell";
 import { BottomNav } from "@/components/nav/BottomNav";
-import { TribeList } from "@/components/today/TribeList";
+import { TribeCircleGraphic } from "@/components/today/TribeCircleGraphic";
 import { TodayPageSkeleton } from "@/components/ui/Skeleton";
 import { fetchJson } from "@/lib/api/fetch-client";
 import type { TodayResponse } from "@/lib/api/types";
@@ -38,15 +38,17 @@ export function TribeScreen() {
 
   return (
     <AppShell>
-      <BrandBar />
-      <div className="flex min-h-screen flex-col px-5 pb-28 pt-6">
-        <Eyebrow>Your tribe</Eyebrow>
-        <Headline className="mt-2">
-          {tribeCount === 1 ? "1 person" : `${tribeCount} people`}
-        </Headline>
-        <Subhead className="mt-2">
-          Everyone you&apos;re tending this season. Tap a name for their profile.
-        </Subhead>
+      <BrandBar className="py-2" />
+      <div className="flex h-[calc(100dvh-49px)] flex-col overflow-hidden px-5 pb-20 pt-4">
+        <div className="space-y-1">
+          <Eyebrow>Your tribe</Eyebrow>
+          <Headline className="text-[28px] leading-tight">
+            {tribeCount === 1 ? "1 person" : `${tribeCount} people`}
+          </Headline>
+          <Subhead className="text-sm leading-relaxed">
+            Everyone you&apos;re tending this season.
+          </Subhead>
+        </div>
 
         {loading && <TodayPageSkeleton />}
 
@@ -57,8 +59,14 @@ export function TribeScreen() {
         )}
 
         {!loading && !error && data && (
-          <div className="mt-8">
-            <TribeList tribe={data.tribe} />
+          <div className="mt-6 flex flex-1 flex-col justify-center">
+            <TribeCircleGraphic
+              tribe={data.tribe}
+              className="h-[300px] max-w-[340px]"
+            />
+            <p className="mt-4 text-center font-inter text-xs italic text-ink-soft">
+              Tap a circle to open their profile.
+            </p>
           </div>
         )}
       </div>

@@ -16,20 +16,23 @@ import { cn } from "@/lib/cn";
 
 export function RevealScreen() {
   const router = useRouter();
-  const { q1People, q2People, hydrated } = useOnboarding();
+  const { q1People, circleAssignments, hydrated } = useOnboarding();
 
-  const { innerCircle, growingCloser } = useMemo(
-    () => splitReflectionRevealGroups(q1People, q2People),
-    [q1People, q2People]
+  const { innerCircle, village, acquaintances } = useMemo(
+    () => splitReflectionRevealGroups(q1People, circleAssignments),
+    [q1People, circleAssignments]
   );
 
-  const subhead = formatRevealSubhead(q1People.length, q2People.length);
+  const subhead = formatRevealSubhead(innerCircle.length, village.length);
 
   useEffect(() => {
     if (hydrated && q1People.length === 0) {
       router.replace("/onboarding/q1");
     }
-  }, [hydrated, q1People.length, router]);
+    if (hydrated && q1People.length > 0 && innerCircle.length === 0) {
+      router.replace("/onboarding/q2");
+    }
+  }, [hydrated, innerCircle.length, q1People.length, router]);
 
   if (!hydrated) {
     return (
@@ -47,7 +50,7 @@ export function RevealScreen() {
         <div className="flex-1 space-y-8">
           <div className="space-y-2 text-center">
             <Eyebrow>Reflection complete</Eyebrow>
-            <Headline>Here&apos;s your tribe.</Headline>
+            <Headline>Here are your circles.</Headline>
             <Subhead className="text-center">{subhead}</Subhead>
           </div>
 
@@ -58,16 +61,24 @@ export function RevealScreen() {
             </section>
           )}
 
-          {growingCloser.length > 0 && (
+          {village.length > 0 && (
             <section
               className={cn(
                 "space-y-5",
                 innerCircle.length > 0 && "border-t border-ink/[0.12] pt-8"
               )}
             >
-              <Eyebrow>Growing closer · {growingCloser.length}</Eyebrow>
-              <GrowingCloserRow faces={growingCloser} />
+              <Eyebrow>Your village · {village.length}</Eyebrow>
+              <GrowingCloserRow faces={village} />
             </section>
+          )}
+
+          {acquaintances.length > 0 && (
+            <p className="border-t border-ink/[0.12] pt-6 text-center font-inter text-sm italic text-ink-soft">
+              {acquaintances.length === 1
+                ? "1 acquaintance is set aside for the acquaintances page."
+                : `${acquaintances.length} acquaintances are set aside for the acquaintances page.`}
+            </p>
           )}
         </div>
 

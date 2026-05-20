@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import type { FriendProfile } from "@/lib/api/types";
+import type { FriendProfile, FriendProfilePrompt } from "@/lib/api/types";
 import { mapMemoryNoteRow } from "@/lib/memories/map-note";
 import {
   cadenceLabel,
@@ -8,9 +8,73 @@ import {
   vibeLabel,
   type FriendRow,
 } from "@/lib/friends/utils";
+import { buildTodayState } from "@/lib/today/get-daily-state";
 import { NextResponse } from "next/server";
 
 type RouteContext = { params: Promise<{ id: string }> };
+
+function firstName(name: string) {
+  return name.trim().split(/\s+/)[0] ?? name;
+}
+
+function profilePromptForFriend(params: {
+  friend: FriendRow;
+  daysQuiet: number;
+  hasHistory: boolean;
+  dailyState: Awaited<ReturnType<typeof buildTodayState>>["dailyState"];
+}): FriendProfilePrompt {
+  const { friend, daysQuiet, hasHistory, dailyState } = params;
+  const isTodaysSpotlight = dailyState?.friend.id === friend.id;
+  const name = firstName(friend.name);
+
+  if (isTodaysSpotlight && dailyState) {
+    if (dailyState.kind === "send_discovery") {
+      return {
+        kind: "send",
+        quote: dailyState.prompt.question,
+        why_this_works: dailyState.prompt.why_it_works,
+        cta_label: "Send a voice note",
+        cta_href: `/api/discovery/outreach?friend_id=${friend.id}&day=${dailyState.day_number}`,
+      };
+    }
+
+    if (dailyState.kind === "send_algorithmic") {
+      return {
+        kind: "send",
+        quote: dailyState.personalized_prompt,
+        why_this_works: dailyState.primary_reason,
+        cta_label: "Send a voice note",
+        cta_href: `/friends/${friend.id}/voice-note`,
+      };
+    }
+
+    return {
+      kind: "capture",
+      quote: `You asked: "${dailyState.original_question}"`,
+      prompt: `What did ${name} say? Type or voice-note what you learned.`,
+      cta_label: `Save to ${name}'s profile →`,
+      cta_href: `/friends/${friend.id}/details?capture=${dailyState.interaction_id}`,
+    };
+  }
+
+  if (hasHistory) {
+    return {
+      kind: "send",
+      quote: `It's been ${daysQuiet} ${daysQuiet === 1 ? "day" : "days"} since you reached out to ${name}.`,
+      why_this_works: null,
+      cta_label: "Send a voice note",
+      cta_href: `/friends/${friend.id}/voice-note`,
+    };
+  }
+
+  return {
+    kind: "send",
+    quote: `KinMatch learns about ${name} from the conversations we capture. Send them a voice note — their profile will fill in as you go.`,
+    why_this_works: null,
+    cta_label: "Send a voice note",
+    cta_href: `/friends/${friend.id}/voice-note`,
+  };
+}
 
 export async function GET(_request: Request, context: RouteContext) {
   const { id } = await context.params;
@@ -26,7 +90,7 @@ export async function GET(_request: Request, context: RouteContext) {
   const { data: friend, error: friendError } = await supabase
     .from("friends")
     .select(
-      "id, name, avatar_color, vibe, cadence_days, last_touch_at, created_at, where_met, is_wished_closer"
+      "id, name, avatar_color, vibe, cadence_days, last_touch_at, created_at, where_met, phone_number, is_wished_closer"
     )
     .eq("id", id)
     .eq("user_id", user.id)
@@ -41,7 +105,7 @@ export async function GET(_request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  const [memoriesRes, interestsRes, ritualsRes, interactionsRes] =
+  const [memoriesRes, interestsRes, ritualsRes, interactionsRes, profileRes] =
     await Promise.all([
       supabase
         .from("memory_notes")
@@ -66,13 +130,29 @@ export async function GET(_request: Request, context: RouteContext) {
         .eq("friend_id", id)
         .order("occurred_at", { ascending: false })
         .limit(5),
+      supabase
+        .from("users")
+        .select("id, barriers, discovery_started_at, discovery_completed_at")
+        .eq("id", user.id)
+        .single(),
     ]);
 
   const row = friend as FriendRow & {
     where_met: string | null;
+    phone_number: string | null;
     is_wished_closer: boolean;
   };
   const quiet = daysQuiet(row);
+  const { dailyState } = await buildTodayState({
+    supabase,
+    user: {
+      id: user.id,
+      barriers: (profileRes.data?.barriers ?? []) as string[],
+      discovery_started_at: profileRes.data?.discovery_started_at,
+      discovery_completed_at: profileRes.data?.discovery_completed_at,
+    },
+  });
+  const hasHistory = (interactionsRes.data ?? []).length > 0;
 
   const profile: FriendProfile = {
     id: row.id,
@@ -84,6 +164,7 @@ export async function GET(_request: Request, context: RouteContext) {
     is_drifting: isDrifting(row),
     last_touch_at: row.last_touch_at,
     where_met: row.where_met,
+    phone_number: row.phone_number,
     is_wished_closer: row.is_wished_closer,
     cadence_label: cadenceLabel(row.cadence_days),
     vibe_label: vibeLabel(row.vibe),
@@ -91,6 +172,12 @@ export async function GET(_request: Request, context: RouteContext) {
     shared_interests: interestsRes.data ?? [],
     rituals: ritualsRes.data ?? [],
     interactions: interactionsRes.data ?? [],
+    profile_prompt: profilePromptForFriend({
+      friend: row,
+      daysQuiet: quiet,
+      hasHistory,
+      dailyState,
+    }),
   };
 
   return NextResponse.json(profile);

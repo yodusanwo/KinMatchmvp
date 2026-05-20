@@ -20,7 +20,7 @@ export function SpotlightCard({ spotlight, className }: SpotlightCardProps) {
   return (
     <article
       className={cn(
-        "rounded-2xl border border-ink/[0.12] bg-cream-deep/80 p-5",
+        "rounded-2xl border border-ink/[0.12] bg-cream-deep/80 p-3.5",
         className
       )}
     >
@@ -31,31 +31,31 @@ export function SpotlightCard({ spotlight, className }: SpotlightCardProps) {
         <MiniAvatar
           name={spotlight.name}
           avatarColor={spotlight.avatar_color}
-          size="md"
+          size="sm"
         />
         <div>
-          <p className="font-sans text-base font-medium text-ink">
+          <p className="font-sans text-sm font-medium text-ink">
             {spotlight.name}
           </p>
           <p className="font-sans text-xs text-ink-soft">{statusLabel}</p>
         </div>
       </Link>
 
-      <p className="mt-4 font-inter text-base italic leading-relaxed text-ink-soft">
+      <p className="mt-3 line-clamp-2 font-inter text-sm italic leading-relaxed text-ink-soft">
         {spotlight.prompt_text}
       </p>
 
-      <div className="mt-5 space-y-3">
+      <div className="mt-2.5 space-y-1.5">
         <Link
           href={`/friends/${spotlight.friend_id}/voice-note`}
-          className={cn(primaryButtonClassName, "block")}
+          className={cn(primaryButtonClassName, "block py-2 text-xs")}
         >
           Send voice note
         </Link>
         <p className="text-center">
           <Link
             href={`/friends/${spotlight.friend_id}`}
-            className="font-inter text-sm text-terracotta underline decoration-terracotta/60 underline-offset-2"
+            className="font-inter text-xs text-terracotta underline decoration-terracotta/60 underline-offset-2"
           >
             View {spotlight.name}&apos;s profile
           </Link>

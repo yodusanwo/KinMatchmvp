@@ -1,4 +1,5 @@
 import type { AvatarColor } from "@/lib/onboarding/types";
+import type { SpotlightComponents } from "@/lib/algorithm/types";
 
 export type FriendSummary = {
   id: string;
@@ -18,12 +19,74 @@ export type TodaySpotlight = {
   days_quiet: number;
   prompt_text: string;
   suggested_action: string;
+  total_score?: number;
+  component_scores?: SpotlightComponents;
+  primary_reason?: string;
 } | null;
+
+export type TodayUpNext = NonNullable<TodaySpotlight>;
 
 export type TodayResponse = {
   spotlight: TodaySpotlight;
+  dailyState?: TodayDailyState | null;
+  upNext?: TodayUpNext[];
+  pendingCaptures?: PendingCapturePrompt[];
+  discoveryPrompt?: TodayDiscoveryPrompt | null;
   tribe: FriendSummary[];
 };
+
+export type PendingCapturePrompt = {
+  interaction_id: string;
+  friend_id: string;
+  friend_name: string;
+  mode: "voice_note_sent";
+  occurred_at: string;
+  prompt: string;
+};
+
+export type TodayDiscoveryPrompt = {
+  day: number;
+  friend_id: string;
+  friend_name: string;
+  question: string;
+  primary_cta_label: string;
+  primary_cta_url: string;
+  why_it_works: string;
+};
+
+export type TodayDailyState =
+  | {
+      kind: "capture";
+      friend: FriendSummary;
+      voice_note: {
+        id: string;
+        created_at: string;
+        duration_seconds: number;
+      };
+      interaction_id: string;
+      original_question: string;
+      day_number?: number;
+      cycle_number?: number;
+    }
+  | {
+      kind: "send_discovery";
+      friend: FriendSummary;
+      day_number: number;
+      cycle_number: number;
+      prompt: {
+        cycle: number;
+        question: string;
+        category: MemoryCategory;
+        depth_tier: 1 | 2 | 3;
+        why_it_works: string;
+      };
+    }
+  | {
+      kind: "send_algorithmic";
+      friend: FriendSummary;
+      personalized_prompt: string;
+      primary_reason: string;
+    };
 
 export type MemoryCategory =
   | "people"
@@ -71,6 +134,7 @@ export type Interaction = {
 
 export type FriendProfile = FriendSummary & {
   where_met: string | null;
+  phone_number: string | null;
   is_wished_closer: boolean;
   memories: MemoryNote[];
   shared_interests: SharedInterest[];
@@ -78,4 +142,21 @@ export type FriendProfile = FriendSummary & {
   interactions: Interaction[];
   cadence_label: string;
   vibe_label: string;
+  profile_prompt: FriendProfilePrompt;
 };
+
+export type FriendProfilePrompt =
+  | {
+      kind: "send";
+      quote: string;
+      why_this_works?: string | null;
+      cta_label: string;
+      cta_href: string;
+    }
+  | {
+      kind: "capture";
+      quote: string;
+      prompt: string;
+      cta_label: string;
+      cta_href: string;
+    };

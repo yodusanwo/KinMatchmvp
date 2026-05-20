@@ -10,11 +10,11 @@ import type { AvatarColor } from "@/lib/onboarding/types";
 import { NextResponse } from "next/server";
 
 /**
- * Pilot Held semantics (see onboarding/complete):
- * - Onboarding "who holds you" selections are stored as holder_user_id = current user,
- *   held_friend_id = friend. In product language that is "You're holding" — you watch
- *   these friends for quiet periods (alerts not automated yet in pilot).
- * - "Held by" is reserved for reciprocal KinMatch users (held_user_id = current user).
+ * Pilot Held semantics:
+ * - Onboarding selections mean "these friends hold the current user."
+ * - The existing table stores those rows as holder_user_id=current user +
+ *   held_friend_id=friend because non-user friends cannot be holder_user_id yet.
+ * - Product language should treat those friends as accountability partners.
  */
 export async function GET() {
   const supabase = await createClient();
@@ -32,11 +32,14 @@ export async function GET() {
       `
       id,
       threshold_days,
+      setup_notified_at,
+      setup_notification_error,
       status,
       held_friend_id,
       friends (
         id,
         name,
+        email,
         avatar_color,
         last_touch_at,
         created_at
@@ -57,6 +60,7 @@ export async function GET() {
         | {
             id: string;
             name: string;
+            email: string | null;
             avatar_color: AvatarColor;
             last_touch_at: string | null;
             created_at: string;
@@ -64,6 +68,7 @@ export async function GET() {
         | {
             id: string;
             name: string;
+            email: string | null;
             avatar_color: AvatarColor;
             last_touch_at: string | null;
             created_at: string;
@@ -81,9 +86,12 @@ export async function GET() {
         relationship_id: row.id,
         friend_id: friend.id,
         name: friend.name,
+        email: friend.email,
         avatar_color: friend.avatar_color,
         days_quiet: quiet,
         threshold_days: threshold,
+        setup_notified_at: row.setup_notified_at,
+        setup_notification_error: row.setup_notification_error,
         status: row.status as "active" | "paused",
         at_threshold: quiet >= threshold,
       };

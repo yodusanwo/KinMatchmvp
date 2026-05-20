@@ -20,13 +20,13 @@ const HOW_IT_WORKS_STEPS = [
     number: 1,
     title: "Thoughtful emails, about 3 a week.",
     description:
-      "Each one is a small nudge — a name from your tribe and a reason to reach out.",
+      "Each one is a small nudge — a name from your inner circle or village and a reason to reach out.",
   },
   {
     number: 2,
     title: "Open it when it lands.",
     description:
-      "If KinMatch is reaching out, someone in your tribe could use you today.",
+      "If KinMatch is reaching out, someone in your circle could use you today.",
   },
   {
     number: 3,
@@ -41,6 +41,7 @@ export function EmailPrefsScreen() {
   const {
     q1People,
     q2People,
+    circleAssignments,
     q3Barriers,
     watchers,
     resetOnboarding,
@@ -65,6 +66,7 @@ export function EmailPrefsScreen() {
     const payload: CompleteOnboardingPayload = {
       q1People,
       q2People,
+      circleAssignments,
       q3Barriers,
       watchers,
     };
@@ -107,8 +109,9 @@ export function EmailPrefsScreen() {
             <Eyebrow>Here&apos;s how it works</Eyebrow>
             <Headline>Here&apos;s where we begin.</Headline>
             <p className={REFLECTION_COPY_CLASS}>
-              KinMatch helps you stay close to the people in your circle — and
-              grow closer to the ones you wish were.
+              KinMatch helps you stay close to the people in your inner circle
+              and village without pretending every relationship needs the same
+              level of attention.
             </p>
           </div>
 

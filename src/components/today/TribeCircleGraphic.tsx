@@ -1,0 +1,92 @@
+import Link from "next/link";
+import { MiniAvatar } from "@/components/onboarding/MiniAvatar";
+import type { FriendSummary } from "@/lib/api/types";
+import { cn } from "@/lib/cn";
+
+type TribeCircleGraphicProps = {
+  tribe: FriendSummary[];
+  highlightFriendId?: string;
+  className?: string;
+};
+
+const CIRCLE_SLOTS: { top: string; left: string }[] = [
+  { top: "9%", left: "50%" },
+  { top: "34%", left: "20%" },
+  { top: "34%", left: "80%" },
+  { top: "71%", left: "32%" },
+  { top: "71%", left: "68%" },
+  { top: "52%", left: "50%" },
+];
+
+function firstName(name: string) {
+  return name.trim().split(/\s+/)[0] ?? name;
+}
+
+export function TribeCircleGraphic({
+  tribe,
+  highlightFriendId,
+  className,
+}: TribeCircleGraphicProps) {
+  if (tribe.length === 0) {
+    return (
+      <p className="font-inter text-sm italic text-ink-soft">
+        Add your first connection to begin.
+      </p>
+    );
+  }
+
+  const displayTribe = tribe.slice(0, CIRCLE_SLOTS.length);
+  const overflow = tribe.length - displayTribe.length;
+
+  return (
+    <div
+      className={cn(
+        "relative mx-auto h-[170px] w-full max-w-[320px] rounded-[2rem] border border-ink/[0.1] bg-cream-deep/35",
+        className
+      )}
+    >
+      <div className="absolute left-1/2 top-1/2 h-16 w-16 -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-terracotta/25" />
+      <div className="absolute left-1/2 top-1/2 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-ink/[0.1]" />
+
+      {displayTribe.map((friend, index) => {
+        const slot = CIRCLE_SLOTS[index];
+        return (
+          <Link
+            key={friend.id}
+            href={`/friends/${friend.id}`}
+            className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1 text-center transition-transform hover:scale-105 active:scale-95"
+            style={{ top: slot.top, left: slot.left }}
+            aria-label={`Open ${friend.name}'s profile`}
+          >
+            <MiniAvatar
+              name={friend.name}
+              avatarColor={friend.avatar_color}
+              size="lg"
+              className={cn(
+                "h-10 w-10 ring-2 ring-cream",
+                friend.is_drifting && "ring-terracotta/60",
+                friend.id === highlightFriendId &&
+                  "shadow-[0_0_0_2px_rgba(182,82,50,0.3)]"
+              )}
+            />
+            <span className="max-w-[64px] truncate font-sans text-[11px] font-medium leading-none text-ink">
+              {firstName(friend.name)}
+            </span>
+            <span className="font-sans text-[9px] leading-none text-ink-soft">
+              {friend.days_quiet === 0 ? "today" : `${friend.days_quiet}d quiet`}
+            </span>
+          </Link>
+        );
+      })}
+
+      {overflow > 0 && (
+        <Link
+          href="/tribe"
+          className="absolute bottom-2 right-3 rounded-full bg-cream px-2 py-1 font-sans text-[10px] text-ink-soft"
+        >
+          +{overflow} more
+        </Link>
+      )}
+    </div>
+  );
+}

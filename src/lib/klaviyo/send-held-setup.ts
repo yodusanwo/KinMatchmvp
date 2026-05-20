@@ -1,22 +1,21 @@
 import { getAppOrigin, hasKlaviyo } from "@/lib/env";
 
-type SendVoiceNoteEmailParams = {
+type SendHeldSetupEmailParams = {
   recipientEmail: string;
-  senderName: string;
-  shareToken: string;
-  durationSeconds: number;
+  holderName: string;
+  userName: string;
+  thresholdDays: number;
 };
 
-export async function sendVoiceNoteReceivedEmail(
-  params: SendVoiceNoteEmailParams
+/** Notifies a friend that the user chose them as a Held accountability partner. */
+export async function sendHeldSetupEmail(
+  params: SendHeldSetupEmailParams
 ): Promise<{ sent: boolean; skipped?: boolean; error?: string }> {
   if (!hasKlaviyo()) {
     return { sent: false, skipped: true };
   }
 
   const apiKey = process.env.KLAVIYO_PRIVATE_API_KEY!;
-  const origin = getAppOrigin();
-  const voiceNoteUrl = `${origin}/v/${params.shareToken}`;
 
   const response = await fetch("https://a.klaviyo.com/api/events/", {
     method: "POST",
@@ -32,7 +31,7 @@ export async function sendVoiceNoteReceivedEmail(
           metric: {
             data: {
               type: "metric",
-              attributes: { name: "kinmatch_voice_note_received" },
+              attributes: { name: "kinmatch_held_setup" },
             },
           },
           profile: {
@@ -42,9 +41,10 @@ export async function sendVoiceNoteReceivedEmail(
             },
           },
           properties: {
-            voice_note_url: voiceNoteUrl,
-            sender_name: params.senderName,
-            duration: params.durationSeconds,
+            holder_name: params.holderName,
+            user_name: params.userName,
+            quiet_window_days: params.thresholdDays,
+            app_url: getAppOrigin(),
           },
         },
       },

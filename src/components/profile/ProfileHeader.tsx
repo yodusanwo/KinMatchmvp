@@ -22,13 +22,13 @@ export function ProfileHeader({ friend }: ProfileHeaderProps) {
         name={friend.name}
         avatarColor={friend.avatar_color}
         size="md"
-        className="h-16 w-16 text-sm"
+        className="h-12 w-12 text-xs"
       />
-      <Headline className="mt-4">{friend.name}</Headline>
-      <p className="mt-1 font-inter text-sm italic text-terracotta">
+      <Headline className="mt-2 text-2xl">{friend.name}</Headline>
+      <p className="mt-0.5 font-inter text-xs italic text-terracotta">
         {friend.vibe_label}
       </p>
-      <p className="mt-2 flex flex-wrap items-center justify-center gap-x-1 font-sans text-xs text-ink-soft">
+      <p className="mt-1 flex flex-wrap items-center justify-center gap-x-1 font-sans text-[11px] text-ink-soft">
         <span>{friend.cadence_label} ·</span>
         <DriftIndicator
           daysQuiet={friend.days_quiet}

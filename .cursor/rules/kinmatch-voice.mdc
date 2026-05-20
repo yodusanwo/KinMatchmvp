@@ -1,0 +1,254 @@
+---
+description: KinMatch copy voice and style guide
+alwaysApply: true
+---
+
+# KinMatch Copy Style Guide
+
+All in-app copy, email subjects, prompts, error messages, button labels, and AI-generated text in KinMatch must follow these principles. This is not optional — the brand voice is core to how the product feels.
+
+## CORE VOICE PRINCIPLES
+
+KinMatch sounds like a thoughtful, observant friend — never like a database, a chatbot, or a productivity app.
+
+1. **Reference the friend by first name whenever possible.**
+   The friend's first name is almost always available in context. Use it. Generic prompts feel like forms; specific prompts feel like conversation.
+
+2. **Use possessive, human language.**
+   "Your people," "their world," "what they're carrying" — never "contacts," "users," "entries," "data," "records," "info."
+
+3. **The product never refers to itself as "I" or as a separate agent.**
+   Avoid: "Should I remember...", "Let me know...", "I'll surface..." Instead, speak directly to the user about the friend: "What's Sarah going through?" not "What should I know about Sarah?"
+
+4. **Sentence case, not Title Case.**
+   "Here's where we begin." ✓
+   "Here's Where We Begin." ✗
+
+5. **Italic for warmth, used sparingly.**
+   Italicize subheads and small clarifying lines. Never italicize buttons or main headlines.
+
+6. **Brevity is warmth. 5-15 words for prompts, 1-4 words for buttons.**
+   If a sentence is over 15 words, ask whether each word is earning its place.
+
+7. **Em-dashes, not semicolons.**
+   "60 seconds is enough — really." ✓
+   "60 seconds is enough; really." ✗
+
+8. **No exclamation marks except in rare celebration moments.**
+   "Saved." ✓
+   "Saved!" ✗ (mostly)
+
+9. **Match emotional register to the prompt's depth.**
+   Light topics get warm, casual tone. Deep topics get gentle, soft tone. The same template doesn't fit both.
+
+10. **No product-speak.** Banned vocabulary inside user-facing copy:
+    - "data," "info," "information," "details" → use "things"
+    - "entry," "field," "input," "form," "submit" → just don't say
+    - "user" → "you" (when addressing them) or skip entirely
+    - "click," "tap to," "select" → use the verb directly ("Send", "Pick a time")
+    - "successfully," "completed," "processed" → silent confirmation
+    - "your friend Sarah" → "Sarah" (the name alone is enough)
+
+## ALWAYS PERSONALIZE
+
+If the friend's first name is available in context, use it.
+
+❌ "Who should I remember?"
+✓ "Who's important to Sarah?"
+
+❌ "Add a note about your friend's current life."
+✓ "What's Sarah going through right now?"
+
+❌ "Tell me about hobbies."
+✓ "What does Sarah love?"
+
+❌ "Submit your friend's birthday."
+✓ "When is Sarah's birthday?"
+
+If multiple friends are in context (e.g., a list view), use a generic stand-in like "they" or "them" but never "your friend" or "this person."
+
+❌ "What is your friend's preferred contact method?"
+✓ "How do they like to hear from you?"
+
+## BANNED PATTERNS — REWRITE EXAMPLES
+
+When you see any of these patterns, rewrite. These are real examples of robotic copy that should never appear in KinMatch:
+
+### Self-referential AI language
+
+❌ "Who in your family or inner circle should I remember?"
+✓ "Who's important to Sarah?"
+
+❌ "Let me know what they've been up to lately."
+✓ "What's Sarah been up to lately?"
+
+❌ "I'll surface this person on Today."
+✓ "Sarah will appear on Today when the rhythm slips."
+
+### Generic, contextless prompts
+
+❌ "Enter important date."
+✓ "When's Sarah's birthday?"
+
+❌ "Add new memory note."
+✓ "+ add a note"
+
+❌ "Please provide friend information."
+✓ "Tell us about your people."
+
+### Form/database language
+
+❌ "Submit"
+✓ "Save your people →" (or context-appropriate verb)
+
+❌ "Required field"
+✓ (just show inline gentle guidance: "Sarah's name?")
+
+❌ "Update successful"
+✓ "Saved to Sarah's profile."
+
+❌ "Error: invalid input"
+✓ "That doesn't look like a date — try MM/DD/YYYY"
+
+### Imperative commands
+
+❌ "Click here to record"
+✓ "Send a voice note →"
+
+❌ "Tap to add"
+✓ "+ add"
+
+❌ "Please confirm"
+✓ "Save these?"
+
+## PATTERN LIBRARY — USE THESE STRUCTURES
+
+### Eyebrows (small uppercase or sentence-case labels above sections)
+
+Use lowercase, no caps, no period. Spaced widely if styled with letter-spacing CSS.
+
+✓ "here's how it works"
+✓ "what happens next"
+✓ "your tribe so far · 7"
+
+### Section headlines
+
+Always end with a period (calm, not exclamatory). Always sentence case.
+
+✓ "Here's where we begin."
+✓ "Who are your people?"
+✓ "Here's your tribe."
+
+### Subheads (italic, gray)
+
+Conversational, observational. Often start with "The..." or describe what the section covers.
+
+✓ "The friends and close family you actually spend time with."
+✓ "We'll save your tribe and take you to Today."
+
+### Buttons (terracotta pill, primary actions)
+
+Verb-led. 2-4 words. Often end with → arrow.
+
+✓ "Save your people →"
+✓ "Send a voice note →"
+✓ "See my tribe →"
+
+### Empty-state prompts
+
+Italic, muted color, with terracotta underlined link at the end.
+
+✓ "Add Sarah's birthday →"
+✓ "What's Marcus into? →"
+✓ "Who's important to Ella? →"
+
+### Confirmations
+
+Silent or single phrase. No exclamation. No "successfully."
+
+✓ "Saved."
+✓ "Sent to Sarah."
+✓ "Added to your tribe."
+
+### Errors
+
+Acknowledge + fix path. Conversational tone. Never red shouting.
+
+✓ "That doesn't look right — try a phone number with area code."
+✓ "Looks like Sarah's already in your tribe."
+
+## THE "THOUGHTFUL FRIEND" TEST
+
+Before shipping any string, ask: "Would a thoughtful, attentive friend say this to me?"
+
+A thoughtful friend would say:
+- "Who's important to Sarah?"
+- "Tell me what Sarah's been up to."
+- "What did Sarah say?"
+
+A thoughtful friend would NOT say:
+- "Please enter contact information."
+- "Who in your inner circle should I remember?"
+- "Update successful."
+
+If the line fails the thoughtful-friend test, rewrite.
+
+## SPECIFIC RULES FOR DISCOVERY SEQUENCE EMAILS
+
+Days 1-10 prompts must:
+1. Use the friend's first name in the question itself when natural
+2. Use the friend's first name in the email subject line
+3. Frame "why this works" as a single warm observation, not marketing copy
+4. Avoid the word "engagement" or "sequence" or "step X of 10" in user-facing copy
+
+Example email body — BAD:
+"Step 2 of the engagement sequence: Ask your friend Marcus for his birthday. This will help me populate your profile data."
+
+Example email body — GOOD:
+"Today, ask Marcus: 'What's your birthday? Want to make sure it's actually in my calendar.'
+
+Why this works: permission-asking framing makes it respectful, not invasive — and it's useful for both of you."
+
+## WHEN UNCERTAIN
+
+If you're not sure whether copy fits the voice, default to:
+1. Shorter
+2. More specific (use the friend's name)
+3. More conversational (would a friend say this?)
+4. Less formal (sentence case, no excess punctuation)
+5. Less self-referential (no "I" from the product)
+
+When generating AI prompts (Claude/Gemini) for memory extraction or content generation, instruct the model to follow these same rules in its outputs.
+---
+
+## NO ACADEMIC OR PSYCHOLOGICAL JARGON IN USER-FACING COPY
+
+KinMatch is informed by behavioral science research (Aron, Reis 
+& Shaver, Gable, Dunbar, etc.) — but users should NEVER see this 
+vocabulary in the product. Researcher names, framework labels, 
+and clinical terminology stay in internal documentation only.
+
+Banned in user-facing copy:
+- "Aron-style," "disclosure," "vulnerability disclosure"
+- "Capitalization," "active capitalization"
+- "Self-disclosure," "reciprocal disclosure"
+- "Intimacy process model," "intimacy progression"
+- "Friendship maintenance behaviors"
+- "Tier 1/2/3 questions," "depth tier"
+- "Closeness questions," "relationship maintenance"
+
+The "why this works" line in discovery cards should sound like a 
+thoughtful friend giving you confidence to send the message — 
+not like a behavioral science textbook explaining a study.
+
+❌ "Aron-style light disclosure. Lets them share what they want."
+✓ "Low-stakes and easy to answer. Gives them room to share."
+
+❌ "Capitalization moment — celebrating wins builds trust."
+✓ "Wins are worth celebrating. They'll feel good you noticed."
+
+❌ "Tier 3 vulnerability question — only safe after trust-building."
+✓ "A deep question. Save it for someone you really want to see."
+
+When in doubt: would a thoughtful friend say this, or would a 
+psychology professor say this? If it's the professor, rewrite.

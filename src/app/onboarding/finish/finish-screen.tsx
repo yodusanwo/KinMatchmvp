@@ -24,8 +24,15 @@ function loadOnboardingFromStorage(): Partial<OnboardingState> | null {
 
 export function FinishScreen() {
   const router = useRouter();
-  const { q1People, q2People, q3Barriers, watchers, resetOnboarding, hydrated } =
-    useOnboarding();
+  const {
+    q1People,
+    q2People,
+    circleAssignments,
+    q3Barriers,
+    watchers,
+    resetOnboarding,
+    hydrated,
+  } = useOnboarding();
   const [status, setStatus] = useState<"checking" | "saving" | "done" | "error">(
     "checking"
   );
@@ -56,6 +63,10 @@ export function FinishScreen() {
       const stored = loadOnboardingFromStorage();
       const people = q1People.length > 0 ? q1People : (stored?.q1People ?? []);
       const peopleQ2 = q2People.length > 0 ? q2People : (stored?.q2People ?? []);
+      const assignments =
+        Object.keys(circleAssignments).length > 0
+          ? circleAssignments
+          : (stored?.circleAssignments ?? {});
       const barriers =
         q3Barriers.length > 0 ? q3Barriers : (stored?.q3Barriers ?? []);
       const watcherIds =
@@ -72,6 +83,7 @@ export function FinishScreen() {
       const payload: CompleteOnboardingPayload = {
         q1People: people,
         q2People: peopleQ2,
+        circleAssignments: assignments,
         q3Barriers: barriers,
         watchers: watcherIds,
       };
@@ -86,7 +98,7 @@ export function FinishScreen() {
         const data = await res.json().catch(() => ({}));
         hasRun.current = false;
         setErrorMessage(
-          (data as { error?: string }).error ?? "Could not save your tribe."
+          (data as { error?: string }).error ?? "Could not save your circles."
         );
         setStatus("error");
         return;
@@ -109,7 +121,16 @@ export function FinishScreen() {
     complete();
 
     return () => subscription.unsubscribe();
-  }, [hydrated, q1People, q2People, q3Barriers, watchers, resetOnboarding, router]);
+  }, [
+    hydrated,
+    q1People,
+    q2People,
+    circleAssignments,
+    q3Barriers,
+    watchers,
+    resetOnboarding,
+    router,
+  ]);
 
   return (
     <AppShell>
@@ -118,7 +139,7 @@ export function FinishScreen() {
         {status === "error" ? (
           <div className="space-y-4">
             <Eyebrow>Something went wrong</Eyebrow>
-            <Headline>Couldn&apos;t save your tribe</Headline>
+            <Headline>Couldn&apos;t save your circles</Headline>
             <Subhead>{errorMessage}</Subhead>
             <button
               type="button"
@@ -134,7 +155,7 @@ export function FinishScreen() {
         ) : (
           <div className="space-y-2">
             <Eyebrow>Almost there</Eyebrow>
-            <Headline>Saving your tribe…</Headline>
+            <Headline>Saving your circles…</Headline>
             <Subhead>Just a moment while we put everyone in place.</Subhead>
           </div>
         )}

@@ -1,6 +1,6 @@
 import { sendWelcomeEmail } from "@/lib/klaviyo/send-welcome-email";
 import type { CompleteOnboardingPayload } from "@/lib/onboarding/api-types";
-import type { BarrierId } from "@/lib/onboarding/types";
+import type { BarrierId, CircleId } from "@/lib/onboarding/types";
 import { dedupePeopleByName, normalizeName } from "@/lib/onboarding/person-utils";
 import { barrierIdsToKeys } from "@/lib/personalization";
 import { createClient } from "@/lib/supabase/server";
@@ -40,12 +40,22 @@ export async function POST(request: Request) {
   const q2People = dedupePeopleByName(
     Array.isArray(body.q2People) ? body.q2People : []
   );
+  const circleAssignments =
+    body.circleAssignments && typeof body.circleAssignments === "object"
+      ? (body.circleAssignments as Record<string, CircleId>)
+      : null;
+  const innerCirclePeople = circleAssignments
+    ? q1People.filter((person) => circleAssignments[person.id] === "inner")
+    : q1People;
+  const villagePeople = circleAssignments
+    ? q1People.filter((person) => circleAssignments[person.id] === "village")
+    : q2People;
   const q3Barriers = body.q3Barriers;
   const watchers = Array.isArray(body.watchers) ? body.watchers : [];
 
-  if (q1People.length === 0) {
+  if (innerCirclePeople.length === 0) {
     return NextResponse.json(
-      { error: "At least one connection is required" },
+      { error: "At least one inner-circle connection is required" },
       { status: 400 }
     );
   }
@@ -62,6 +72,8 @@ export async function POST(request: Request) {
     .from("users")
     .update({
       onboarding_completed_at: completedAt,
+      discovery_started_at: completedAt,
+      discovery_completed_at: null,
       email: user.email ?? undefined,
     })
     .eq("id", user.id)
@@ -85,13 +97,12 @@ export async function POST(request: Request) {
     await supabase.from("reflection_barriers").delete().eq("user_id", user.id);
     await supabase.from("friends").delete().eq("user_id", user.id);
 
-    const wishedCloserNames = new Set(
-      q2People.map((p) => normalizeName(p.name))
-    );
     const chipIdToFriendId = new Map<string, string>();
-    const q1NameSet = new Set(q1People.map((p) => normalizeName(p.name)));
+    const innerNameSet = new Set(
+      innerCirclePeople.map((p) => normalizeName(p.name))
+    );
 
-    for (const person of q1People) {
+    for (const person of innerCirclePeople) {
       const { data: friend, error: friendError } = await supabase
         .from("friends")
         .insert({
@@ -99,7 +110,7 @@ export async function POST(request: Request) {
           name: person.name,
           avatar_color: person.avatarColor,
           vibe: "potential_close",
-          is_wished_closer: wishedCloserNames.has(normalizeName(person.name)),
+          is_wished_closer: false,
           in_tribe: true,
         })
         .select("id")
@@ -112,8 +123,8 @@ export async function POST(request: Request) {
       chipIdToFriendId.set(person.id, friend.id);
     }
 
-    for (const person of q2People) {
-      if (q1NameSet.has(normalizeName(person.name))) continue;
+    for (const person of villagePeople) {
+      if (innerNameSet.has(normalizeName(person.name))) continue;
 
       const { data: friend, error: friendError } = await supabase
         .from("friends")
@@ -122,7 +133,7 @@ export async function POST(request: Request) {
           name: person.name,
           avatar_color: person.avatarColor,
           vibe: "potential_close",
-          is_wished_closer: true,
+          is_wished_closer: false,
           in_tribe: true,
         })
         .select("id")
@@ -155,6 +166,7 @@ export async function POST(request: Request) {
       const heldRows: {
         holder_user_id: string;
         held_friend_id: string;
+        threshold_days: number;
         status: "active";
       }[] = [];
 
@@ -165,6 +177,7 @@ export async function POST(request: Request) {
         heldRows.push({
           holder_user_id: user.id,
           held_friend_id,
+          threshold_days: 10,
           status: "active",
         });
       }

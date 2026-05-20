@@ -37,13 +37,3 @@ export function vibeLabel(vibe: string): string {
   };
   return labels[vibe] ?? "A connection you care about";
 }
-
-export function defaultSpotlightPrompt(name: string, days: number): string {
-  if (days >= 14) {
-    return `${name} has been quiet for a while. A voice note might land softer than a text.`;
-  }
-  if (days >= 7) {
-    return `It's been ${days} days since you reached out. Something small from you could mean a lot.`;
-  }
-  return `${name} is on your mind today. A quick voice note keeps the rhythm going.`;
-}

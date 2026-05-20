@@ -47,8 +47,8 @@ export function HeldScreen() {
       <div className="px-5 pb-28 pt-6">
         <Headline>Held</Headline>
         <Subhead className="mt-2">
-          A quiet circle of care. You hold {holdingCount} · {heldByCount} hold
-          you.
+          Your quiet circle of care. {holdingCount}{" "}
+          {holdingCount === 1 ? "person holds" : "people hold"} you.
         </Subhead>
 
         {loading && <HeldPageSkeleton />}
@@ -62,10 +62,10 @@ export function HeldScreen() {
         {data && !loading && (
           <div className="mt-10 space-y-10">
             <section>
-              <Eyebrow className="mb-3">You&apos;re holding</Eyebrow>
+              <Eyebrow className="mb-3">Your holders</Eyebrow>
               {data.holding.length === 0 ? (
                 <p className="font-inter text-sm italic text-ink-soft">
-                  You haven&apos;t set up Held yet.{" "}
+                  You haven&apos;t picked who holds you yet.{" "}
                   <Link
                     href="/onboarding/held"
                     className="text-terracotta underline underline-offset-2"
@@ -82,28 +82,23 @@ export function HeldScreen() {
               )}
             </section>
 
-            <section>
+            {heldByCount > 0 && (
+              <section>
               <Eyebrow className="mb-3">Held by</Eyebrow>
-              {data.held_by.length === 0 ? (
-                <p className="font-inter text-sm italic text-ink-soft">
-                  When friends join KinMatch and hold you back, they&apos;ll
-                  appear here. Your circle from setup is listed above.
-                </p>
-              ) : (
-                <ul className="divide-y divide-ink/[0.12]">
-                  {data.held_by.map((entry) => (
-                    <HeldByRow key={entry.relationship_id} entry={entry} />
-                  ))}
-                </ul>
-              )}
-            </section>
+              <ul className="divide-y divide-ink/[0.12]">
+                {data.held_by.map((entry) => (
+                  <HeldByRow key={entry.relationship_id} entry={entry} />
+                ))}
+              </ul>
+              </section>
+            )}
 
             <section>
               <Eyebrow className="mb-3">Recent</Eyebrow>
               {data.recent_events.length === 0 ? (
                 <p className="font-inter text-sm italic text-ink-soft">
-                  Held alerts aren&apos;t automated in the pilot yet — quiet
-                  moments will show up here later.
+                  Quiet-window notifications and acknowledgements will show up
+                  here.
                 </p>
               ) : (
                 <div className="space-y-3">
@@ -114,15 +109,6 @@ export function HeldScreen() {
               )}
             </section>
 
-            <p className="text-center">
-              <button
-                type="button"
-                disabled
-                className="font-inter text-sm text-ink-soft underline decoration-ink-soft/40 underline-offset-2"
-              >
-                Pause or adjust thresholds — coming soon
-              </button>
-            </p>
           </div>
         )}
       </div>

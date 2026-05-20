@@ -10,8 +10,8 @@ import { NumberedSteps } from "@/components/onboarding/NumberedSteps";
 import { OnboardingStartedTracker } from "@/components/onboarding/OnboardingStartedTracker";
 
 const REFLECTION_STEPS = [
-  { number: 1, title: "Who are your people?" },
-  { number: 2, title: "Who do you wish were closer?" },
+  { number: 1, title: "List people in your life" },
+  { number: 2, title: "Sort them into circles" },
   { number: 3, title: "What gets in the way?" },
 ];
 
@@ -27,8 +27,9 @@ export default function OnboardingIntroPage() {
         </div>
 
         <Subhead>
-          Three quick questions help us tune KinMatch to your relationships.
-          Most people finish in under two minutes.
+          First, name the people who come to mind. Then we&apos;ll sort them
+          into inner circle, village, or acquaintances so KinMatch knows who to
+          help you tend.
         </Subhead>
 
         <NumberedSteps steps={REFLECTION_STEPS} />

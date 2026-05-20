@@ -1,5 +1,5 @@
 import { randomAvatarColor } from "./avatar-colors";
-import type { PersonChip } from "./types";
+import type { CircleId, PersonChip } from "./types";
 
 export function createPerson(name: string): PersonChip {
   return {
@@ -31,38 +31,41 @@ export function dedupePeopleByName(people: PersonChip[]): PersonChip[] {
   return result;
 }
 
-/** Reveal: inner circle = all of Q1; growing closer = all of Q2 (both sections always). */
+/** Reveal and saving derive circles from the classification step. */
 export function splitReflectionRevealGroups(
-  q1People: PersonChip[],
-  q2People: PersonChip[]
-): { innerCircle: PersonChip[]; growingCloser: PersonChip[] } {
+  people: PersonChip[],
+  assignments: Record<string, CircleId>
+): { innerCircle: PersonChip[]; village: PersonChip[]; acquaintances: PersonChip[] } {
   return {
-    innerCircle: q1People,
-    growingCloser: q2People,
+    innerCircle: people.filter((person) => assignments[person.id] === "inner"),
+    village: people.filter((person) => assignments[person.id] === "village"),
+    acquaintances: people.filter(
+      (person) => assignments[person.id] === "acquaintance"
+    ),
   };
 }
 
 export function formatRevealSubhead(
   innerCount: number,
-  growingCount: number
+  villageCount: number
 ): string {
-  if (innerCount > 0 && growingCount > 0) {
+  if (innerCount > 0 && villageCount > 0) {
     const close =
       innerCount === 1
-        ? "One person you're close to"
-        : `${innerCount} people you're close to`;
-    const growing =
-      growingCount === 1
-        ? "one you want to grow closer with"
-        : `${growingCount} you want to grow closer with`;
-    return `${close} — and ${growing}.`;
+        ? "One person in your inner circle"
+        : `${innerCount} people in your inner circle`;
+    const village =
+      villageCount === 1
+        ? "one person in your village"
+        : `${villageCount} people in your village`;
+    return `${close} — and ${village}.`;
   }
-  if (growingCount > 0) {
-    return growingCount === 1
-      ? "One person you want to grow closer with."
-      : `${growingCount} people you want to grow closer with.`;
+  if (villageCount > 0) {
+    return villageCount === 1
+      ? "One person in your village."
+      : `${villageCount} people in your village.`;
   }
   return innerCount === 1
-    ? "One person you've chosen to invest in."
-    : `${innerCount} people you've chosen to invest in.`;
+    ? "One person in your inner circle."
+    : `${innerCount} people in your inner circle.`;
 }

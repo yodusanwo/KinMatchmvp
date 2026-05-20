@@ -6,8 +6,11 @@ export type HeldFriendEntry = {
   friend_id: string;
   name: string;
   avatar_color: AvatarColor;
+  email: string | null;
   days_quiet: number;
   threshold_days: number;
+  setup_notified_at: string | null;
+  setup_notification_error: string | null;
   status: "active" | "paused";
   at_threshold: boolean;
 };

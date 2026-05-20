@@ -1,20 +1,42 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Eyebrow, Headline, TextLink } from "@/components/brand";
-import { AddNameInput } from "@/components/onboarding/AddNameInput";
 import { ContinueButton } from "@/components/onboarding/ContinueButton";
-import { NameChipList } from "@/components/onboarding/NameChipList";
+import { MiniAvatar } from "@/components/onboarding/MiniAvatar";
 import { ReflectionStepShell } from "@/components/onboarding/ReflectionStepShell";
 import { useOnboarding } from "@/contexts/onboarding-context";
+import type { CircleId } from "@/lib/onboarding/types";
+import { cn } from "@/lib/cn";
 
 const REFLECTION_COPY_CLASS =
   "font-inter text-sm italic leading-[1.5] text-[rgba(31,26,20,0.65)]";
 
-export function Q2Screen() {
-  const { q2People, addQ2Person, removeQ2Person, hydrated } = useOnboarding();
+const CIRCLE_OPTIONS: { id: CircleId; label: string }[] = [
+  { id: "inner", label: "Inner circle" },
+  { id: "village", label: "Village" },
+  { id: "acquaintance", label: "Acquaintance" },
+];
 
-  const count = q2People.length;
-  const canContinue = count > 0;
+export function Q2Screen() {
+  const router = useRouter();
+  const { q1People, circleAssignments, setCircleAssignment, hydrated } =
+    useOnboarding();
+
+  const assignedCount = q1People.filter(
+    (person) => circleAssignments[person.id]
+  ).length;
+  const innerCount = q1People.filter(
+    (person) => circleAssignments[person.id] === "inner"
+  ).length;
+  const canContinue = q1People.length > 0 && assignedCount === q1People.length && innerCount > 0;
+
+  useEffect(() => {
+    if (hydrated && q1People.length === 0) {
+      router.replace("/onboarding/q1");
+    }
+  }, [hydrated, q1People.length, router]);
 
   if (!hydrated) {
     return (
@@ -31,7 +53,7 @@ export function Q2Screen() {
         <>
           {!canContinue && (
             <p className="text-center font-inter text-sm italic text-ink-soft">
-              Add at least one name to continue.
+              Sort every person and include at least one inner-circle person.
             </p>
           )}
           <ContinueButton href={canContinue ? "/onboarding/q3" : undefined} disabled={!canContinue}>
@@ -44,25 +66,55 @@ export function Q2Screen() {
       }
     >
       <div className="space-y-2">
-        <Eyebrow>Q2 · growing closer · {count}</Eyebrow>
-        <Headline>Who do you wish were closer?</Headline>
+        <Eyebrow>
+          Q2 · sort your circles · {assignedCount}/{q1People.length}
+        </Eyebrow>
+        <Headline>Where does each person fit?</Headline>
         <p className={REFLECTION_COPY_CLASS}>
-          Anyone you want to invest more in — long-distance friends, family far
-          away, drifting friendships, acquaintances you&apos;d like to deepen,
-          or people from step 1 you want to grow even closer with.
+          Pick the circle that best matches your actual energy, time, and
+          closeness right now. You can always change it later.
         </p>
       </div>
 
-      <NameChipList people={q2People} onRemove={removeQ2Person} />
-
-      <AddNameInput
-        placeholder="Someone you'd like to know better…"
-        onAdd={addQ2Person}
-      />
+      <div className="space-y-3">
+        {q1People.map((person) => (
+          <section
+            key={person.id}
+            className="space-y-3 rounded-2xl border border-ink/[0.12] bg-cream-deep/35 p-3"
+          >
+            <div className="flex items-center gap-3">
+              <MiniAvatar name={person.name} avatarColor={person.avatarColor} />
+              <p className="font-sans text-sm font-medium text-ink">{person.name}</p>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {CIRCLE_OPTIONS.map((option) => {
+                const selected = circleAssignments[person.id] === option.id;
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => setCircleAssignment(person.id, option.id)}
+                    className={cn(
+                      "rounded-full border px-2 py-2 font-sans text-[11px] transition-colors",
+                      selected
+                        ? "border-terracotta bg-terracotta/10 text-ink"
+                        : "border-ink/[0.25] text-ink-soft hover:border-ink/[0.45] hover:text-ink"
+                    )}
+                    aria-pressed={selected}
+                  >
+                    {option.label}
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+        ))}
+      </div>
 
       <p className={REFLECTION_COPY_CLASS}>
-        Anyone counts. Adding someone from step 1 just means you want to grow
-        what&apos;s already there.
+        Inner circle is usually 2 to 5 people. Village is the wider group you
+        see regularly or rely on. Acquaintances will live outside your main
+        friends dashboard for now.
       </p>
     </ReflectionStepShell>
   );

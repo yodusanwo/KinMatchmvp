@@ -36,7 +36,6 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
     "id" | "name" | "avatar_color"
   > | null>(null);
   const [loading, setLoading] = useState(true);
-  const [recipientEmail, setRecipientEmail] = useState("");
   const [sendStatus, setSendStatus] = useState<
     "idle" | "uploading" | "error"
   >("idle");
@@ -119,13 +118,7 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
 
     const sendResult = await fetchJson<SendVoiceNoteResponse>(
       `/api/voice-notes/${id}/send`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          recipient_email: recipientEmail.trim() || undefined,
-        }),
-      }
+      { method: "POST" }
     );
 
     if (!sendResult.ok) {
@@ -136,15 +129,18 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
 
     const sendData = sendResult.data;
 
-    trackEvent("voice_note_sent", {
-      has_email: recipientEmail.trim() ? "1" : "0",
-    });
+    trackEvent("voice_note_sent", { share_sheet: "1" });
 
-    if (recipientEmail.trim() && sendData.error) {
-      router.push(
-        `/friends/${friend.id}?voice_note_sent=1&email_warning=1`
-      );
-      return;
+    if (navigator.share && sendData.listen_url) {
+      try {
+        await navigator.share({
+          url: sendData.listen_url,
+          text: `Hey ${friend.name} — sent you a quick voice note.`,
+          title: "Voice note from KinMatch",
+        });
+      } catch {
+        // Share sheets can be cancelled; the voice note is already saved.
+      }
     }
 
     router.push(`/friends/${friend.id}?voice_note_sent=1`);
@@ -241,29 +237,6 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
         <div className="mt-8 space-y-4">
           {recorder.audioBlob && (
             <>
-              <div className="space-y-2">
-                <label
-                  htmlFor="recipient-email"
-                  className="font-sans text-[11px] font-medium uppercase tracking-[0.12em] text-ink-soft"
-                >
-                  Their email (optional)
-                </label>
-                <input
-                  id="recipient-email"
-                  type="email"
-                  value={recipientEmail}
-                  onChange={(event) => setRecipientEmail(event.target.value)}
-                  placeholder="friend@example.com"
-                  className="w-full rounded-xl border border-ink/[0.35] bg-cream px-4 py-3 font-inter text-sm text-ink placeholder:text-ink-soft/60 focus:border-terracotta focus:outline-none focus:ring-1 focus:ring-terracotta/30"
-                />
-                <p className="font-inter text-xs italic text-ink-soft">
-                  Add an email to send a listen link. Works locally without
-                  Vercel — Klaviyo sends only if{" "}
-                  <code className="text-[10px]">KLAVIYO_PRIVATE_API_KEY</code>{" "}
-                  is set.
-                </p>
-              </div>
-
               <PrimaryButton
                 type="button"
                 disabled={sendStatus === "uploading"}
@@ -271,7 +244,7 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
               >
                 {sendStatus === "uploading"
                   ? "Sending…"
-                  : `Send to ${friend.name}`}
+                  : `Share with ${friend.name}`}
               </PrimaryButton>
 
               <p className="text-center">

@@ -1,11 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 import { getAppOrigin } from "@/lib/env";
-import { sendVoiceNoteReceivedEmail } from "@/lib/klaviyo/send-voice-note-received";
 import { NextResponse } from "next/server";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
-export async function POST(request: Request, context: RouteContext) {
+export async function POST(_request: Request, context: RouteContext) {
   const { id } = await context.params;
   const supabase = await createClient();
   const {
@@ -36,45 +35,11 @@ export async function POST(request: Request, context: RouteContext) {
     );
   }
 
-  let body: { recipient_email?: string } = {};
-  try {
-    body = await request.json();
-  } catch {
-    body = {};
-  }
-
-  const { data: senderProfile } = await supabase
-    .from("users")
-    .select("name, email")
-    .eq("id", user.id)
-    .single();
-
-  const senderName =
-    senderProfile?.name?.trim() ||
-    senderProfile?.email?.split("@")[0] ||
-    "Someone";
-
   const listenUrl = `${getAppOrigin()}/v/${voiceNote.share_token}`;
 
-  let emailResult: Awaited<ReturnType<typeof sendVoiceNoteReceivedEmail>> = {
-    sent: false,
-    skipped: true,
-  };
-  const recipientEmail = body.recipient_email?.trim();
-
-  if (recipientEmail) {
-    emailResult = await sendVoiceNoteReceivedEmail({
-      recipientEmail,
-      senderName,
-      shareToken: voiceNote.share_token,
-      durationSeconds: voiceNote.duration_seconds,
-    });
-  }
-
   return NextResponse.json({
-    sent: emailResult.sent,
-    skipped: emailResult.skipped,
+    sent: true,
+    skipped: false,
     listen_url: listenUrl,
-    error: emailResult.error,
   });
 }

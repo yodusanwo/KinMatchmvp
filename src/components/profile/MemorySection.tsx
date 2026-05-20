@@ -1,3 +1,6 @@
+"use client";
+
+import { useMemo } from "react";
 import type { MemoryCategory, MemoryNote } from "@/lib/api/types";
 import {
   MEMORY_CATEGORIES,
@@ -12,101 +15,194 @@ type MemorySectionProps = {
   memories: MemoryNote[];
   onAddCategory: (category: MemoryCategory) => void;
   highlightId?: string | null;
+  showAddControls?: boolean;
 };
+
+const DISPLAY_CATEGORIES: MemoryCategory[] = [...MEMORY_CATEGORY_ORDER, "other"];
 
 export function MemorySection({
   friendName,
   memories,
   onAddCategory,
   highlightId,
+  showAddControls = true,
 }: MemorySectionProps) {
   const name = firstName(friendName);
 
-  const byCategory = MEMORY_CATEGORY_ORDER.reduce(
-    (acc, category) => {
-      acc[category] = memories.filter((note) => note.category === category);
-      return acc;
-    },
-    {} as Record<MemoryCategory, MemoryNote[]>
+  const byCategory = useMemo(
+    () =>
+      DISPLAY_CATEGORIES.reduce(
+        (acc, category) => {
+          acc[category] = memories.filter((note) => note.category === category);
+          return acc;
+        },
+        {} as Record<MemoryCategory, MemoryNote[]>
+      ),
+    [memories]
+  );
+
+  const categoriesWithContent = DISPLAY_CATEGORIES.filter(
+    (category) => byCategory[category].length > 0
   );
 
   return (
     <section className="space-y-4">
-      {MEMORY_CATEGORY_ORDER.map((categoryId) => {
-        const config = MEMORY_CATEGORIES[categoryId];
-        const Icon = config.icon;
-        const notes = byCategory[categoryId];
-        const empty = config.emptyPrompt(name);
+      <div className="space-y-1.5">
+        <p className="font-sans text-[11px] font-medium uppercase tracking-[0.12em] text-terracotta">
+          Things to remember
+        </p>
+        <h2 className="font-serif text-2xl leading-tight text-ink">
+          What helps you show up for {name}?
+        </h2>
+        <p className="font-inter text-sm italic leading-relaxed text-ink-soft">
+          Capture small details as they come to you. KinMatch will surface them
+          when they matter.
+        </p>
+      </div>
 
-        return (
-          <div key={categoryId}>
-            <div className="flex items-center">
-              <Icon
-                className="h-4 w-4 shrink-0"
-                style={{ color: "rgba(31, 26, 20, 0.55)" }}
-                strokeWidth={1.75}
-                aria-hidden
-              />
-              <h3
-                className="ml-1.5 font-inter text-[13px] font-medium leading-none"
-                style={{ color: "rgba(31, 26, 20, 0.85)" }}
-              >
+      {showAddControls && (
+        <button
+          type="button"
+          onClick={() => onAddCategory("current")}
+          className="group flex w-full items-center gap-3 rounded-2xl border border-terracotta/35 bg-terracotta/10 p-4 text-left transition-colors active:bg-terracotta/15"
+        >
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-terracotta text-cream">
+            <Plus className="h-4 w-4" strokeWidth={2} aria-hidden />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-sans text-sm font-medium text-ink">
+              Add something to remember
+            </span>
+            <span className="mt-0.5 block font-inter text-xs italic leading-relaxed text-ink-soft">
+              A birthday, a person they love, what they&apos;re going through, or
+              any small detail.
+            </span>
+          </span>
+        </button>
+      )}
+
+      {categoriesWithContent.length > 0 && (
+        <div className="space-y-3">
+        {categoriesWithContent.map((categoryId) => (
+          <MemoryPromptCard
+            key={categoryId}
+            categoryId={categoryId}
+            friendName={friendName}
+            firstName={name}
+            notes={byCategory[categoryId]}
+            highlightId={highlightId}
+            onAddCategory={onAddCategory}
+            showAddControls={showAddControls}
+          />
+        ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+type MemoryPromptCardProps = {
+  categoryId: MemoryCategory;
+  friendName: string;
+  firstName: string;
+  notes: MemoryNote[];
+  onAddCategory: (category: MemoryCategory) => void;
+  highlightId?: string | null;
+  showAddControls: boolean;
+};
+
+function MemoryPromptCard({
+  categoryId,
+  friendName,
+  firstName: name,
+  notes,
+  onAddCategory,
+  highlightId,
+  showAddControls,
+}: MemoryPromptCardProps) {
+  const config = MEMORY_CATEGORIES[categoryId];
+  const Icon = config.icon;
+  const empty = config.emptyPrompt(name);
+  const visibleNotes = notes.slice(0, 2);
+
+  return (
+    <article
+      className={cn(
+        "rounded-2xl border border-ink/[0.12] bg-cream-deep/35 p-3.5"
+      )}
+    >
+      <div className="flex items-start gap-3">
+        <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cream">
+          <Icon
+            className="h-4 w-4 text-ink-soft"
+            strokeWidth={1.75}
+            aria-hidden
+          />
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start gap-2">
+            <div className="min-w-0 flex-1">
+              <h3 className="font-sans text-sm font-medium leading-snug text-ink">
                 {config.title(name)}
               </h3>
+              {notes.length === 0 && (
+                <p className="mt-0.5 font-inter text-xs italic leading-relaxed text-ink-soft">
+                  {empty.before}
+                  <span className="text-terracotta underline decoration-terracotta/70 underline-offset-2">
+                    {empty.link}
+                  </span>
+                  {empty.after}
+                </p>
+              )}
+            </div>
+            {showAddControls && (
               <button
                 type="button"
                 onClick={() => onAddCategory(categoryId)}
-                className="ml-auto flex h-6 w-6 items-center justify-center rounded-full transition-colors hover:bg-cream-deep"
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-cream"
                 aria-label={`Add ${config.chipLabel.toLowerCase()} note about ${friendName}`}
               >
                 <Plus
-                  className="h-3.5 w-3.5"
-                  style={{ color: "rgba(31, 26, 20, 0.45)" }}
+                  className="h-3.5 w-3.5 text-ink-soft"
                   strokeWidth={2}
+                  aria-hidden
                 />
-              </button>
-            </div>
-
-            {notes.length > 0 ? (
-              <ul className="mt-1 flex flex-col gap-1 pl-[22px]">
-                {notes.map((note) => (
-                  <li
-                    key={note.id}
-                    className={cn(
-                      "font-inter text-xs italic leading-[1.5] transition-opacity duration-500",
-                      highlightId === note.id
-                        ? "text-ink"
-                        : "text-[rgba(31,26,20,0.75)]"
-                    )}
-                  >
-                    · {note.text}
-                    {note.event_date && categoryId === "dates" ? (
-                      <span className="not-italic text-[rgba(31,26,20,0.45)]">
-                        {" "}
-                        ({formatEventDate(note.event_date)})
-                      </span>
-                    ) : null}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <button
-                type="button"
-                onClick={() => onAddCategory(categoryId)}
-                className="mt-1 pl-[22px] text-left font-inter text-xs italic leading-[1.5]"
-                style={{ color: "rgba(31, 26, 20, 0.4)" }}
-              >
-                {empty.before}
-                <span className="text-terracotta underline decoration-terracotta underline-offset-2">
-                  {empty.link}
-                </span>
-                {empty.after}
               </button>
             )}
           </div>
-        );
-      })}
-    </section>
+
+          {visibleNotes.length > 0 && (
+            <ul className="mt-2 space-y-1">
+              {visibleNotes.map((note) => (
+                <li
+                  key={note.id}
+                  className={cn(
+                    "rounded-xl bg-cream/70 px-3 py-2 font-inter text-xs italic leading-[1.5] transition-colors duration-500",
+                    highlightId === note.id
+                      ? "text-ink ring-1 ring-terracotta/40"
+                      : "text-[rgba(31,26,20,0.75)]"
+                  )}
+                >
+                  {note.text}
+                  {note.event_date && categoryId === "dates" ? (
+                    <span className="not-italic text-[rgba(31,26,20,0.45)]">
+                      {" "}
+                      ({formatEventDate(note.event_date)})
+                    </span>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {notes.length > visibleNotes.length && (
+            <p className="mt-1.5 font-inter text-[11px] italic text-ink-soft">
+              +{notes.length - visibleNotes.length} more saved
+            </p>
+          )}
+        </div>
+      </div>
+    </article>
   );
 }
 
