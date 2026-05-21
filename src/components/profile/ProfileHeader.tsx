@@ -12,6 +12,7 @@ type ProfileHeaderProps = {
     | "cadence_label"
     | "days_quiet"
     | "is_drifting"
+    | "last_touch_at"
   >;
 };
 
@@ -33,6 +34,7 @@ export function ProfileHeader({ friend }: ProfileHeaderProps) {
         <DriftIndicator
           daysQuiet={friend.days_quiet}
           isDrifting={friend.is_drifting}
+          lastTouchAt={friend.last_touch_at}
         />
       </p>
     </div>

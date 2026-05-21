@@ -3,16 +3,20 @@ import { cn } from "@/lib/cn";
 type DriftIndicatorProps = {
   daysQuiet: number;
   isDrifting: boolean;
+  lastTouchAt?: string | null;
   className?: string;
 };
 
 export function DriftIndicator({
   daysQuiet,
   isDrifting,
+  lastTouchAt,
   className,
 }: DriftIndicatorProps) {
   const label =
-    daysQuiet === 0
+    !lastTouchAt
+      ? "Not reached out yet"
+      : daysQuiet === 0
       ? "On rhythm today"
       : daysQuiet === 1
         ? "1 day quiet"

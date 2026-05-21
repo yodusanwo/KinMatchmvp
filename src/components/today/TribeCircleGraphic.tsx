@@ -22,6 +22,11 @@ function firstName(name: string) {
   return name.trim().split(/\s+/)[0] ?? name;
 }
 
+function quietLabel(friend: FriendSummary) {
+  if (!friend.last_touch_at) return "not yet";
+  return friend.days_quiet === 0 ? "today" : `${friend.days_quiet}d quiet`;
+}
+
 export function TribeCircleGraphic({
   tribe,
   highlightFriendId,
@@ -73,7 +78,7 @@ export function TribeCircleGraphic({
               {firstName(friend.name)}
             </span>
             <span className="font-sans text-[9px] leading-none text-ink-soft">
-              {friend.days_quiet === 0 ? "today" : `${friend.days_quiet}d quiet`}
+              {quietLabel(friend)}
             </span>
           </Link>
         );

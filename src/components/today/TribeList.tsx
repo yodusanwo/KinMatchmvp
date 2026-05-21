@@ -45,6 +45,7 @@ export function TribeList({ tribe, className }: TribeListProps) {
               <DriftIndicator
                 daysQuiet={friend.days_quiet}
                 isDrifting={friend.is_drifting}
+                lastTouchAt={friend.last_touch_at}
               />
               <ChevronRight
                 className="h-4 w-4 text-ink-soft group-hover:text-terracotta"

@@ -20,10 +20,11 @@ function firstName(name: string) {
   return name.trim().split(/\s+/)[0] ?? name;
 }
 
-function cadenceStatus(daysQuiet: number) {
-  if (daysQuiet === 0) return "on rhythm";
-  if (daysQuiet === 1) return "1 day quiet";
-  return `${daysQuiet} days quiet`;
+function cadenceStatus(friend: SendSpotlightProps["state"]["friend"]) {
+  if (!friend.last_touch_at) return "not reached out yet";
+  if (friend.days_quiet === 0) return "reached out today";
+  if (friend.days_quiet === 1) return "1 day quiet";
+  return `${friend.days_quiet} days quiet`;
 }
 
 function daysSince(iso: string) {
@@ -67,7 +68,7 @@ export function SendSpotlight({ state }: SendSpotlightProps) {
         <div>
           <p className="font-sans text-base font-semibold text-ink">{name}</p>
           <p className="font-sans text-xs text-ink-soft">
-            {cadenceStatus(state.friend.days_quiet)}
+            {cadenceStatus(state.friend)}
           </p>
         </div>
       </Link>

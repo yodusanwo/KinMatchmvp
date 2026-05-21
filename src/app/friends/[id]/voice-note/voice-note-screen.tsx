@@ -91,24 +91,35 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
       }
 
       const sendData = (await sendRes.json()) as {
+        voice_note: { id: string };
         public_url: string;
         friend_name: string;
       };
 
       trackEvent("voice_note_sent", { share_sheet: "1" });
 
+      let shareTriggered = false;
       if (navigator.share && sendData.public_url) {
         try {
-          await navigator.share({
+          const sharePromise = navigator.share({
             url: sendData.public_url,
             text: `Hey ${sendData.friend_name} — sent you a quick voice note.`,
             title: "Voice note from KinMatch",
           });
+          shareTriggered = true;
+          await sharePromise;
         } catch {
           // Share sheets can be cancelled; the voice note is already saved.
         }
       } else if (sendData.public_url && navigator.clipboard) {
         await navigator.clipboard.writeText(sendData.public_url);
+        shareTriggered = true;
+      }
+
+      if (shareTriggered) {
+        await fetch(`/api/voice-notes/${sendData.voice_note.id}/send`, {
+          method: "POST",
+        });
       }
 
       router.push("/today");

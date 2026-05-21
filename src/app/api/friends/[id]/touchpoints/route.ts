@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
-const TOUCHPOINT_MODES = ["voice_note", "response_captured"] as const;
+const TOUCHPOINT_MODES = ["response_captured"] as const;
 type TouchpointMode = (typeof TOUCHPOINT_MODES)[number];
 
 function isTouchpointMode(value: unknown): value is TouchpointMode {
@@ -13,8 +13,8 @@ function isTouchpointMode(value: unknown): value is TouchpointMode {
   );
 }
 
-function interactionTypeForMode(mode: TouchpointMode) {
-  return mode === "response_captured" ? "voice_note_received" : "voice_note_sent";
+function interactionTypeForMode() {
+  return "voice_note_received";
 }
 
 export async function POST(request: Request, context: RouteContext) {
@@ -52,19 +52,16 @@ export async function POST(request: Request, context: RouteContext) {
   }
 
   const now = new Date();
-  const captureDueAt = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-
   const { data: interaction, error } = await supabase
     .from("interactions")
     .insert({
       user_id: user.id,
       friend_id: friendId,
-      type: interactionTypeForMode(body.mode),
+      type: interactionTypeForMode(),
       mode: body.mode,
       direction: "outbound",
       occurred_at: now.toISOString(),
-      capture_prompt_due_at:
-        body.mode === "voice_note" ? captureDueAt.toISOString() : null,
+      capture_prompt_due_at: null,
     })
     .select("id, type, mode, occurred_at, capture_prompt_due_at")
     .single();

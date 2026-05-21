@@ -91,56 +91,6 @@ export async function POST(request: Request, context: RouteContext) {
     return NextResponse.json({ error: updateError.message }, { status: 500 });
   }
 
-  if (voiceNote.recipient_friend_id) {
-    const nowDate = new Date();
-    const now = nowDate.toISOString();
-    const capturePromptDueAt = new Date(
-      nowDate.getTime() + 24 * 60 * 60 * 1000
-    ).toISOString();
-
-    const { data: interaction } = await supabase
-      .from("interactions")
-      .insert({
-        user_id: user.id,
-        friend_id: voiceNote.recipient_friend_id,
-        type: "voice_note_sent",
-        mode: "voice_note",
-        direction: "outbound",
-        voice_note_id: id,
-        occurred_at: now,
-        capture_prompt_due_at: capturePromptDueAt,
-      })
-      .select("id")
-      .single();
-
-    if (interaction) {
-      const { data: discoveryPrompt } = await supabase
-        .from("discovery_prompts")
-        .select("id")
-        .eq("user_id", user.id)
-        .eq("friend_id", voiceNote.recipient_friend_id)
-        .is("interaction_id", null)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (discoveryPrompt) {
-        await supabase
-          .from("discovery_prompts")
-          .update({ interaction_id: interaction.id })
-          .eq("id", discoveryPrompt.id)
-          .eq("user_id", user.id);
-      }
-    }
-
-    await supabase
-      .from("friends")
-      .update({ last_touch_at: now })
-      .eq("id", voiceNote.recipient_friend_id)
-      .eq("user_id", user.id)
-      .is("archived_at", null);
-  }
-
   return NextResponse.json({
     id,
     audio_url: audioUrl,

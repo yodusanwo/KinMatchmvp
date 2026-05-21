@@ -115,44 +115,6 @@ export async function POST(req: Request) {
     );
   }
 
-  const nowDate = new Date();
-  const now = nowDate.toISOString();
-  const capturePromptDueAt = new Date(
-    nowDate.getTime() + 24 * 60 * 60 * 1000
-  ).toISOString();
-
-  const { data: interaction } = await supabase
-    .from("interactions")
-    .insert({
-      user_id: user.id,
-      friend_id: friendId,
-      type: "voice_note_sent",
-      mode: "voice_note",
-      direction: "outbound",
-      voice_note_id: voiceNote.id,
-      occurred_at: now,
-      capture_prompt_due_at: capturePromptDueAt,
-    })
-    .select("id")
-    .single();
-
-  if (interaction) {
-    if (discoveryPrompt) {
-      await supabase
-        .from("discovery_prompts")
-        .update({ interaction_id: interaction.id })
-        .eq("id", discoveryPrompt.id)
-        .eq("user_id", user.id);
-    }
-  }
-
-  await supabase
-    .from("friends")
-    .update({ last_touch_at: now })
-    .eq("id", friendId)
-    .eq("user_id", user.id)
-    .is("archived_at", null);
-
   const publicUrl = `${getAppOrigin()}/v/${shareToken}`;
 
   return NextResponse.json({
