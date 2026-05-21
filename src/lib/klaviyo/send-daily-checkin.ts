@@ -1,8 +1,10 @@
 import { formatDailyCheckinSubject } from "@/lib/personalization";
 import type { PersonalizableUser } from "@/lib/personalization";
 import { getAppOrigin, hasKlaviyo } from "@/lib/env";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 type SendDailyCheckinParams = {
+  userId: string;
   userEmail: string;
   user: PersonalizableUser;
   friendName: string;
@@ -16,6 +18,22 @@ export async function sendDailyCheckinEmail(
   params: SendDailyCheckinParams
 ): Promise<{ sent: boolean; skipped?: boolean; error?: string }> {
   if (!hasKlaviyo()) {
+    return { sent: false, skipped: true };
+  }
+
+  const admin = createAdminClient();
+  const { data: profile, error: profileError } = await admin
+    .from("users")
+    .select("daily_checkin_enabled")
+    .eq("id", params.userId)
+    .maybeSingle();
+
+  if (profileError) {
+    return { sent: false, error: profileError.message };
+  }
+
+  if (profile?.daily_checkin_enabled === false) {
+    console.log(`Skipping daily check-in for ${params.userId} — disabled`);
     return { sent: false, skipped: true };
   }
 

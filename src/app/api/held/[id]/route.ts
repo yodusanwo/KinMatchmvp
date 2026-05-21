@@ -123,6 +123,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
     const quietWindow = thresholdDays ?? relationship.threshold_days;
     const result = await sendHeldSetupEmail({
+      holderUserId: user.id,
       recipientEmail: notificationEmail,
       holderName: friend.name,
       userName: profile?.name?.trim() || profile?.email?.split("@")[0] || "Someone",

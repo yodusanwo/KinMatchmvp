@@ -27,6 +27,7 @@ export function FinishScreen() {
   const {
     q1People,
     q2People,
+    userName,
     circleAssignments,
     q3Barriers,
     watchers,
@@ -62,6 +63,7 @@ export function FinishScreen() {
 
       const stored = loadOnboardingFromStorage();
       const people = q1People.length > 0 ? q1People : (stored?.q1People ?? []);
+      const name = userName.trim() || stored?.userName?.trim() || "";
       const peopleQ2 = q2People.length > 0 ? q2People : (stored?.q2People ?? []);
       const assignments =
         Object.keys(circleAssignments).length > 0
@@ -72,7 +74,7 @@ export function FinishScreen() {
       const watcherIds =
         watchers.length > 0 ? watchers : (stored?.watchers ?? []);
 
-      if (people.length === 0) {
+      if (!name || people.length === 0) {
         hasRun.current = false;
         router.replace("/onboarding/q1");
         return;
@@ -81,6 +83,7 @@ export function FinishScreen() {
       setStatus("saving");
 
       const payload: CompleteOnboardingPayload = {
+        userName: name,
         q1People: people,
         q2People: peopleQ2,
         circleAssignments: assignments,
@@ -125,6 +128,7 @@ export function FinishScreen() {
     hydrated,
     q1People,
     q2People,
+    userName,
     circleAssignments,
     q3Barriers,
     watchers,

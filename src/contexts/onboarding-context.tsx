@@ -20,6 +20,7 @@ export type { BarrierId, CircleId, OnboardingState, PersonChip };
 const STORAGE_KEY = "kinmatch-onboarding";
 
 const defaultState: OnboardingState = {
+  userName: "",
   q1People: [],
   q2People: [],
   circleAssignments: {},
@@ -29,6 +30,7 @@ const defaultState: OnboardingState = {
 
 type OnboardingContextValue = OnboardingState & {
   hydrated: boolean;
+  setUserName: (name: string) => void;
   setQ1People: React.Dispatch<React.SetStateAction<PersonChip[]>>;
   setQ2People: React.Dispatch<React.SetStateAction<PersonChip[]>>;
   addQ1Person: (name: string) => boolean;
@@ -49,10 +51,12 @@ function migrateLegacyState(parsed: Record<string, unknown>): OnboardingState {
   const q2Names = (parsed.q2Names as string[] | undefined) ?? [];
   const q3Barriers = (parsed.q3Barriers as BarrierId[] | undefined) ?? [];
   const watchers = (parsed.watchers as string[] | undefined) ?? [];
+  const userName = typeof parsed.userName === "string" ? parsed.userName : "";
   const innerPeople = q1Names.map((name) => createPerson(name));
   const villagePeople = q2Names.map((name) => createPerson(name));
 
   return {
+    userName,
     q1People: [...innerPeople, ...villagePeople],
     q2People: villagePeople,
     circleAssignments: {
@@ -118,6 +122,10 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     },
     []
   );
+
+  const setUserName = useCallback((name: string) => {
+    setState((s) => ({ ...s, userName: name }));
+  }, []);
 
   const setQ2People = useCallback(
     (value: React.SetStateAction<PersonChip[]>) => {
@@ -237,6 +245,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     () => ({
       ...state,
       hydrated,
+      setUserName,
       setQ1People,
       setQ2People,
       addQ1Person,
@@ -252,6 +261,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     [
       state,
       hydrated,
+      setUserName,
       setQ1People,
       setQ2People,
       addQ1Person,

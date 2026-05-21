@@ -37,6 +37,7 @@ export async function POST(request: Request) {
   const q1People = dedupePeopleByName(
     Array.isArray(body.q1People) ? body.q1People : []
   );
+  const userName = body.userName?.trim();
   const q2People = dedupePeopleByName(
     Array.isArray(body.q2People) ? body.q2People : []
   );
@@ -52,6 +53,13 @@ export async function POST(request: Request) {
     : q2People;
   const q3Barriers = body.q3Barriers;
   const watchers = Array.isArray(body.watchers) ? body.watchers : [];
+
+  if (!userName || userName.length < 2) {
+    return NextResponse.json(
+      { error: "Enter your name to finish onboarding." },
+      { status: 400 }
+    );
+  }
 
   if (innerCirclePeople.length === 0) {
     return NextResponse.json(
@@ -75,6 +83,7 @@ export async function POST(request: Request) {
       discovery_started_at: completedAt,
       discovery_completed_at: null,
       email: user.email ?? undefined,
+      name: userName,
     })
     .eq("id", user.id)
     .is("onboarding_completed_at", null)

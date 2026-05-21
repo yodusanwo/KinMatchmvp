@@ -6,7 +6,9 @@ export default async function ProfilePage() {
 
   const { data: profile } = await supabase
     .from("users")
-    .select("name, email, email_preferences, onboarding_completed_at")
+    .select(
+      "name, email, onboarding_completed_at, daily_checkin_enabled, sunday_voice_drop_enabled, held_alerts_enabled"
+    )
     .eq("id", user.id)
     .single();
 
@@ -15,15 +17,11 @@ export default async function ProfilePage() {
       email={profile?.email ?? user.email ?? ""}
       name={profile?.name ?? null}
       onboardingComplete={Boolean(profile?.onboarding_completed_at)}
-      emailPreferences={
-        profile?.email_preferences as
-          | {
-              daily_checkin?: boolean;
-              sunday_voice_drop?: boolean;
-              held_alerts?: boolean;
-            }
-          | null
-      }
+      emailPreferences={{
+        daily_checkin_enabled: profile?.daily_checkin_enabled ?? true,
+        sunday_voice_drop_enabled: profile?.sunday_voice_drop_enabled ?? true,
+        held_alerts_enabled: profile?.held_alerts_enabled ?? true,
+      }}
     />
   );
 }

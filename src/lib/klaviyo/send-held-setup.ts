@@ -1,6 +1,8 @@
 import { getAppOrigin, hasKlaviyo } from "@/lib/env";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 type SendHeldSetupEmailParams = {
+  holderUserId: string;
   recipientEmail: string;
   holderName: string;
   userName: string;
@@ -12,6 +14,22 @@ export async function sendHeldSetupEmail(
   params: SendHeldSetupEmailParams
 ): Promise<{ sent: boolean; skipped?: boolean; error?: string }> {
   if (!hasKlaviyo()) {
+    return { sent: false, skipped: true };
+  }
+
+  const admin = createAdminClient();
+  const { data: profile, error: profileError } = await admin
+    .from("users")
+    .select("held_alerts_enabled")
+    .eq("id", params.holderUserId)
+    .maybeSingle();
+
+  if (profileError) {
+    return { sent: false, error: profileError.message };
+  }
+
+  if (profile?.held_alerts_enabled === false) {
+    console.log(`Skipping held alert for ${params.holderUserId} — disabled`);
     return { sent: false, skipped: true };
   }
 

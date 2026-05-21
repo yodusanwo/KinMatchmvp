@@ -19,6 +19,7 @@ export type BarrierId =
 export type CircleId = "inner" | "village" | "acquaintance";
 
 export type OnboardingState = {
+  userName: string;
   q1People: PersonChip[];
   q2People: PersonChip[];
   circleAssignments: Record<string, CircleId>;
