@@ -39,7 +39,12 @@ export async function sendWelcomeEmail(
           profile: {
             data: {
               type: "profile",
-              attributes: { email: params.email },
+              attributes: {
+                email: params.email,
+                ...(params.firstName?.trim()
+                  ? { first_name: params.firstName.trim() }
+                  : {}),
+              },
             },
           },
           properties: {

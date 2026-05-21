@@ -12,8 +12,6 @@ const REFLECTION_COPY_CLASS =
 
 export function Q1Screen() {
   const {
-    userName,
-    setUserName,
     q1People,
     addQ1Person,
     removeQ1Person,
@@ -21,8 +19,7 @@ export function Q1Screen() {
   } = useOnboarding();
 
   const count = q1People.length;
-  const hasUserName = userName.trim().length >= 2;
-  const canContinue = hasUserName && count > 0;
+  const canContinue = count > 0;
 
   if (!hydrated) {
     return (
@@ -39,7 +36,7 @@ export function Q1Screen() {
         <>
           {!canContinue && (
             <p className="text-center font-inter text-sm italic text-ink-soft">
-              Add your name and at least one person to continue.
+              Add at least one person to continue.
             </p>
           )}
           <ContinueButton
@@ -63,21 +60,9 @@ export function Q1Screen() {
         </p>
       </div>
 
-      <label className="block space-y-2">
-        <span className="font-sans text-[11px] font-medium uppercase tracking-[0.12em] text-ink-soft">
-          Your name
-        </span>
-        <input
-          value={userName}
-          onChange={(event) => setUserName(event.target.value)}
-          placeholder="What should we call you?"
-          className="w-full rounded-2xl border border-ink/[0.18] bg-cream px-4 py-3 font-inter text-sm text-ink placeholder:text-ink-soft/60 focus:border-terracotta focus:outline-none focus:ring-1 focus:ring-terracotta/30"
-        />
-      </label>
-
       <NameChipList people={q1People} onRemove={removeQ1Person} />
 
-      <AddNameInput placeholder="Add another name…" onAdd={addQ1Person} />
+      <AddNameInput placeholder="Add a name…" onAdd={addQ1Person} />
 
       <p className={REFLECTION_COPY_CLASS}>
         Don&apos;t classify yet. The next step will help you sort each person

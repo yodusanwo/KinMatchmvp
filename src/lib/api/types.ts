@@ -27,10 +27,6 @@ export type TodaySpotlight = {
 export type TodayUpNext = NonNullable<TodaySpotlight>;
 
 export type TodayResponse = {
-  user: {
-    name: string | null;
-    email: string | null;
-  };
   spotlight: TodaySpotlight;
   dailyState?: TodayDailyState | null;
   upNext?: TodayUpNext[];
