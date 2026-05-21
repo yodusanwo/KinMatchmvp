@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { HeartHandshake, Home, Mic, Users } from "lucide-react";
+import { CalendarHeart, HeartHandshake, Home, Mic, Users } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 type BottomNavProps = {
@@ -23,6 +23,12 @@ const NAV_ITEMS = [
     icon: Mic,
     match: /^\/voice-notes/,
   },
+  {
+    href: "/rituals",
+    label: "Rituals",
+    icon: CalendarHeart,
+    match: /^\/rituals/,
+  },
   { href: "/held", label: "Held", icon: HeartHandshake, match: /^\/held/ },
 ] as const;
 
@@ -31,7 +37,7 @@ export function BottomNav({ heldBadge = false }: BottomNavProps) {
 
   return (
     <nav
-      className="fixed bottom-0 left-1/2 z-20 w-full max-w-[480px] -translate-x-1/2 border-t border-ink/[0.12] bg-cream px-6 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+      className="fixed bottom-0 left-1/2 z-20 w-full max-w-[480px] -translate-x-1/2 border-t border-ink/[0.12] bg-cream px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
       aria-label="Main"
     >
       <ul className="flex items-center justify-between">
@@ -42,12 +48,12 @@ export function BottomNav({ heldBadge = false }: BottomNavProps) {
               <Link
                 href={href}
                 className={cn(
-                  "relative flex flex-col items-center gap-1 px-2 py-1",
-                  active ? "text-terracotta" : "text-ink-soft"
+                  "relative flex flex-col items-center gap-1 px-1 py-1 min-[360px]:px-2",
+                  active ? "text-[#B65232]" : "text-[rgba(31,26,20,0.45)]"
                 )}
                 aria-current={active ? "page" : undefined}
               >
-                <Icon className="h-5 w-5" strokeWidth={1.75} aria-hidden />
+                <Icon className="h-3.5 w-3.5 min-[360px]:h-5 min-[360px]:w-5" strokeWidth={1.75} aria-hidden />
                 <span className="font-sans text-[10px] font-medium">{label}</span>
                 {label === "Held" && heldBadge && (
                   <span

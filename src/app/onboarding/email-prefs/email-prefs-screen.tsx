@@ -92,7 +92,7 @@ export function EmailPrefsScreen() {
 
       resetOnboarding();
       sessionStorage.removeItem(STORAGE_KEY);
-      router.replace("/today");
+      router.replace("/onboarding/rituals");
     } catch {
       setError("Could not save your people. Check your connection and try again.");
       saveInFlight.current = false;

@@ -47,7 +47,7 @@ export function RevealScreen() {
     <AppShell>
       <BrandBar />
       <div className="flex min-h-[calc(100vh-65px)] flex-col px-5 py-6">
-        <div className="flex-1 space-y-6">
+        <div className="flex-1 space-y-5">
           <div className="space-y-2 text-center">
             <Eyebrow>Reflection complete</Eyebrow>
             <Headline>Here are your circles.</Headline>
@@ -55,9 +55,13 @@ export function RevealScreen() {
           </div>
 
           {innerCircle.length > 0 && (
-            <section className="space-y-5">
+            <section className="space-y-4">
               <Eyebrow>Your Inner Circle · {innerCircle.length}</Eyebrow>
-              <ConstellationView faces={innerCircle} avatarSize="lg" />
+              <ConstellationView
+                faces={innerCircle}
+                avatarSize="lg"
+                compact={innerCircle.length <= 2}
+              />
             </section>
           )}
 
@@ -65,7 +69,7 @@ export function RevealScreen() {
             <section
               className={cn(
                 "space-y-4",
-                innerCircle.length > 0 && "border-t border-ink/[0.12] pt-5"
+                innerCircle.length > 0 && "border-t border-ink/[0.12] pt-4"
               )}
             >
               <Eyebrow>Your Village · {village.length}</Eyebrow>

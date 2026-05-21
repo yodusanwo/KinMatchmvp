@@ -26,6 +26,7 @@ type ConstellationViewProps = {
   onToggleSelect?: (id: string) => void;
   heartBadge?: boolean;
   avatarSize?: "sm" | "md" | "lg";
+  compact?: boolean;
   className?: string;
 };
 
@@ -35,11 +36,31 @@ export function ConstellationView({
   selectedIds = [],
   heartBadge = false,
   avatarSize = "md",
+  compact = false,
   onToggleSelect,
   className,
 }: ConstellationViewProps) {
   const displayFaces = faces.slice(0, 5);
   const overflow = faces.length > 5 ? faces.slice(5) : [];
+
+  if (compact) {
+    return (
+      <ul className={cn("flex flex-wrap items-start justify-center gap-8", className)}>
+        {displayFaces.map((face) => (
+          <li key={face.id} className="flex flex-col items-center gap-1.5">
+            <MiniAvatar
+              name={face.name}
+              avatarColor={face.avatarColor}
+              size={avatarSize}
+            />
+            <span className="max-w-[72px] truncate font-sans text-xs text-ink">
+              {face.name.split(" ")[0]}
+            </span>
+          </li>
+        ))}
+      </ul>
+    );
+  }
 
   return (
     <div className={cn("w-full", className)}>
