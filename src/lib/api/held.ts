@@ -1,5 +1,7 @@
 import type { AvatarColor } from "@/lib/onboarding/types";
 
+export type HeldRelationshipStatus = "pending" | "accepted" | "declined";
+
 /** Friend the current user watches via Held (pilot: from onboarding watchers). */
 export type HeldFriendEntry = {
   relationship_id: string;
@@ -9,9 +11,13 @@ export type HeldFriendEntry = {
   email: string | null;
   days_quiet: number;
   threshold_days: number;
+  invited_at: string;
+  accepted_at: string | null;
+  archived_at?: string | null;
+  last_notified_at: string | null;
   setup_notified_at: string | null;
   setup_notification_error: string | null;
-  status: "active" | "paused";
+  status: HeldRelationshipStatus;
   at_threshold: boolean;
 };
 
@@ -34,4 +40,11 @@ export type HeldResponse = {
   holding: HeldFriendEntry[];
   held_by: HeldByUserEntry[];
   recent_events: HeldRecentEvent[];
+  eligible_friends: {
+    id: string;
+    name: string;
+    avatar_color: AvatarColor;
+  }[];
+  quiet_threshold_days: number;
+  max_watchers: number;
 };

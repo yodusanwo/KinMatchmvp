@@ -84,7 +84,7 @@ export async function PATCH(request: Request, context: RouteContext) {
       threshold_days,
       setup_notified_at,
       held_friend_id,
-      friends(id, name, email),
+      friends:friends!held_relationships_held_friend_id_fkey(id, name, email, archived_at),
       users:holder_user_id(name, email)
       `
     )
@@ -113,8 +113,8 @@ export async function PATCH(request: Request, context: RouteContext) {
   }
 
   const friendRaw = relationship.friends as
-    | { id: string; name: string; email: string | null }
-    | { id: string; name: string; email: string | null }[]
+    | { id: string; name: string; email: string | null; archived_at: string | null }
+    | { id: string; name: string; email: string | null; archived_at: string | null }[]
     | null;
   const friend = Array.isArray(friendRaw) ? friendRaw[0] : friendRaw;
 
@@ -124,7 +124,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     | null;
   const profile = Array.isArray(userRaw) ? userRaw[0] : userRaw;
 
-  if (partnerEmail !== undefined && friend) {
+  if (partnerEmail !== undefined && friend && !friend.archived_at) {
     const notificationEmail = partnerEmail;
     if (!notificationEmail) {
       return NextResponse.json(
@@ -137,7 +137,8 @@ export async function PATCH(request: Request, context: RouteContext) {
       .from("friends")
       .update({ email: notificationEmail })
       .eq("id", friend.id)
-      .eq("user_id", user.id);
+      .eq("user_id", user.id)
+      .is("archived_at", null);
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });

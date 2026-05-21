@@ -1,4 +1,5 @@
 export { InterestPills } from "./InterestPills";
+export { FriendManagementSheet } from "./FriendManagementSheet";
 export { MemoryCaptureModal } from "./MemoryCaptureModal";
 export { MemorySection } from "./MemorySection";
 export { ProfileDetailsHub } from "./ProfileDetailsHub";

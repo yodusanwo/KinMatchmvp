@@ -247,6 +247,9 @@ export function derivePrimaryReason(
     case "emotional_weight":
       return `${friend.name} has something going on right now`;
     case "cadence":
+      if (!friend.last_contact_at && !friend.last_touch_at) {
+        return `you haven't reached out to ${friend.name} yet`;
+      }
       return `it's been a while with ${friend.name}`;
     case "barrier_match":
       return `a good moment to reach out to ${friend.name}`;
@@ -263,9 +266,12 @@ export function rankFriendsForToday(
   user: User,
   today: Date = new Date()
 ): FriendScore[] {
-  const ignoreFatigue = friends.length === 1;
+  const candidates = friends.filter(
+    (friend) => friend.category !== "acquaintance" && !friend.archived_at
+  );
+  const ignoreFatigue = candidates.length === 1;
 
-  return friends
+  return candidates
     .map((friend) =>
       scoreFriendForSpotlight(friend, user, today, { ignoreFatigue })
     )

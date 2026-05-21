@@ -6,11 +6,14 @@ export type FriendSummary = {
   name: string;
   avatar_color: AvatarColor;
   vibe: string;
+  category: FriendCategory;
   cadence_days: number;
   days_quiet: number;
   is_drifting: boolean;
   last_touch_at: string | null;
 };
+
+export type FriendCategory = "inner_circle" | "village" | "acquaintance";
 
 export type TodaySpotlight = {
   friend_id: string;

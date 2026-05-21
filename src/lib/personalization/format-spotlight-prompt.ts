@@ -10,6 +10,10 @@ export function formatPersonalizedSpotlightPrompt(
   daysQuiet: number,
   memory?: string | null
 ): string {
+  if (daysQuiet <= 0) {
+    return `You haven't reached out to ${name} yet. A small first note is enough.`;
+  }
+
   const primary = pickPrimaryBarrier(user.barriers ?? []);
   let template = COPY_VARIANTS.spotlightPromptStyle[primary];
 

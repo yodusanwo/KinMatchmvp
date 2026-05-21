@@ -1,10 +1,12 @@
 import type { AvatarColor } from "@/lib/onboarding/types";
+import type { FriendCategory } from "@/lib/api/types";
 
 export type FriendRow = {
   id: string;
   name: string;
   avatar_color: AvatarColor;
   vibe: string;
+  category?: FriendCategory | null;
   cadence_days: number;
   last_touch_at: string | null;
   created_at: string;
@@ -36,4 +38,8 @@ export function vibeLabel(vibe: string): string {
     community: "A community connection",
   };
   return labels[vibe] ?? "A connection you care about";
+}
+
+export function normalizedCategory(category?: FriendCategory | null): FriendCategory {
+  return category ?? "inner_circle";
 }

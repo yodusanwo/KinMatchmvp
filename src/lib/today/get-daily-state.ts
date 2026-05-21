@@ -8,6 +8,7 @@ import { mapMemoryNoteRow } from "@/lib/memories/map-note";
 import {
   daysQuiet,
   isDrifting,
+  normalizedCategory,
   type FriendRow,
 } from "@/lib/friends/utils";
 import { formatPersonalizedSpotlightPrompt, isBarrierKey } from "@/lib/personalization";
@@ -103,6 +104,7 @@ function toSummary(friend: FriendContextRow | FriendRow): FriendSummary {
     name: friend.name,
     avatar_color: friend.avatar_color,
     vibe: friend.vibe,
+    category: normalizedCategory(friend.category),
     cadence_days: friend.cadence_days,
     days_quiet: quiet,
     is_drifting: isDrifting(friend),
@@ -140,6 +142,7 @@ function toAlgorithmFriend(friend: FriendContextRow): Friend {
     name: friend.name,
     avatar_color: friend.avatar_color,
     vibe: friend.vibe,
+    category: normalizedCategory(friend.category),
     created_at: friend.created_at,
     last_contact_at: friend.last_touch_at,
     last_touch_at: friend.last_touch_at,
@@ -186,6 +189,7 @@ async function loadFriendContext(supabase: Supabase, userId: string) {
       name,
       avatar_color,
       vibe,
+      category,
       cadence_days,
       last_touch_at,
       last_spotlight_at,

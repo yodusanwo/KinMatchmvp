@@ -16,6 +16,7 @@ type HeldAlertRow = {
         email: string | null;
         last_touch_at: string | null;
         created_at: string;
+        archived_at: string | null;
       }
     | {
         id: string;
@@ -23,6 +24,7 @@ type HeldAlertRow = {
         email: string | null;
         last_touch_at: string | null;
         created_at: string;
+        archived_at: string | null;
       }[]
     | null;
   holder:
@@ -62,7 +64,8 @@ export async function GET(request: NextRequest) {
         name,
         email,
         last_touch_at,
-        created_at
+        created_at,
+        archived_at
       ),
       holder:users!held_relationships_holder_user_id_fkey (
         name,
@@ -96,6 +99,11 @@ export async function GET(request: NextRequest) {
 
     if (holder?.held_alerts_enabled === false) {
       summary.skippedDisabled += 1;
+      continue;
+    }
+
+    if (friend?.archived_at) {
+      summary.skippedNotDue += 1;
       continue;
     }
 

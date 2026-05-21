@@ -5,9 +5,10 @@ import {
   cadenceLabel,
   daysQuiet,
   isDrifting,
-  vibeLabel,
+  normalizedCategory,
   type FriendRow,
 } from "@/lib/friends/utils";
+import { categoryRelationshipLabel } from "@/lib/friends/categories";
 import { buildTodayState } from "@/lib/today/get-daily-state";
 import { NextResponse } from "next/server";
 
@@ -60,7 +61,10 @@ function profilePromptForFriend(params: {
   if (hasHistory) {
     return {
       kind: "send",
-      quote: `It's been ${daysQuiet} ${daysQuiet === 1 ? "day" : "days"} since you reached out to ${name}.`,
+      quote:
+        daysQuiet <= 0
+          ? `You reached out to ${name} today.`
+          : `It's been ${daysQuiet} ${daysQuiet === 1 ? "day" : "days"} since you reached out to ${name}.`,
       why_this_works: null,
       cta_label: "Send a voice note",
       cta_href: `/friends/${friend.id}/voice-note`,
@@ -90,7 +94,7 @@ export async function GET(_request: Request, context: RouteContext) {
   const { data: friend, error: friendError } = await supabase
     .from("friends")
     .select(
-      "id, name, avatar_color, vibe, cadence_days, last_touch_at, created_at, where_met, phone_number, is_wished_closer"
+      "id, name, avatar_color, vibe, category, cadence_days, last_touch_at, created_at, where_met, phone_number, is_wished_closer"
     )
     .eq("id", id)
     .eq("user_id", user.id)
@@ -143,6 +147,7 @@ export async function GET(_request: Request, context: RouteContext) {
     is_wished_closer: boolean;
   };
   const quiet = daysQuiet(row);
+  const category = normalizedCategory(row.category);
   const { dailyState } = await buildTodayState({
     supabase,
     user: {
@@ -159,6 +164,7 @@ export async function GET(_request: Request, context: RouteContext) {
     name: row.name,
     avatar_color: row.avatar_color,
     vibe: row.vibe,
+    category,
     cadence_days: row.cadence_days,
     days_quiet: quiet,
     is_drifting: isDrifting(row),
@@ -167,7 +173,7 @@ export async function GET(_request: Request, context: RouteContext) {
     phone_number: row.phone_number,
     is_wished_closer: row.is_wished_closer,
     cadence_label: cadenceLabel(row.cadence_days),
-    vibe_label: vibeLabel(row.vibe),
+    vibe_label: categoryRelationshipLabel(category),
     memories: (memoriesRes.data ?? []).map(mapMemoryNoteRow),
     shared_interests: interestsRes.data ?? [],
     rituals: ritualsRes.data ?? [],

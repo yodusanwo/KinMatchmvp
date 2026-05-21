@@ -150,7 +150,8 @@ export async function POST(req: Request) {
     .from("friends")
     .update({ last_touch_at: now })
     .eq("id", friendId)
-    .eq("user_id", user.id);
+    .eq("user_id", user.id)
+    .is("archived_at", null);
 
   const publicUrl = `${getAppOrigin()}/v/${shareToken}`;
 

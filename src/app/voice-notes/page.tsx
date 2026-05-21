@@ -100,6 +100,7 @@ export default async function VoiceNotesPage() {
           .from("friends")
           .select("id, name, avatar_color")
           .in("id", friendIds)
+          .is("archived_at", null)
       : Promise.resolve({ data: [] }),
     voiceNoteIds.length > 0
       ? supabase

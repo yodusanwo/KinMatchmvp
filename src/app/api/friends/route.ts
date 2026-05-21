@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { FriendSummary } from "@/lib/api/types";
+import { CATEGORY_CADENCE_DAYS, isFriendCategory } from "@/lib/friends/categories";
 import { daysQuiet, isDrifting } from "@/lib/friends/utils";
 import { randomAvatarColor } from "@/lib/onboarding/avatar-colors";
 import type { AvatarColor } from "@/lib/onboarding/types";
@@ -10,13 +11,59 @@ type FriendInsertRow = {
   name: string;
   avatar_color: AvatarColor;
   vibe: string;
+  category: FriendSummary["category"];
   cadence_days: number;
   last_touch_at: string | null;
   created_at: string;
 };
 
+type FriendListRow = FriendInsertRow;
+
 function normalizeName(name: string) {
   return name.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+function toSummary(friend: FriendListRow): FriendSummary {
+  return {
+    id: friend.id,
+    name: friend.name,
+    avatar_color: friend.avatar_color,
+    vibe: friend.vibe,
+    category: friend.category ?? "inner_circle",
+    cadence_days: friend.cadence_days,
+    days_quiet: daysQuiet(friend),
+    is_drifting: isDrifting(friend),
+    last_touch_at: friend.last_touch_at,
+  };
+}
+
+export async function GET() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { data, error } = await supabase
+    .from("friends")
+    .select("id, name, avatar_color, vibe, category, cadence_days, last_touch_at, created_at")
+    .eq("user_id", user.id)
+    .eq("in_tribe", true)
+    .is("archived_at", null)
+    .order("last_touch_at", { ascending: false, nullsFirst: false })
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({
+    friends: ((data ?? []) as FriendListRow[]).map(toSummary),
+  });
 }
 
 export async function POST(req: NextRequest) {
@@ -30,7 +77,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  let body: { name?: unknown };
+  let body: { name?: unknown; category?: unknown };
   try {
     body = await req.json();
   } catch {
@@ -42,6 +89,9 @@ export async function POST(req: NextRequest) {
   }
 
   const name = body.name.trim().replace(/\s+/g, " ");
+  const category = isFriendCategory(body.category)
+    ? body.category
+    : "inner_circle";
   if (name.length < 3 || name.length > 80) {
     return NextResponse.json(
       { error: "Use a name between 3 and 80 characters." },
@@ -78,10 +128,12 @@ export async function POST(req: NextRequest) {
       name,
       avatar_color: randomAvatarColor(),
       vibe: "potential_close",
+      category,
+      cadence_days: CATEGORY_CADENCE_DAYS[category],
       is_wished_closer: false,
       in_tribe: true,
     })
-    .select("id, name, avatar_color, vibe, cadence_days, last_touch_at, created_at")
+    .select("id, name, avatar_color, vibe, category, cadence_days, last_touch_at, created_at")
     .single<FriendInsertRow>();
 
   if (error || !friend) {
@@ -91,16 +143,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const summary: FriendSummary = {
-    id: friend.id,
-    name: friend.name,
-    avatar_color: friend.avatar_color,
-    vibe: friend.vibe,
-    cadence_days: friend.cadence_days,
-    days_quiet: daysQuiet(friend),
-    is_drifting: isDrifting(friend),
-    last_touch_at: friend.last_touch_at,
-  };
+  const summary = toSummary(friend);
 
   return NextResponse.json({ friend: summary }, { status: 201 });
 }

@@ -137,7 +137,8 @@ export async function POST(request: Request, context: RouteContext) {
       .from("friends")
       .update({ last_touch_at: now })
       .eq("id", voiceNote.recipient_friend_id)
-      .eq("user_id", user.id);
+      .eq("user_id", user.id)
+      .is("archived_at", null);
   }
 
   return NextResponse.json({

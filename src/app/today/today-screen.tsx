@@ -49,6 +49,7 @@ export function TodayScreen() {
   const [data, setData] = useState<TodayResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
 
   async function load() {
       const result = await fetchJson<TodayResponse>("/api/today");
@@ -69,6 +70,15 @@ export function TodayScreen() {
     void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
+
+  useEffect(() => {
+    const storedToast = sessionStorage.getItem("kinmatch-toast");
+    if (!storedToast) return;
+    sessionStorage.removeItem("kinmatch-toast");
+    setToast(storedToast);
+    const timeout = window.setTimeout(() => setToast(null), 3000);
+    return () => window.clearTimeout(timeout);
+  }, []);
 
   const tribeCount = data?.tribe.length ?? 0;
   const state = data?.dailyState ?? null;
@@ -138,6 +148,11 @@ export function TodayScreen() {
           </div>
         )}
       </div>
+      {toast && (
+        <p className="fixed bottom-24 left-1/2 z-50 w-[calc(100%-40px)] max-w-[420px] -translate-x-1/2 rounded-full bg-ink px-4 py-3 text-center font-inter text-sm italic text-cream shadow-lg">
+          {toast}
+        </p>
+      )}
       <BottomNav />
     </AppShell>
   );

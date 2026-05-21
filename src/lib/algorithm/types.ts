@@ -31,6 +31,8 @@ export type Friend = {
   name: string;
   avatar_color?: AvatarColor;
   vibe?: string;
+  category?: "inner_circle" | "village" | "acquaintance" | null;
+  archived_at?: string | Date | null;
   created_at?: string | Date;
   last_contact_at?: string | Date | null;
   last_touch_at?: string | Date | null;

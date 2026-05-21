@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/layout/AppShell";
 import { BottomNav } from "@/components/nav/BottomNav";
 import {
+  FriendManagementSheet,
   MemoryCaptureModal,
   MemorySection,
   ProfileHeader,
@@ -15,12 +16,19 @@ import { VoiceNoteSentToast } from "@/components/profile/VoiceNoteSentToast";
 import { ProfilePageSkeleton } from "@/components/ui/Skeleton";
 import { fetchJson } from "@/lib/api/fetch-client";
 import type {
+  FriendCategory,
   FriendProfile,
   MemoryCategory,
   MemoryNote,
 } from "@/lib/api/types";
 import { trackEvent } from "@/lib/analytics/events";
 import { firstName } from "@/lib/memories/categories";
+import {
+  CATEGORY_CADENCE_DAYS,
+  categoryRelationshipLabel,
+  categoryToastLabel,
+} from "@/lib/friends/categories";
+import { cadenceLabel } from "@/lib/friends/utils";
 
 type ProfileScreenProps = {
   friendId: string;
@@ -34,6 +42,12 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
   const [memoryModalCategory, setMemoryModalCategory] = useState<
     MemoryCategory | undefined
   >(undefined);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [sheetMode, setSheetMode] = useState<"actions" | "confirm-remove">(
+    "actions"
+  );
+  const [savingAction, setSavingAction] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
 
   const loadProfile = useCallback(async () => {
     const result = await fetchJson<FriendProfile>(`/api/friends/${friendId}`);
@@ -66,6 +80,78 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
     });
   }
 
+  function showToast(message: string) {
+    setToast(message);
+    window.setTimeout(() => setToast(null), 3000);
+  }
+
+  async function handleRecategorize(category: FriendCategory) {
+    if (!friend || savingAction) return;
+    const previous = friend;
+    const nextCadence = CATEGORY_CADENCE_DAYS[category];
+
+    setSavingAction(true);
+    setFriend({
+      ...friend,
+      category,
+      cadence_days: nextCadence,
+      cadence_label: cadenceLabel(nextCadence),
+      vibe_label: categoryRelationshipLabel(category),
+      is_drifting: friend.days_quiet >= nextCadence,
+    });
+    setSheetOpen(false);
+
+    try {
+      const response = await fetch(`/api/friends/${friend.id}/recategorize`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ category }),
+      });
+      const data = (await response.json().catch(() => ({}))) as {
+        error?: string;
+      };
+
+      if (!response.ok) {
+        throw new Error(data.error ?? "Couldn't update — try again");
+      }
+
+      showToast(`${firstName(friend.name)} is now in ${categoryToastLabel(category)}.`);
+    } catch (err) {
+      setFriend(previous);
+      showToast(err instanceof Error ? err.message : "Couldn't update — try again");
+    } finally {
+      setSavingAction(false);
+      setSheetMode("actions");
+    }
+  }
+
+  async function handleArchive() {
+    if (!friend || savingAction) return;
+    setSavingAction(true);
+
+    try {
+      const response = await fetch(`/api/friends/${friend.id}/archive`, {
+        method: "POST",
+      });
+      const data = (await response.json().catch(() => ({}))) as {
+        error?: string;
+      };
+
+      if (!response.ok) {
+        throw new Error(data.error ?? "Couldn't remove — try again");
+      }
+
+      sessionStorage.setItem(
+        "kinmatch-toast",
+        `${firstName(friend.name)} removed from your tribe.`
+      );
+      router.replace("/today");
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "Couldn't remove — try again");
+      setSavingAction(false);
+    }
+  }
+
   if (loading || !friend) {
     return (
       <AppShell>
@@ -82,7 +168,13 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
 
   return (
     <AppShell>
-      <ProfileTopBar friendName={friend.name} />
+      <ProfileTopBar
+        friendName={name}
+        onMore={() => {
+          setSheetMode("actions");
+          setSheetOpen(true);
+        }}
+      />
 
       <div className="px-5 pb-24 pt-4">
         <ProfileHeader friend={friend} />
@@ -143,6 +235,25 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
         onSaved={handleMemoriesSaved}
       />
 
+      {toast && (
+        <p className="fixed bottom-24 left-1/2 z-50 w-[calc(100%-40px)] max-w-[420px] -translate-x-1/2 rounded-full bg-ink px-4 py-3 text-center font-inter text-sm italic text-cream shadow-lg">
+          {toast}
+        </p>
+      )}
+
+      <FriendManagementSheet
+        open={sheetOpen}
+        mode={sheetMode}
+        friend={friend}
+        saving={savingAction}
+        onClose={() => {
+          setSheetOpen(false);
+          setSheetMode("actions");
+        }}
+        onRecategorize={(category) => void handleRecategorize(category)}
+        onStartRemove={() => setSheetMode("confirm-remove")}
+        onConfirmRemove={() => void handleArchive()}
+      />
     </AppShell>
   );
 }

@@ -119,6 +119,8 @@ export async function POST(request: Request) {
           name: person.name,
           avatar_color: person.avatarColor,
           vibe: "potential_close",
+          category: "inner_circle",
+          cadence_days: 14,
           is_wished_closer: false,
           in_tribe: true,
         })
@@ -142,6 +144,8 @@ export async function POST(request: Request) {
           name: person.name,
           avatar_color: person.avatarColor,
           vibe: "potential_close",
+          category: "village",
+          cadence_days: 30,
           is_wished_closer: false,
           in_tribe: true,
         })
