@@ -49,7 +49,7 @@ const PREFERENCES: {
   {
     field: "held_alerts_enabled",
     label: "Held alerts",
-    helper: "Soft reminders for friendships you're holding.",
+    helper: "Soft reminders to your holders when you go quiet.",
   },
 ];
 

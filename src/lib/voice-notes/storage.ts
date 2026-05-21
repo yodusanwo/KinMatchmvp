@@ -14,12 +14,14 @@ export async function uploadVoiceAudio(
     ? "mp4"
     : contentType.includes("mpeg")
       ? "mp3"
-      : "webm";
+      : contentType.includes("ogg")
+        ? "ogg"
+        : "webm";
   const pathname = `${userId}/${voiceNoteId}.${extension}`;
 
   if (hasVercelBlob()) {
     const blob = await put(pathname, audio, {
-      access: "private",
+      access: "public",
       contentType,
       addRandomSuffix: false,
     });

@@ -1,18 +1,18 @@
 import { getAppOrigin, hasKlaviyo } from "@/lib/env";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-type SendHeldSetupEmailParams = {
+type SendHeldAlertEmailParams = {
   holderUserId: string;
   recipientEmail: string;
   holderName: string;
   userName: string;
+  daysQuiet: number;
   thresholdDays: number;
-  setupMessage: string;
 };
 
-/** Notifies a friend that the user chose them as a Held accountability partner. */
-export async function sendHeldSetupEmail(
-  params: SendHeldSetupEmailParams
+/** Notifies a holder that the user has crossed their quiet window. */
+export async function sendHeldAlertEmail(
+  params: SendHeldAlertEmailParams
 ): Promise<{ sent: boolean; skipped?: boolean; error?: string }> {
   if (!hasKlaviyo()) {
     return { sent: false, skipped: true };
@@ -30,7 +30,7 @@ export async function sendHeldSetupEmail(
   }
 
   if (profile?.held_alerts_enabled === false) {
-    console.log(`Skipping held alert for ${params.holderUserId} — disabled`);
+    console.log(`Skipping held quiet-window alert for ${params.holderUserId} — disabled`);
     return { sent: false, skipped: true };
   }
 
@@ -50,7 +50,7 @@ export async function sendHeldSetupEmail(
           metric: {
             data: {
               type: "metric",
-              attributes: { name: "kinmatch_held_setup" },
+              attributes: { name: "kinmatch_held_alert" },
             },
           },
           profile: {
@@ -62,8 +62,8 @@ export async function sendHeldSetupEmail(
           properties: {
             holder_name: params.holderName,
             user_name: params.userName,
+            days_quiet: params.daysQuiet,
             quiet_window_days: params.thresholdDays,
-            setup_message: params.setupMessage,
             app_url: getAppOrigin(),
           },
         },

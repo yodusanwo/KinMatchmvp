@@ -16,7 +16,7 @@ export async function POST(_request: Request, context: RouteContext) {
 
   const { data: capture } = await supabase
     .from("interactions")
-    .select("capture_skip_count")
+    .select("capture_skip_count, voice_note_id")
     .eq("id", id)
     .eq("user_id", user.id)
     .maybeSingle();
@@ -38,6 +38,14 @@ export async function POST(_request: Request, context: RouteContext) {
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  if (skipCount >= 7 && capture?.voice_note_id) {
+    await supabase
+      .from("voice_notes")
+      .update({ capture_pending: false })
+      .eq("id", capture.voice_note_id)
+      .eq("sender_user_id", user.id);
   }
 
   return NextResponse.json({ success: true });

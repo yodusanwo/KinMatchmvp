@@ -11,12 +11,29 @@ type HeldFriendRowProps = {
   entry: HeldFriendEntry;
 };
 
+function defaultSetupMessage(name: string, thresholdDays: string) {
+  return `Hi ${name} — I chose you as one of my holders in KinMatch. KinMatch helps me notice when I’ve gone quiet with people I care about. If I’m quiet for ${thresholdDays} days, KinMatch will send you a gentle heads-up so you can nudge me to reconnect. You don’t need to do anything right now — this is just me inviting you into that little accountability loop.`;
+}
+
 export function HeldFriendRow({ entry }: HeldFriendRowProps) {
   const [expanded, setExpanded] = useState(false);
   const [email, setEmail] = useState(entry.email ?? "");
   const [threshold, setThreshold] = useState(String(entry.threshold_days));
+  const [setupMessage, setSetupMessage] = useState(() =>
+    defaultSetupMessage(entry.name, String(entry.threshold_days))
+  );
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+
+  function handleThresholdChange(value: string) {
+    const previousDefault = defaultSetupMessage(entry.name, threshold);
+    setThreshold(value);
+    setSetupMessage((current) =>
+      current === previousDefault
+        ? defaultSetupMessage(entry.name, value)
+        : current
+    );
+  }
 
   async function saveSettings() {
     setSaving(true);
@@ -27,6 +44,7 @@ export function HeldFriendRow({ entry }: HeldFriendRowProps) {
       body: JSON.stringify({
         threshold_days: Number(threshold),
         partner_email: email.trim() || undefined,
+        setup_message: setupMessage.trim(),
       }),
     });
     const data = (await res.json().catch(() => ({}))) as { error?: string };
@@ -81,7 +99,7 @@ export function HeldFriendRow({ entry }: HeldFriendRowProps) {
           Quiet window
           <select
             value={threshold}
-            onChange={(event) => setThreshold(event.target.value)}
+            onChange={(event) => handleThresholdChange(event.target.value)}
             className="mt-1 w-full rounded-xl border border-ink/[0.2] bg-cream px-3 py-2 font-inter text-sm normal-case tracking-normal text-ink"
           >
             {[3, 5, 7, 10, 14, 21, 30].map((days) => (
@@ -101,19 +119,19 @@ export function HeldFriendRow({ entry }: HeldFriendRowProps) {
             className="mt-1 w-full rounded-xl border border-ink/[0.2] bg-cream px-3 py-2 font-inter text-sm normal-case tracking-normal text-ink placeholder:text-ink-soft/50"
           />
         </label>
-        <div className="rounded-xl bg-cream/70 px-3 py-2">
-          <p className="font-sans text-[10px] font-medium uppercase tracking-[0.12em] text-ink-soft">
-            What they&apos;ll receive
-          </p>
-          <p className="mt-1 font-inter text-xs italic leading-relaxed text-ink-soft">
-            {`You've been chosen to hold someone in KinMatch. If they go quiet for ${threshold} days, we'll gently email you to check on them.`}
-          </p>
-        </div>
+        <label className="block font-sans text-[11px] font-medium uppercase tracking-[0.12em] text-ink-soft">
+          Note they&apos;ll receive
+          <textarea
+            value={setupMessage}
+            onChange={(event) => setSetupMessage(event.target.value)}
+            className="mt-1 min-h-32 w-full resize-none rounded-xl border border-ink/[0.2] bg-cream px-3 py-2 font-inter text-sm italic normal-case leading-relaxed tracking-normal text-ink placeholder:text-ink-soft/50"
+          />
+        </label>
         <div className="flex items-center justify-between gap-3">
           <p className="font-inter text-xs italic text-ink-soft">
             {entry.setup_notified_at
               ? "Setup email sent"
-              : "Save email to notify them."}
+              : "Review the note, then send it."}
           </p>
           <button
             type="button"
@@ -121,7 +139,7 @@ export function HeldFriendRow({ entry }: HeldFriendRowProps) {
             disabled={saving}
             className="rounded-full bg-terracotta px-4 py-2 font-sans text-xs font-medium text-cream disabled:opacity-50"
           >
-            {saving ? "Saving..." : "Save"}
+            {saving ? "Sending..." : "Save and send"}
           </button>
         </div>
         {message && (

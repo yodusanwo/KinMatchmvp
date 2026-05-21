@@ -58,10 +58,10 @@ type FriendContextRow = FriendRow & {
 
 type PendingCaptureRow = {
   id: string;
-  friend_id: string;
-  voice_note_id: string | null;
-  occurred_at: string;
-  capture_skip_count?: number | null;
+  friend_id: string | null;
+  recipient_friend_id: string | null;
+  created_at: string;
+  duration_seconds: number;
   friends:
     | (FriendRow & {
         archived_at?: string | null;
@@ -69,18 +69,6 @@ type PendingCaptureRow = {
     | (FriendRow & {
         archived_at?: string | null;
       })[]
-    | null;
-  voice_notes:
-    | {
-        id: string;
-        created_at: string;
-        duration_seconds: number;
-      }
-    | {
-        id: string;
-        created_at: string;
-        duration_seconds: number;
-      }[]
     | null;
   discovery_prompts:
     | {
@@ -221,27 +209,26 @@ async function getPendingCapture(
   user: User
 ): Promise<TodayDailyState | null> {
   const now = new Date();
+  const cutoff = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
   const { data, error } = await supabase
-    .from("interactions")
+    .from("voice_notes")
     .select(
       `
       id,
       friend_id,
-      voice_note_id,
-      occurred_at,
-      capture_skip_count,
-      friends(id, name, avatar_color, vibe, cadence_days, last_touch_at, created_at, is_wished_closer, archived_at),
-      voice_notes(id, created_at, duration_seconds),
+      recipient_friend_id,
+      created_at,
+      duration_seconds,
+      friends:friends!voice_notes_friend_id_fkey(id, name, avatar_color, vibe, cadence_days, last_touch_at, created_at, is_wished_closer, archived_at),
       discovery_prompts(question, prompt_day, prompt_cycle)
       `
     )
-    .eq("user_id", user.id)
-    .eq("type", "voice_note_sent")
-    .eq("mode", "voice_note")
-    .is("captured_at", null)
-    .is("capture_archived_at", null)
-    .lte("capture_prompt_due_at", now.toISOString())
-    .order("occurred_at", { ascending: true })
+    .eq("sender_id", user.id)
+    .eq("capture_pending", true)
+    .eq("capture_abandoned", false)
+    .lte("created_at", cutoff)
+    .or(`capture_deferred_until.is.null,capture_deferred_until.lt.${now.toISOString()}`)
+    .order("created_at", { ascending: true })
     .limit(1);
 
   if (error) throw new Error(error.message);
@@ -249,8 +236,7 @@ async function getPendingCapture(
   if (!row) return null;
 
   const friend = firstOrNull(row.friends);
-  const voiceNote = firstOrNull(row.voice_notes);
-  if (!friend || friend.archived_at || !voiceNote) return null;
+  if (!friend || friend.archived_at) return null;
 
   const prompt = firstOrNull(row.discovery_prompts);
   const dayNumber = prompt?.prompt_day ?? undefined;
@@ -260,12 +246,11 @@ async function getPendingCapture(
     kind: "capture",
     friend: toSummary(friend),
     voice_note: {
-      id: voiceNote.id,
-      created_at: voiceNote.created_at,
-      duration_seconds: voiceNote.duration_seconds,
+      id: row.id,
+      created_at: row.created_at,
+      duration_seconds: row.duration_seconds,
     },
-    interaction_id: row.id,
-    original_question: prompt?.question ?? "your last voice note",
+    original_question: prompt?.question ?? "",
     day_number: dayNumber ? dayNumber + 1 : undefined,
     cycle_number: cycleNumber,
   };

@@ -27,6 +27,10 @@ export type TodaySpotlight = {
 export type TodayUpNext = NonNullable<TodaySpotlight>;
 
 export type TodayResponse = {
+  user: {
+    name: string | null;
+    email: string | null;
+  };
   spotlight: TodaySpotlight;
   dailyState?: TodayDailyState | null;
   upNext?: TodayUpNext[];
@@ -63,7 +67,6 @@ export type TodayDailyState =
         created_at: string;
         duration_seconds: number;
       };
-      interaction_id: string;
       original_question: string;
       day_number?: number;
       cycle_number?: number;

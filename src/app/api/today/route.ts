@@ -15,7 +15,7 @@ export async function GET() {
 
   const { data: profile, error: profileError } = await supabase
     .from("users")
-    .select("id, barriers, discovery_started_at, discovery_completed_at")
+    .select("id, name, email, barriers, discovery_started_at, discovery_completed_at")
     .eq("id", user.id)
     .single();
 
@@ -56,6 +56,10 @@ export async function GET() {
       : null;
 
   return NextResponse.json({
+    user: {
+      name: profile.name,
+      email: profile.email ?? user.email ?? null,
+    },
     spotlight,
     upNext,
     dailyState,

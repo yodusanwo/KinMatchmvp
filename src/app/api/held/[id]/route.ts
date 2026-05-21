@@ -17,6 +17,13 @@ function cleanThreshold(value: unknown): number | null {
   return Math.min(30, Math.max(3, Math.round(number)));
 }
 
+function cleanSetupMessage(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  if (trimmed.length < 20) return null;
+  return trimmed.slice(0, 1200);
+}
+
 export async function PATCH(request: Request, context: RouteContext) {
   const { id } = await context.params;
   const supabase = await createClient();
@@ -28,7 +35,11 @@ export async function PATCH(request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  let body: { threshold_days?: unknown; partner_email?: unknown };
+  let body: {
+    threshold_days?: unknown;
+    partner_email?: unknown;
+    setup_message?: unknown;
+  };
   try {
     body = await request.json();
   } catch {
@@ -39,6 +50,10 @@ export async function PATCH(request: Request, context: RouteContext) {
     body.threshold_days === undefined ? null : cleanThreshold(body.threshold_days);
   const partnerEmail =
     body.partner_email === undefined ? undefined : cleanEmail(body.partner_email);
+  const setupMessage =
+    body.setup_message === undefined
+      ? null
+      : cleanSetupMessage(body.setup_message);
 
   if (body.threshold_days !== undefined && thresholdDays === null) {
     return NextResponse.json(
@@ -50,6 +65,13 @@ export async function PATCH(request: Request, context: RouteContext) {
   if (body.partner_email !== undefined && partnerEmail === null) {
     return NextResponse.json(
       { error: "Enter a valid accountability partner email." },
+      { status: 400 }
+    );
+  }
+
+  if (body.setup_message !== undefined && setupMessage === null) {
+    return NextResponse.json(
+      { error: "Add a little more context before sending." },
       { status: 400 }
     );
   }
@@ -128,6 +150,9 @@ export async function PATCH(request: Request, context: RouteContext) {
       holderName: friend.name,
       userName: profile?.name?.trim() || profile?.email?.split("@")[0] || "Someone",
       thresholdDays: quietWindow,
+      setupMessage:
+        setupMessage ??
+        `Hi ${friend.name} — I chose you as one of my holders in KinMatch. KinMatch helps me notice when I’ve gone quiet with people I care about. If I’m quiet for ${quietWindow} days, KinMatch will send you a gentle heads-up so you can nudge me to reconnect. You don’t need to do anything right now — this is just me inviting you into that little accountability loop.`,
     });
 
     await supabase

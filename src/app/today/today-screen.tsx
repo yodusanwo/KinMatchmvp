@@ -16,6 +16,13 @@ function firstName(name: string) {
   return name.trim().split(/\s+/)[0] ?? name;
 }
 
+function greetingName(user: TodayResponse["user"] | undefined) {
+  const name = user?.name?.trim();
+  if (name) return firstName(name);
+  const emailName = user?.email?.split("@")[0]?.trim();
+  return emailName || null;
+}
+
 function dayLabel(state: TodayDailyState | null | undefined) {
   const base = dayEyebrow();
   if (!state || state.kind === "send_algorithmic" || !state.day_number) return base;
@@ -73,11 +80,17 @@ export function TodayScreen() {
   const tribeCount = data?.tribe.length ?? 0;
   const state = data?.dailyState ?? null;
   const hint = tomorrowHint(state);
+  const name = greetingName(data?.user);
 
   return (
     <AppShell>
       <BrandBar className="py-2" />
       <div className="flex h-[calc(100dvh-49px)] flex-col overflow-hidden px-5 pb-20 pt-3">
+        {name && (
+          <p className="mb-2 font-inter text-sm italic text-ink-soft">
+            Hi, {name}.
+          </p>
+        )}
         <Eyebrow>{dayLabel(state)}</Eyebrow>
         <Headline className="mt-1 text-[23px] leading-tight">
           {headlineForState(state)}

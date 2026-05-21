@@ -20,10 +20,6 @@ import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
 import { REACHABILITY_ERROR, fetchJson } from "@/lib/api/fetch-client";
 import { trackEvent } from "@/lib/analytics/events";
 import type { FriendProfile } from "@/lib/api/types";
-import type {
-  CreateVoiceNoteResponse,
-  SendVoiceNoteResponse,
-} from "@/lib/api/voice-notes";
 
 type VoiceNoteScreenProps = {
   friendId: string;
@@ -72,78 +68,54 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
     setSendStatus("uploading");
     setSendError(null);
 
-    const createResult = await fetchJson<CreateVoiceNoteResponse>(
-      "/api/voice-notes",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ friend_id: friend.id }),
-      }
-    );
-
-    if (!createResult.ok) {
-      setSendStatus("error");
-      setSendError(createResult.error);
-      return;
-    }
-
-    const { id } = createResult.data;
-
     const formData = new FormData();
-    formData.append("audio", recorder.audioBlob, "voice-note.webm");
-    formData.append(
-      "duration_seconds",
-      String(Math.max(1, recorder.durationSeconds))
-    );
+    const mimeType = recorder.recordedMimeType || recorder.audioBlob.type || "audio/webm";
+    formData.append("audio", recorder.audioBlob, "voice-note");
+    formData.append("friend_id", friend.id);
+    formData.append("duration", String(Math.max(1, recorder.durationSeconds)));
+    formData.append("mime_type", mimeType);
     formData.append("peaks", JSON.stringify(recorder.peaks));
 
     try {
-      const finalizeRes = await fetch(`/api/voice-notes/${id}/finalize`, {
+      const sendRes = await fetch("/api/voice-notes/send", {
         method: "POST",
         body: formData,
       });
-      if (!finalizeRes.ok) {
-        const data = await finalizeRes.json().catch(() => ({}));
+      if (!sendRes.ok) {
+        const data = await sendRes.json().catch(() => ({}));
         setSendStatus("error");
         setSendError(
           (data as { error?: string }).error ?? REACHABILITY_ERROR
         );
         return;
       }
+
+      const sendData = (await sendRes.json()) as {
+        public_url: string;
+        friend_name: string;
+      };
+
+      trackEvent("voice_note_sent", { share_sheet: "1" });
+
+      if (navigator.share && sendData.public_url) {
+        try {
+          await navigator.share({
+            url: sendData.public_url,
+            text: `Hey ${sendData.friend_name} — sent you a quick voice note.`,
+            title: "Voice note from KinMatch",
+          });
+        } catch {
+          // Share sheets can be cancelled; the voice note is already saved.
+        }
+      } else if (sendData.public_url && navigator.clipboard) {
+        await navigator.clipboard.writeText(sendData.public_url);
+      }
+
+      router.push("/today");
     } catch {
       setSendStatus("error");
-      setSendError(REACHABILITY_ERROR);
-      return;
+      setSendError("Couldn't send — try again");
     }
-
-    const sendResult = await fetchJson<SendVoiceNoteResponse>(
-      `/api/voice-notes/${id}/send`,
-      { method: "POST" }
-    );
-
-    if (!sendResult.ok) {
-      setSendStatus("error");
-      setSendError(sendResult.error);
-      return;
-    }
-
-    const sendData = sendResult.data;
-
-    trackEvent("voice_note_sent", { share_sheet: "1" });
-
-    if (navigator.share && sendData.listen_url) {
-      try {
-        await navigator.share({
-          url: sendData.listen_url,
-          text: `Hey ${friend.name} — sent you a quick voice note.`,
-          title: "Voice note from KinMatch",
-        });
-      } catch {
-        // Share sheets can be cancelled; the voice note is already saved.
-      }
-    }
-
-    router.push(`/friends/${friend.id}?voice_note_sent=1`);
   }
 
   if (loading || !friend) {

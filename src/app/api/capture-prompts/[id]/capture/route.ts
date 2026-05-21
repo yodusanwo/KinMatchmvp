@@ -26,7 +26,7 @@ export async function POST(_request: Request, context: RouteContext) {
 
   const { data: interaction } = await supabase
     .from("interactions")
-    .select("friend_id, discovery_prompts(prompt_cycle)")
+    .select("friend_id, voice_note_id, discovery_prompts(prompt_cycle)")
     .eq("id", id)
     .eq("user_id", user.id)
     .maybeSingle();
@@ -40,6 +40,17 @@ export async function POST(_request: Request, context: RouteContext) {
       direction: "inbound",
       occurred_at: new Date().toISOString(),
     });
+  }
+
+  if (interaction?.voice_note_id) {
+    await supabase
+      .from("voice_notes")
+      .update({
+        capture_pending: false,
+        captured_at: new Date().toISOString(),
+      })
+      .eq("id", interaction.voice_note_id)
+      .eq("sender_user_id", user.id);
   }
 
   const discoveryPrompt = Array.isArray(interaction?.discovery_prompts)

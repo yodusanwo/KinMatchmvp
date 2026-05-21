@@ -1,0 +1,106 @@
+import { NextRequest, NextResponse } from "next/server";
+import type { FriendSummary } from "@/lib/api/types";
+import { daysQuiet, isDrifting } from "@/lib/friends/utils";
+import { randomAvatarColor } from "@/lib/onboarding/avatar-colors";
+import type { AvatarColor } from "@/lib/onboarding/types";
+import { createClient } from "@/lib/supabase/server";
+
+type FriendInsertRow = {
+  id: string;
+  name: string;
+  avatar_color: AvatarColor;
+  vibe: string;
+  cadence_days: number;
+  last_touch_at: string | null;
+  created_at: string;
+};
+
+function normalizeName(name: string) {
+  return name.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+export async function POST(req: NextRequest) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  let body: { name?: unknown };
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+
+  if (typeof body.name !== "string") {
+    return NextResponse.json({ error: "Name is required" }, { status: 400 });
+  }
+
+  const name = body.name.trim().replace(/\s+/g, " ");
+  if (name.length < 3 || name.length > 80) {
+    return NextResponse.json(
+      { error: "Use a name between 3 and 80 characters." },
+      { status: 400 }
+    );
+  }
+
+  const { data: existingRows, error: existingError } = await supabase
+    .from("friends")
+    .select("name")
+    .eq("user_id", user.id)
+    .is("archived_at", null);
+
+  if (existingError) {
+    return NextResponse.json({ error: existingError.message }, { status: 500 });
+  }
+
+  const normalizedName = normalizeName(name);
+  const alreadyExists = (existingRows ?? []).some(
+    (friend) => normalizeName(friend.name) === normalizedName
+  );
+
+  if (alreadyExists) {
+    return NextResponse.json(
+      { error: "Already in your tribe." },
+      { status: 409 }
+    );
+  }
+
+  const { data: friend, error } = await supabase
+    .from("friends")
+    .insert({
+      user_id: user.id,
+      name,
+      avatar_color: randomAvatarColor(),
+      vibe: "potential_close",
+      is_wished_closer: false,
+      in_tribe: true,
+    })
+    .select("id, name, avatar_color, vibe, cadence_days, last_touch_at, created_at")
+    .single<FriendInsertRow>();
+
+  if (error || !friend) {
+    return NextResponse.json(
+      { error: error?.message ?? "Failed to add this person." },
+      { status: 500 }
+    );
+  }
+
+  const summary: FriendSummary = {
+    id: friend.id,
+    name: friend.name,
+    avatar_color: friend.avatar_color,
+    vibe: friend.vibe,
+    cadence_days: friend.cadence_days,
+    days_quiet: daysQuiet(friend),
+    is_drifting: isDrifting(friend),
+    last_touch_at: friend.last_touch_at,
+  };
+
+  return NextResponse.json({ friend: summary }, { status: 201 });
+}

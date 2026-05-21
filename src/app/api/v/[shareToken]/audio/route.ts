@@ -16,7 +16,7 @@ export async function GET(_request: Request, context: RouteContext) {
   const admin = createAdminClient();
   const { data: voiceNote } = await admin
     .from("voice_notes")
-    .select("audio_url")
+    .select("audio_url, mime_type")
     .eq("share_token", shareToken)
     .maybeSingle();
 

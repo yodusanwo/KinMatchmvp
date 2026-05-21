@@ -32,6 +32,17 @@ export function WelcomeContent({ auth }: { auth: WelcomeAuthState }) {
                 A science-based way to deepen the friendships you&apos;re building
                 in life.
               </Subhead>
+              <article className="mt-8 max-w-xs rounded-2xl border border-terracotta/20 bg-cream-deep/50 p-5 text-left">
+                <p className="font-sans text-[10px] font-medium uppercase tracking-[0.12em] text-terracotta-deep">
+                  for people who sometimes wonder if anyone would notice
+                </p>
+                <p className="mt-3 font-inter text-sm italic leading-relaxed text-terracotta-deep">
+                  Modern life has more people in it than ever, and fewer
+                  who&apos;d actually notice if you went quiet. KinMatch lets you
+                  build a small circle who would — and lets you be that for
+                  them.
+                </p>
+              </article>
             </>
           ) : auth.status === "onboarding" ? (
             <>

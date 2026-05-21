@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
-import { Eyebrow, Headline, Subhead } from "@/components/brand";
+import { Eyebrow, Headline } from "@/components/brand";
 import { ConstellationView } from "@/components/onboarding/ConstellationView";
 import { ContinueButton } from "@/components/onboarding/ContinueButton";
 import { AppShell } from "@/components/layout/AppShell";
@@ -56,11 +56,11 @@ export function HeldScreen() {
           <div className="space-y-2">
             <Eyebrow>One last thing</Eyebrow>
             <Headline>Choose who holds you.</Headline>
-            <Subhead>
-              Pick one or two people from your inner circle. If you pass your
-              quiet window, we&apos;ll gently let them know to check on you.
-              You can adjust the number of days later.
-            </Subhead>
+            <p className="font-inter text-[13px] italic leading-[1.55] text-[rgba(31,26,20,0.85)]">
+              Modern life has more people in it than ever, and fewer who&apos;d
+              actually notice if you went quiet. Held is the small circle who
+              would.
+            </p>
           </div>
 
           <ConstellationView

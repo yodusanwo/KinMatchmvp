@@ -186,7 +186,7 @@ export async function POST(request: Request) {
         heldRows.push({
           holder_user_id: user.id,
           held_friend_id,
-          threshold_days: 10,
+          threshold_days: 14,
           status: "active",
         });
       }

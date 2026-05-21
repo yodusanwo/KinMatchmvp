@@ -36,7 +36,7 @@ export async function GET(_request: Request, context: RouteContext) {
   const { data: voiceNote, error } = await admin
     .from("voice_notes")
     .select(
-      "audio_url, duration_seconds, waveform_peaks, transcript, created_at, sender_user_id"
+      "audio_url, duration_seconds, waveform_peaks, transcript, created_at, sender_user_id, sender_id, listened_at, listen_count"
     )
     .eq("share_token", shareToken)
     .maybeSingle();
@@ -52,7 +52,7 @@ export async function GET(_request: Request, context: RouteContext) {
   const { data: sender } = await admin
     .from("users")
     .select("name, email")
-    .eq("id", voiceNote.sender_user_id)
+    .eq("id", voiceNote.sender_id ?? voiceNote.sender_user_id)
     .maybeSingle();
 
   const senderName =
@@ -60,10 +60,18 @@ export async function GET(_request: Request, context: RouteContext) {
     sender?.email?.split("@")[0] ||
     "Someone";
 
+  await admin
+    .from("voice_notes")
+    .update({
+      listened_at: voiceNote.listened_at ?? new Date().toISOString(),
+      listen_count: (voiceNote.listen_count ?? 0) + 1,
+    })
+    .eq("share_token", shareToken);
+
   const payload: PublicVoiceNote = {
     sender_name: senderName,
     sender_avatar_color: avatarColorFromUserId(
-      voiceNote.sender_user_id
+      voiceNote.sender_id ?? voiceNote.sender_user_id
     ) as AvatarColor,
     audio_url: listenPageAudioUrl(shareToken, voiceNote.audio_url),
     duration_seconds: voiceNote.duration_seconds,

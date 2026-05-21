@@ -41,6 +41,7 @@ export function EmailPrefsScreen() {
   const {
     q1People,
     q2People,
+    userName,
     circleAssignments,
     q3Barriers,
     watchers,
@@ -54,7 +55,7 @@ export function EmailPrefsScreen() {
   async function handleSave() {
     if (!hydrated || saving || saveInFlight.current) return;
 
-    if (q1People.length === 0) {
+    if (!userName.trim() || q1People.length === 0) {
       router.push("/onboarding/q1");
       return;
     }
@@ -64,6 +65,7 @@ export function EmailPrefsScreen() {
     setError(null);
 
     const payload: CompleteOnboardingPayload = {
+      userName: userName.trim(),
       q1People,
       q2People,
       circleAssignments,

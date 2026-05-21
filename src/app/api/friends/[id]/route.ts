@@ -53,7 +53,7 @@ function profilePromptForFriend(params: {
       quote: `You asked: "${dailyState.original_question}"`,
       prompt: `What did ${name} say? Type or voice-note what you learned.`,
       cta_label: `Save to ${name}'s profile →`,
-      cta_href: `/friends/${friend.id}/details?capture=${dailyState.interaction_id}`,
+      cta_href: `/capture/${dailyState.voice_note.id}`,
     };
   }
 

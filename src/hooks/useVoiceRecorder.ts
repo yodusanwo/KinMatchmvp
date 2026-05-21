@@ -6,25 +6,17 @@ import {
   MAX_RECORDING_SECONDS,
   readAnalyserLevel,
 } from "@/lib/voice-notes/peaks";
+import { getSupportedAudioMimeType } from "@/lib/audio/mime-type";
 
 export type VoiceRecorderState = {
   isRecording: boolean;
   durationSeconds: number;
   livePeaks: number[];
   audioBlob: Blob | null;
+  recordedMimeType: string;
   peaks: number[];
   error: string | null;
 };
-
-function pickMimeType(): string | undefined {
-  const types = [
-    "audio/mp4",
-    "audio/webm;codecs=opus",
-    "audio/webm",
-    "audio/ogg;codecs=opus",
-  ];
-  return types.find((type) => MediaRecorder.isTypeSupported(type));
-}
 
 export function useVoiceRecorder() {
   const [state, setState] = useState<VoiceRecorderState>({
@@ -32,6 +24,7 @@ export function useVoiceRecorder() {
     durationSeconds: 0,
     livePeaks: Array.from({ length: 30 }, () => 0.08),
     audioBlob: null,
+    recordedMimeType: "",
     peaks: [],
     error: null,
   });
@@ -92,6 +85,7 @@ export function useVoiceRecorder() {
       ...current,
       error: null,
       audioBlob: null,
+      recordedMimeType: "",
       peaks: [],
     }));
 
@@ -113,7 +107,7 @@ export function useVoiceRecorder() {
       source.connect(analyser);
       analyserRef.current = analyser;
 
-      const mimeType = pickMimeType();
+      const mimeType = getSupportedAudioMimeType();
       const recorder = new MediaRecorder(
         stream,
         mimeType ? { mimeType } : undefined
@@ -127,10 +121,18 @@ export function useVoiceRecorder() {
         if (event.data.size > 0) chunksRef.current.push(event.data);
       };
 
+      recorder.onstart = () => {
+        setState((current) => ({
+          ...current,
+          recordedMimeType: recorder.mimeType,
+        }));
+      };
+
       recorder.onstop = () => {
         cleanupStream();
+        const recordedMimeType = recorder.mimeType || mimeType || "audio/webm";
         const blob = new Blob(chunksRef.current, {
-          type: recorder.mimeType || "audio/webm",
+          type: recordedMimeType,
         });
         const durationSeconds = Math.max(
           1,
@@ -143,6 +145,7 @@ export function useVoiceRecorder() {
           isRecording: false,
           durationSeconds,
           audioBlob: blob,
+          recordedMimeType,
           peaks,
           livePeaks: peaks,
         }));
@@ -185,6 +188,7 @@ export function useVoiceRecorder() {
       durationSeconds: 0,
       livePeaks: Array.from({ length: 30 }, () => 0.08),
       audioBlob: null,
+      recordedMimeType: "",
       peaks: [],
       error: null,
     });
