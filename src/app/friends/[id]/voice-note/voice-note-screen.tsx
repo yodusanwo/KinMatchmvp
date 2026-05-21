@@ -205,9 +205,18 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
           <Subhead className="mt-2 text-center">{helperText}</Subhead>
 
           {recorder.error && (
-            <p className="mt-4 font-inter text-sm italic text-terracotta-deep" role="alert">
-              {recorder.error}
-            </p>
+            <div className="mt-4 max-w-[320px] space-y-3 text-center">
+              <p
+                className="font-inter text-sm italic text-terracotta-deep"
+                role="alert"
+              >
+                {recorder.error}
+              </p>
+              <p className="font-inter text-xs italic leading-relaxed text-ink-soft">
+                If your phone already blocked it, turn on microphone access in
+                browser settings, then try again.
+              </p>
+            </div>
           )}
 
           {sendError && (
@@ -218,6 +227,16 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
         </div>
 
         <div className="mt-8 space-y-4">
+          {recorder.error && !recorder.audioBlob && (
+            <PrimaryButton
+              type="button"
+              disabled={sendStatus === "uploading"}
+              onClick={() => void recorder.startRecording()}
+            >
+              Try microphone again
+            </PrimaryButton>
+          )}
+
           {recorder.audioBlob && (
             <>
               <PrimaryButton

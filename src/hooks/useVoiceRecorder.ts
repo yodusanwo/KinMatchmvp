@@ -173,7 +173,7 @@ export function useVoiceRecorder() {
       setState((current) => ({
         ...current,
         isRecording: false,
-        error: "Microphone access is required to record a voice note.",
+        error: "Turn on the microphone to record a voice note.",
       }));
     }
   }, [cleanupStream, stopRecording, tickAnalyser]);

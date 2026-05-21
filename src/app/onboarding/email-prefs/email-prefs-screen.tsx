@@ -49,7 +49,40 @@ export function EmailPrefsScreen() {
   } = useOnboarding();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [micStatus, setMicStatus] = useState<
+    "idle" | "requesting" | "ready" | "blocked" | "unsupported"
+  >("idle");
+  const [micMessage, setMicMessage] = useState<string | null>(null);
   const saveInFlight = useRef(false);
+
+  async function requestMicrophone() {
+    setError(null);
+    setMicMessage(null);
+
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setMicStatus("unsupported");
+      setMicMessage(
+        "This browser can't set up voice notes here. You can still continue."
+      );
+      return false;
+    }
+
+    setMicStatus("requesting");
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach((track) => track.stop());
+      setMicStatus("ready");
+      setMicMessage("Voice notes are ready.");
+      return true;
+    } catch {
+      setMicStatus("blocked");
+      setMicMessage(
+        "Your phone blocked the microphone. Turn it on in settings, or set this up later."
+      );
+      return false;
+    }
+  }
 
   async function handleSave() {
     if (!hydrated || saving || saveInFlight.current) return;
@@ -100,6 +133,15 @@ export function EmailPrefsScreen() {
     }
   }
 
+  async function handleSetupVoiceNotes() {
+    if (saving || micStatus === "requesting") return;
+
+    const allowed = await requestMicrophone();
+    if (allowed) {
+      await handleSave();
+    }
+  }
+
   return (
     <AppShell>
       <BrandBar />
@@ -125,6 +167,29 @@ export function EmailPrefsScreen() {
             </p>
           </section>
 
+          <section className="space-y-3 rounded-2xl border border-ink/[0.12] bg-cream-deep/45 p-4">
+            <Eyebrow>Voice notes</Eyebrow>
+            <p className="font-sans text-base font-medium text-ink">
+              Set up voice notes before the first one.
+            </p>
+            <p className={REFLECTION_COPY_CLASS}>
+              Your phone will ask before anything is recorded. We&apos;ll only
+              use the microphone when you start a note.
+            </p>
+            {micMessage && (
+              <p
+                className={
+                  micStatus === "ready"
+                    ? "font-inter text-sm italic text-ink-soft"
+                    : "font-inter text-sm italic text-terracotta-deep"
+                }
+                role={micStatus === "ready" ? "status" : "alert"}
+              >
+                {micMessage}
+              </p>
+            )}
+          </section>
+
           {error && (
             <p className="font-inter text-sm italic text-terracotta-deep" role="alert">
               {error}
@@ -135,11 +200,25 @@ export function EmailPrefsScreen() {
         <div className="mt-8 space-y-4 pb-4">
           <ContinueButton
             variant="terracotta"
-            disabled={saving || !hydrated}
-            onClick={() => void handleSave()}
+            disabled={saving || !hydrated || micStatus === "requesting"}
+            onClick={() => void handleSetupVoiceNotes()}
           >
-            {saving ? "Saving…" : "Save your people →"}
+            {saving
+              ? "Saving…"
+              : micStatus === "requesting"
+                ? "Asking…"
+                : "Set up voice notes →"}
           </ContinueButton>
+          <p className="text-center">
+            <button
+              type="button"
+              disabled={saving || !hydrated}
+              onClick={() => void handleSave()}
+              className="font-inter text-sm text-terracotta underline decoration-terracotta/60 underline-offset-2 disabled:text-ink-soft disabled:decoration-ink-soft/40"
+            >
+              Set up later
+            </button>
+          </p>
           <p className="text-center">
             {saving ? (
               <span className="font-inter text-sm text-ink-soft">← Back</span>
