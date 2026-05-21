@@ -59,7 +59,7 @@ export function HeldScreen() {
             <p className="font-inter text-[13px] italic leading-[1.55] text-[rgba(31,26,20,0.85)]">
               Modern life has more people in it than ever, and fewer who&apos;d
               actually notice if you went quiet. Held is the small circle who
-              would.
+              would. Tap the people you want in that circle.
             </p>
           </div>
 
@@ -84,18 +84,20 @@ export function HeldScreen() {
           >
             Continue
           </ContinueButton>
-          <p className="text-center">
-            <button
-              type="button"
-              onClick={() => {
-                setWatchers([]);
-                router.push("/onboarding/email-prefs");
-              }}
-              className="font-inter text-sm text-terracotta underline decoration-terracotta/60 underline-offset-2"
-            >
-              Set up Held later
-            </button>
-          </p>
+          {selectedCount === 0 && (
+            <p className="text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setWatchers([]);
+                  router.push("/onboarding/email-prefs");
+                }}
+                className="font-inter text-sm text-terracotta underline decoration-terracotta/60 underline-offset-2"
+              >
+                Set up Held later
+              </button>
+            </p>
+          )}
         </div>
       </div>
     </AppShell>

@@ -47,7 +47,7 @@ export function RevealScreen() {
     <AppShell>
       <BrandBar />
       <div className="flex min-h-[calc(100vh-65px)] flex-col px-5 py-6">
-        <div className="flex-1 space-y-8">
+        <div className="flex-1 space-y-6">
           <div className="space-y-2 text-center">
             <Eyebrow>Reflection complete</Eyebrow>
             <Headline>Here are your circles.</Headline>
@@ -56,7 +56,7 @@ export function RevealScreen() {
 
           {innerCircle.length > 0 && (
             <section className="space-y-5">
-              <Eyebrow>Your inner circle · {innerCircle.length}</Eyebrow>
+              <Eyebrow>Your Inner Circle · {innerCircle.length}</Eyebrow>
               <ConstellationView faces={innerCircle} avatarSize="lg" />
             </section>
           )}
@@ -64,11 +64,11 @@ export function RevealScreen() {
           {village.length > 0 && (
             <section
               className={cn(
-                "space-y-5",
-                innerCircle.length > 0 && "border-t border-ink/[0.12] pt-8"
+                "space-y-4",
+                innerCircle.length > 0 && "border-t border-ink/[0.12] pt-5"
               )}
             >
-              <Eyebrow>Your village · {village.length}</Eyebrow>
+              <Eyebrow>Your Village · {village.length}</Eyebrow>
               <GrowingCloserRow faces={village} />
             </section>
           )}
@@ -76,8 +76,12 @@ export function RevealScreen() {
           {acquaintances.length > 0 && (
             <p className="border-t border-ink/[0.12] pt-6 text-center font-inter text-sm italic text-ink-soft">
               {acquaintances.length === 1
-                ? "1 acquaintance is set aside for the acquaintances page."
-                : `${acquaintances.length} acquaintances are set aside for the acquaintances page.`}
+                ? "1 Acquaintance Is Set Aside For The "
+                : `${acquaintances.length} Acquaintances Are Set Aside For The `}
+              <TextLink href="/onboarding/acquaintances" className="text-sm italic">
+                Acquaintances Page
+              </TextLink>
+              .
             </p>
           )}
         </div>
