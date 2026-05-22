@@ -1,4 +1,5 @@
 import { requestNativeMicrophonePermission } from "@/lib/audio/permissions";
+import { WebAudioRecorder } from "@/lib/audio/web-recorder";
 import type {
   AudioRecorderAdapter,
   MicrophonePermissionState,
@@ -9,6 +10,8 @@ import {
   downsamplePeaks,
   MAX_RECORDING_SECONDS,
 } from "@/lib/voice-notes/peaks";
+
+const NATIVE_START_TIMEOUT_MS = 3_000;
 
 function permissionError(state: MicrophonePermissionState): RecorderError {
   if (state === "denied") {
@@ -28,6 +31,7 @@ export class NativeAudioRecorder implements AudioRecorderAdapter {
   private amplitudeTimer: ReturnType<typeof setInterval> | null = null;
   private maxTimer: ReturnType<typeof setTimeout> | null = null;
   private stopPromise: Promise<RecorderResult> | null = null;
+  private webFallback: WebAudioRecorder | null = null;
 
   private async getPlugin() {
     const { CapacitorAudioRecorder } = await import(
@@ -55,15 +59,25 @@ export class NativeAudioRecorder implements AudioRecorderAdapter {
 
     this.samples = [];
     try {
-      await AudioRecorder.startRecording({
-        sampleRate: 44100,
-        bitRate: 128000,
-      });
+      await Promise.race([
+        AudioRecorder.startRecording({
+          sampleRate: 44100,
+          bitRate: 128000,
+        }),
+        new Promise<never>((_, reject) => {
+          setTimeout(() => {
+            reject(new Error("Native recorder start timed out"));
+          }, NATIVE_START_TIMEOUT_MS);
+        }),
+      ]);
     } catch {
-      throw {
-        code: "unknown",
-        message: "Could not start native recording",
-      } satisfies RecorderError;
+      // WKWebView recording is a useful fallback when the native plugin stalls
+      // in the iOS simulator but microphone permission is already granted.
+      void AudioRecorder.cancelRecording();
+      const fallback = new WebAudioRecorder();
+      await fallback.startRecording();
+      this.webFallback = fallback;
+      return;
     }
 
     this.amplitudeTimer = setInterval(() => {
@@ -77,6 +91,12 @@ export class NativeAudioRecorder implements AudioRecorderAdapter {
   }
 
   stopRecording(): Promise<RecorderResult> {
+    if (this.webFallback) {
+      return this.webFallback.stopRecording().finally(() => {
+        this.webFallback = null;
+      });
+    }
+
     if (this.stopPromise) return this.stopPromise;
 
     this.stopPromise = this.finishRecording();
@@ -158,6 +178,11 @@ export class NativeAudioRecorder implements AudioRecorderAdapter {
   }
 
   async cancelRecording(): Promise<void> {
+    if (this.webFallback) {
+      await this.webFallback.cancelRecording();
+      this.webFallback = null;
+    }
+
     if (this.amplitudeTimer) {
       clearInterval(this.amplitudeTimer);
       this.amplitudeTimer = null;
@@ -173,6 +198,14 @@ export class NativeAudioRecorder implements AudioRecorderAdapter {
     } catch {
       // ignore
     }
+  }
+
+  async getCurrentAmplitude(): Promise<number> {
+    if (this.webFallback) {
+      return this.webFallback.getCurrentAmplitude();
+    }
+    const latest = this.samples.at(-1);
+    return latest ?? 0.08;
   }
 
 }
