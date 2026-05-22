@@ -9,8 +9,8 @@ import { AppShell } from "@/components/layout/AppShell";
 import { BrandBar } from "@/components/brand";
 import { useOnboarding } from "@/contexts/onboarding-context";
 import type { CompleteOnboardingPayload } from "@/lib/onboarding/api-types";
-import { isNativePlatform, openAppSettings } from "@/lib/audio/platform";
-import { requestMicrophonePermission } from "@/lib/audio/recorder";
+import { VoiceNotesMicSetupSection } from "@/components/voice-note/VoiceNotesMicSetupSection";
+import { useVoiceNotesMicSetup } from "@/hooks/useVoiceNotesMicSetup";
 
 const REFLECTION_COPY_CLASS =
   "font-inter text-sm italic leading-[1.5] text-[rgba(31,26,20,0.65)]";
@@ -51,41 +51,8 @@ export function EmailPrefsScreen() {
   } = useOnboarding();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [micStatus, setMicStatus] = useState<
-    "idle" | "requesting" | "ready" | "blocked" | "unsupported"
-  >("idle");
-  const [micMessage, setMicMessage] = useState<string | null>(null);
+  const { micStatus, micMessage, requestMicrophone } = useVoiceNotesMicSetup();
   const saveInFlight = useRef(false);
-
-  async function requestMicrophone() {
-    setError(null);
-    setMicMessage(null);
-    setMicStatus("requesting");
-
-    const permission = await requestMicrophonePermission();
-
-    if (permission === "granted") {
-      setMicStatus("ready");
-      setMicMessage("Voice notes are ready.");
-      return true;
-    }
-
-    if (permission === "unsupported") {
-      setMicStatus("unsupported");
-      setMicMessage(
-        "This browser can't set up voice notes here. You can still continue."
-      );
-      return false;
-    }
-
-    setMicStatus("blocked");
-    setMicMessage(
-      isNativePlatform()
-        ? "Your phone blocked the microphone. Open settings to allow it, or set this up later."
-        : "Your phone blocked the microphone. Turn it on in browser settings, or set this up later."
-    );
-    return false;
-  }
 
   async function handleSave() {
     if (!hydrated || saving || saveInFlight.current) return;
@@ -139,6 +106,7 @@ export function EmailPrefsScreen() {
   async function handleSetupVoiceNotes() {
     if (saving || micStatus === "requesting") return;
 
+    setError(null);
     const allowed = await requestMicrophone();
     if (allowed) {
       await handleSave();
@@ -170,37 +138,10 @@ export function EmailPrefsScreen() {
             </p>
           </section>
 
-          <section className="space-y-3 rounded-2xl border border-ink/[0.12] bg-cream-deep/45 p-4">
-            <Eyebrow>Voice notes</Eyebrow>
-            <p className="font-sans text-base font-medium text-ink">
-              Set up voice notes before the first one.
-            </p>
-            <p className={REFLECTION_COPY_CLASS}>
-              Your phone will ask before anything is recorded. We&apos;ll only
-              use the microphone when you start a note.
-            </p>
-            {micMessage && (
-              <p
-                className={
-                  micStatus === "ready"
-                    ? "font-inter text-sm italic text-ink-soft"
-                    : "font-inter text-sm italic text-terracotta-deep"
-                }
-                role={micStatus === "ready" ? "status" : "alert"}
-              >
-                {micMessage}
-              </p>
-            )}
-            {micStatus === "blocked" && isNativePlatform() && (
-              <button
-                type="button"
-                onClick={() => void openAppSettings()}
-                className="font-inter text-sm text-terracotta underline decoration-terracotta/60 underline-offset-2"
-              >
-                Open settings
-              </button>
-            )}
-          </section>
+          <VoiceNotesMicSetupSection
+            micStatus={micStatus}
+            micMessage={micMessage}
+          />
 
           {error && (
             <p className="font-inter text-sm italic text-terracotta-deep" role="alert">

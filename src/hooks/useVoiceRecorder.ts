@@ -98,20 +98,34 @@ export function useVoiceRecorder() {
     }));
   }, []);
 
+  const refreshPermissionState = useCallback(async () => {
+    const permission = await queryMicrophonePermission();
+    setState((current) => ({
+      ...current,
+      permissionState: permission,
+    }));
+    if (permission === "granted") {
+      setError(null);
+    }
+    return permission;
+  }, [setError]);
+
   const requestPermission = useCallback(async () => {
     setError(null);
     const permission = await requestMicrophonePermission();
     setState((current) => ({ ...current, permissionState: permission }));
 
     if (permission === "granted") return true;
-    if (permission === "denied") {
-      setError(permissionDeniedError(true));
-    } else if (permission === "prompt") {
+
+    if (permission === "unsupported") {
       setError({
-        code: "permission_denied",
-        message: "Allow the microphone when your device asks.",
+        code: "unsupported",
+        message: "Voice recording isn't supported in this browser.",
       });
+      return false;
     }
+
+    setError(permissionDeniedError(permission === "denied"));
     return false;
   }, [setError]);
 
@@ -277,6 +291,7 @@ export function useVoiceRecorder() {
     startRecording,
     stopRecording,
     requestPermission,
+    refreshPermissionState,
     ensureMicrophoneReady,
     loadFromFile,
     openAppSettings,
