@@ -15,8 +15,12 @@ export function RecordButton({
     <button
       type="button"
       disabled={disabled}
-      onClick={onPress}
+      onClick={(event) => {
+        event.preventDefault();
+        onPress();
+      }}
       onContextMenu={(event) => event.preventDefault()}
+      style={{ touchAction: "manipulation", WebkitUserSelect: "none" }}
       className={cn(
         "flex h-[120px] w-[120px] select-none items-center justify-center rounded-full",
         "bg-terracotta text-cream shadow-md transition-transform duration-200",

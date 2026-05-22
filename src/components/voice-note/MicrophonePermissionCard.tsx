@@ -5,6 +5,7 @@ import { openAppSettings } from "@/lib/audio/platform";
 import type { RecorderErrorCode } from "@/lib/audio/types";
 
 type MicrophonePermissionCardProps = {
+  variant?: "setup" | "error";
   errorCode: RecorderErrorCode | null;
   message: string | null;
   isNative: boolean;
@@ -15,6 +16,7 @@ type MicrophonePermissionCardProps = {
 };
 
 export function MicrophonePermissionCard({
+  variant = "error",
   errorCode,
   message,
   isNative,
@@ -23,7 +25,12 @@ export function MicrophonePermissionCard({
   onRetryRecording,
   disabled = false,
 }: MicrophonePermissionCardProps) {
-  if (!message && errorCode !== "permission_denied" && errorCode !== "permission_blocked") {
+  const needsPermission =
+    permissionState !== "granted" ||
+    errorCode === "permission_denied" ||
+    errorCode === "permission_blocked";
+
+  if (!needsPermission && !message) {
     return null;
   }
 
@@ -32,14 +39,24 @@ export function MicrophonePermissionCard({
     permissionState === "denied" ||
     errorCode === "permission_blocked";
 
+  const isSetup = variant === "setup";
+
   return (
-    <div className="mt-4 max-w-[320px] space-y-4 text-center">
+    <div
+      className={
+        isSetup
+          ? "mb-6 w-full max-w-[340px] space-y-4 rounded-2xl border border-ink/[0.12] bg-cream-deep/50 p-4 text-center"
+          : "mt-4 max-w-[320px] space-y-4 text-center"
+      }
+    >
       <div className="space-y-2">
         <p className="font-sans text-sm font-medium text-ink">
-          Turn on the microphone.
+          {isSetup ? "Set up voice notes." : "Turn on the microphone."}
         </p>
         <Subhead className="text-center">
-          KinMatch only records when you tap the button.
+          {isSetup
+            ? "Same as onboarding — we only record when you tap the button."
+            : "KinMatch only records when you tap the button."}
         </Subhead>
         {message && (
           <p
@@ -54,6 +71,11 @@ export function MicrophonePermissionCard({
             In Safari, open the aA menu → Website Settings → Microphone → Allow.
           </p>
         )}
+        {isNative && isSetup && (
+          <p className="font-inter text-xs italic leading-relaxed text-ink-soft">
+            Tap below — iOS will ask to allow the microphone.
+          </p>
+        )}
       </div>
 
       <div className="space-y-3">
@@ -65,13 +87,15 @@ export function MicrophonePermissionCard({
           Allow microphone
         </PrimaryButton>
 
-        <PrimaryButton
-          type="button"
-          disabled={disabled}
-          onClick={() => void onRetryRecording()}
-        >
-          Try recording again
-        </PrimaryButton>
+        {!isSetup && (
+          <PrimaryButton
+            type="button"
+            disabled={disabled}
+            onClick={() => void onRetryRecording()}
+          >
+            Try recording again
+          </PrimaryButton>
+        )}
 
         {showSettings && (
           <button

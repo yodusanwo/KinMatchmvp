@@ -9,6 +9,7 @@ import {
   isRecorderError,
   MAX_RECORDING_SECONDS,
   requestMicrophonePermission,
+  resetAudioRecorder,
   type RecorderErrorCode,
 } from "@/lib/audio/recorder";
 import {
@@ -46,7 +47,7 @@ export function useVoiceRecorder() {
     isNative: false,
   });
 
-  const adapterRef = useRef(getAudioRecorder());
+  const adapterRef = useRef<ReturnType<typeof getAudioRecorder> | null>(null);
   const startedAtRef = useRef(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const amplitudeRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -63,7 +64,10 @@ export function useVoiceRecorder() {
   }, []);
 
   useEffect(() => {
-    setState((current) => ({ ...current, isNative: isNativePlatform() }));
+    resetAudioRecorder();
+    adapterRef.current = getAudioRecorder();
+    const isNative = isNativePlatform();
+    setState((current) => ({ ...current, isNative }));
 
     void queryMicrophonePermission().then((permissionState) => {
       setState((current) => ({ ...current, permissionState }));
@@ -94,7 +98,30 @@ export function useVoiceRecorder() {
     }));
   }, []);
 
+  const requestPermission = useCallback(async () => {
+    setError(null);
+    const permission = await requestMicrophonePermission();
+    setState((current) => ({ ...current, permissionState: permission }));
+
+    if (permission === "granted") return true;
+    if (permission === "denied") {
+      setError(permissionDeniedError(true));
+    } else if (permission === "prompt") {
+      setError({
+        code: "permission_denied",
+        message: "Allow the microphone when your device asks.",
+      });
+    }
+    return false;
+  }, [setError]);
+
   const startRecording = useCallback(async () => {
+    const permission = await queryMicrophonePermission();
+    if (permission !== "granted") {
+      const allowed = await requestPermission();
+      if (!allowed) return;
+    }
+
     setError(null);
     setState((current) => ({
       ...current,
@@ -106,7 +133,8 @@ export function useVoiceRecorder() {
     }));
 
     try {
-      const adapter = adapterRef.current;
+      const adapter = adapterRef.current ?? getAudioRecorder();
+      adapterRef.current = adapter;
       await adapter.startRecording();
       startedAtRef.current = Date.now();
 
@@ -170,7 +198,7 @@ export function useVoiceRecorder() {
         setError({ code: "unknown", message: "Could not start recording" });
       }
     }
-  }, [clearTimers, setError]);
+  }, [clearTimers, setError, requestPermission]);
 
   const stopRecording = useCallback(async () => {
     clearTimers();
@@ -197,17 +225,10 @@ export function useVoiceRecorder() {
     }
   }, [clearTimers, setError]);
 
-  const requestPermission = useCallback(async () => {
-    setError(null);
-    const permission = await requestMicrophonePermission();
-    setState((current) => ({ ...current, permissionState: permission }));
-
-    if (permission === "granted") return true;
-    if (permission === "denied") {
-      setError(permissionDeniedError(true));
-    }
-    return false;
-  }, [setError]);
+  const ensureMicrophoneReady = useCallback(async () => {
+    if (state.permissionState === "granted") return true;
+    return requestPermission();
+  }, [requestPermission, state.permissionState]);
 
   const loadFromFile = useCallback(async (file: File) => {
     setError(null);
@@ -252,6 +273,7 @@ export function useVoiceRecorder() {
     startRecording,
     stopRecording,
     requestPermission,
+    ensureMicrophoneReady,
     loadFromFile,
     openAppSettings,
     reset,

@@ -17,6 +17,19 @@ function mapPermission(
   return "prompt";
 }
 
+function permissionError(state: MicrophonePermissionState): RecorderError {
+  if (state === "denied") {
+    return {
+      code: "permission_blocked",
+      message: "Microphone access is blocked",
+    };
+  }
+  return {
+    code: "permission_denied",
+    message: "Microphone permission is required",
+  };
+}
+
 export class NativeAudioRecorder implements AudioRecorderAdapter {
   private samples: number[] = [];
   private amplitudeTimer: ReturnType<typeof setInterval> | null = null;
@@ -46,24 +59,28 @@ export class NativeAudioRecorder implements AudioRecorderAdapter {
   async startRecording(): Promise<void> {
     const AudioRecorder = await this.getPlugin();
     const permission = await this.requestPermission();
-    if (permission === "denied") {
-      throw {
-        code: "permission_denied",
-        message: "Microphone permission denied",
-      } satisfies RecorderError;
-    }
     if (permission === "unsupported") {
       throw {
         code: "unsupported",
         message: "Native recording unavailable",
       } satisfies RecorderError;
     }
+    if (permission !== "granted") {
+      throw permissionError(permission);
+    }
 
     this.samples = [];
-    await AudioRecorder.startRecording({
-      sampleRate: 44100,
-      bitRate: 128000,
-    });
+    try {
+      await AudioRecorder.startRecording({
+        sampleRate: 44100,
+        bitRate: 128000,
+      });
+    } catch {
+      throw {
+        code: "unknown",
+        message: "Could not start native recording",
+      } satisfies RecorderError;
+    }
 
     this.amplitudeTimer = setInterval(() => {
       const level = 0.08 + Math.random() * 0.35;

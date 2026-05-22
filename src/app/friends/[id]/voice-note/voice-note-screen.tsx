@@ -146,12 +146,11 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
     }
   }
 
-  const showPermissionHelp =
-    Boolean(recorder.error) &&
+  const micIsReady = recorder.permissionState === "granted";
+  const showMicSetup =
+    !micIsReady &&
     !recorder.audioBlob &&
-    (recorder.errorCode === "permission_denied" ||
-      recorder.errorCode === "permission_blocked" ||
-      recorder.errorCode === "unsupported");
+    !recorder.isRecording;
 
   if (loading || !friend) {
     return (
@@ -168,7 +167,9 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
     ? "Recording… tap to stop"
     : recorder.audioBlob
       ? "Tap send when you're ready"
-      : "Tap to start recording";
+      : showMicSetup
+        ? "Set up the microphone first, then tap to record"
+        : "Tap to start recording";
 
   return (
     <AppShell>
@@ -196,6 +197,24 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
         </div>
 
         <div className="mt-10 flex flex-1 flex-col items-center justify-center">
+          {showMicSetup && (
+            <MicrophonePermissionCard
+              variant="setup"
+              errorCode={recorder.errorCode}
+              message={
+                recorder.error ??
+                (recorder.permissionState === "denied"
+                  ? "Microphone access is off for KinMatch."
+                  : "KinMatch needs the microphone for voice notes.")
+              }
+              isNative={recorder.isNative}
+              permissionState={recorder.permissionState}
+              disabled={sendStatus === "uploading"}
+              onRequestPermission={recorder.requestPermission}
+              onRetryRecording={recorder.startRecording}
+            />
+          )}
+
           <LiveWaveform
             peaks={recorder.livePeaks}
             active={recorder.isRecording || Boolean(recorder.audioBlob)}
@@ -228,25 +247,13 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
 
           <Subhead className="mt-2 text-center">{helperText}</Subhead>
 
-          {showPermissionHelp ? (
-            <MicrophonePermissionCard
-              errorCode={recorder.errorCode}
-              message={recorder.error}
-              isNative={recorder.isNative}
-              permissionState={recorder.permissionState}
-              disabled={sendStatus === "uploading"}
-              onRequestPermission={recorder.requestPermission}
-              onRetryRecording={recorder.startRecording}
-            />
-          ) : (
-            recorder.error && (
-              <p
-                className="mt-4 font-inter text-sm italic text-terracotta-deep"
-                role="alert"
-              >
-                {recorder.error}
-              </p>
-            )
+          {!showMicSetup && recorder.error && (
+            <p
+              className="mt-4 font-inter text-sm italic text-terracotta-deep"
+              role="alert"
+            >
+              {recorder.error}
+            </p>
           )}
 
           {!recorder.isNative && !recorder.audioBlob && (
