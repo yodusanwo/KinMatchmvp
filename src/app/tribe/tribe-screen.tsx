@@ -10,6 +10,7 @@ import { BottomNav } from "@/components/nav/BottomNav";
 import { TodayPageSkeleton } from "@/components/ui/Skeleton";
 import { fetchJson } from "@/lib/api/fetch-client";
 import type { FriendCategory, FriendSummary } from "@/lib/api/types";
+import { firstName } from "@/lib/memories/categories";
 
 type FriendsResponse = {
   friends: FriendSummary[];
@@ -20,10 +21,6 @@ const CATEGORY_COLORS: Record<FriendCategory, string[]> = {
   village: ["#6B7A5C", "#C68F3E"],
   acquaintance: ["rgba(107,122,92,0.85)", "rgba(198,143,62,0.85)"],
 };
-
-function firstName(name: string) {
-  return name.trim().split(/\s+/)[0] ?? name;
-}
 
 function initials(name: string) {
   const parts = name.trim().split(/\s+/);

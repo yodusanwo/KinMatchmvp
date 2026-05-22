@@ -1,3 +1,4 @@
+import { firstName } from "@/lib/memories/categories";
 import type { MemoryCategory } from "@/lib/memories/types";
 
 export type DiscoveryPrompt = {
@@ -70,7 +71,7 @@ export function renderDiscoveryQuestion(
   prompt: DiscoveryPrompt,
   friendName: string
 ): string {
-  return prompt.question.replace(/\[Name\]/g, friendName);
+  return prompt.question.replace(/\[Name\]/g, firstName(friendName));
 }
 
 export function discoveryPrimaryCtaLabel(): string {

@@ -29,7 +29,7 @@ export function CaptureReviewScreen({
   initialItems,
 }: CaptureReviewScreenProps) {
   const router = useRouter();
-  const name = firstName(voiceNote.friend_name).toLowerCase();
+  const name = firstName(voiceNote.friend_name);
   const [items, setItems] = useState<EditableItem[]>(
     initialItems.map((item) => ({
       ...item,

@@ -11,6 +11,7 @@ import {
   normalizedCategory,
   type FriendRow,
 } from "@/lib/friends/utils";
+import { formatPersonName } from "@/lib/names/format";
 import { formatPersonalizedSpotlightPrompt, isBarrierKey } from "@/lib/personalization";
 import type { BarrierKey } from "@/lib/personalization";
 import { rankFriendsForToday } from "@/lib/algorithm/spotlight-ranking";
@@ -101,7 +102,7 @@ function toSummary(friend: FriendContextRow | FriendRow): FriendSummary {
   const quiet = daysQuiet(friend);
   return {
     id: friend.id,
-    name: friend.name,
+    name: formatPersonName(friend.name),
     avatar_color: friend.avatar_color,
     vibe: friend.vibe,
     category: normalizedCategory(friend.category),
@@ -139,7 +140,7 @@ function toAlgorithmFriend(friend: FriendContextRow): Friend {
 
   return {
     id: friend.id,
-    name: friend.name,
+    name: formatPersonName(friend.name),
     avatar_color: friend.avatar_color,
     vibe: friend.vibe,
     category: normalizedCategory(friend.category),

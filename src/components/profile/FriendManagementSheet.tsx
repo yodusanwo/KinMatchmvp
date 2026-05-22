@@ -51,7 +51,7 @@ export function FriendManagementSheet({
         {mode === "actions" ? (
           <>
             <p className="mb-5 text-center font-sans text-[11px] font-medium uppercase tracking-[0.16em] text-ink-soft">
-              about {name.toLowerCase()}
+              about {name}
             </p>
 
             <div className="space-y-1">

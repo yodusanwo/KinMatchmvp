@@ -357,7 +357,7 @@ function HeldSheet({
         {mode === "actions" && selected && (
           <>
             <p className="mb-5 text-center font-sans text-[11px] font-medium uppercase tracking-[0.16em] text-ink-soft">
-              about {name.toLowerCase()}
+              about {name}
             </p>
             <Link
               href={`/friends/${selected.friend_id}`}

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { MiniAvatar } from "@/components/onboarding/MiniAvatar";
 import type { FriendSummary } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
+import { firstName } from "@/lib/memories/categories";
 
 type TribeCircleGraphicProps = {
   tribe: FriendSummary[];
@@ -17,10 +18,6 @@ const CIRCLE_SLOTS: { top: string; left: string }[] = [
   { top: "71%", left: "68%" },
   { top: "52%", left: "50%" },
 ];
-
-function firstName(name: string) {
-  return name.trim().split(/\s+/)[0] ?? name;
-}
 
 function quietLabel(friend: FriendSummary) {
   if (!friend.last_touch_at) return "not yet";

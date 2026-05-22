@@ -1,3 +1,4 @@
+import { firstName } from "@/lib/memories/categories";
 import { pickPrimaryBarrier } from "./barriers";
 import { COPY_VARIANTS } from "./copy-variants";
 import { fillPersonalizationTemplate } from "./fill-template";
@@ -10,8 +11,10 @@ export function formatPersonalizedSpotlightPrompt(
   daysQuiet: number,
   memory?: string | null
 ): string {
+  const displayName = firstName(name);
+
   if (daysQuiet <= 0) {
-    return `You haven't reached out to ${name} yet. A small first note is enough.`;
+    return `You haven't reached out to ${displayName} yet. A small first note is enough.`;
   }
 
   const primary = pickPrimaryBarrier(user.barriers ?? []);
@@ -22,7 +25,7 @@ export function formatPersonalizedSpotlightPrompt(
   }
 
   return fillPersonalizationTemplate(template, {
-    name,
+    name: displayName,
     days: daysQuiet,
     memory,
   });

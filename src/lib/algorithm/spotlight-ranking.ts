@@ -1,3 +1,4 @@
+import { firstName } from "@/lib/memories/categories";
 import { pickPrimaryBarrier } from "@/lib/personalization/barriers";
 import type {
   AlgorithmMemoryNote,
@@ -239,20 +240,22 @@ export function derivePrimaryReason(
 
   const [topComponent] = positives[0];
 
+  const name = firstName(friend.name);
+
   switch (topComponent) {
     case "reciprocity":
-      return `${friend.name} reached out — you haven't replied yet`;
+      return `${name} reached out — you haven't replied yet`;
     case "life_event":
-      return `${friend.name} has an important date coming up`;
+      return `${name} has an important date coming up`;
     case "emotional_weight":
-      return `${friend.name} has something going on right now`;
+      return `${name} has something going on right now`;
     case "cadence":
       if (!friend.last_contact_at && !friend.last_touch_at) {
-        return `you haven't reached out to ${friend.name} yet`;
+        return `you haven't reached out to ${name} yet`;
       }
-      return `it's been a while with ${friend.name}`;
+      return `it's been a while with ${name}`;
     case "barrier_match":
-      return `a good moment to reach out to ${friend.name}`;
+      return `a good moment to reach out to ${name}`;
     default:
       return "rotation";
   }

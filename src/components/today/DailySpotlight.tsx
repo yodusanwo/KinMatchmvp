@@ -6,6 +6,7 @@ import { MiniAvatar } from "@/components/onboarding/MiniAvatar";
 import { primaryButtonClassName } from "@/components/brand/primary-button-styles";
 import type { TodayDailyState } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
+import { firstName } from "@/lib/memories/categories";
 
 type SendSpotlightProps = {
   state: Extract<TodayDailyState, { kind: "send_discovery" | "send_algorithmic" }>;
@@ -15,10 +16,6 @@ type CaptureSpotlightProps = {
   state: Extract<TodayDailyState, { kind: "capture" }>;
   onRefresh: () => void;
 };
-
-function firstName(name: string) {
-  return name.trim().split(/\s+/)[0] ?? name;
-}
 
 function cadenceStatus(friend: SendSpotlightProps["state"]["friend"]) {
   if (!friend.last_touch_at) return "not reached out yet";

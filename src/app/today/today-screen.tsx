@@ -10,11 +10,8 @@ import { TribeCircleGraphic } from "@/components/today/TribeCircleGraphic";
 import { TodayPageSkeleton } from "@/components/ui/Skeleton";
 import { fetchJson } from "@/lib/api/fetch-client";
 import type { TodayDailyState, TodayResponse } from "@/lib/api/types";
+import { firstName } from "@/lib/memories/categories";
 import { dayEyebrow } from "@/lib/today/format";
-
-function firstName(name: string) {
-  return name.trim().split(/\s+/)[0] ?? name;
-}
 
 function dayLabel(state: TodayDailyState | null | undefined) {
   const base = dayEyebrow();
@@ -29,14 +26,14 @@ function reachOutPeriod() {
 
 function headlineForState(state: TodayDailyState | null | undefined) {
   if (!state) return "Who you can build community with today.";
-  const name = firstName(state.friend.name).toLowerCase();
+  const name = firstName(state.friend.name);
   if (state.kind === "capture") return `What did ${name} share?`;
   return `${reachOutPeriod()}, reach out to ${name}.`;
 }
 
 function tomorrowHint(state: TodayDailyState | null | undefined) {
   if (!state) return null;
-  const name = firstName(state.friend.name).toLowerCase();
+  const name = firstName(state.friend.name);
   if (state.kind === "capture") {
     const nextDepth = Math.min((state.cycle_number ?? 1) + 1, 5);
     return `A new question for your tribe — depth ${nextDepth} of 5.`;
