@@ -10,8 +10,8 @@ export async function uploadVoiceAudio(
   audio: Blob,
   contentType: string
 ): Promise<string> {
-  const extension = contentType.includes("mp4")
-    ? "mp4"
+  const extension = contentType.includes("mp4") || contentType.includes("m4a")
+    ? "m4a"
     : contentType.includes("mpeg")
       ? "mp3"
       : contentType.includes("ogg")

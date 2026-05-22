@@ -9,6 +9,8 @@ import { AppShell } from "@/components/layout/AppShell";
 import { BrandBar } from "@/components/brand";
 import { useOnboarding } from "@/contexts/onboarding-context";
 import type { CompleteOnboardingPayload } from "@/lib/onboarding/api-types";
+import { isNativePlatform, openAppSettings } from "@/lib/audio/platform";
+import { requestMicrophonePermission } from "@/lib/audio/recorder";
 
 const REFLECTION_COPY_CLASS =
   "font-inter text-sm italic leading-[1.5] text-[rgba(31,26,20,0.65)]";
@@ -58,8 +60,17 @@ export function EmailPrefsScreen() {
   async function requestMicrophone() {
     setError(null);
     setMicMessage(null);
+    setMicStatus("requesting");
 
-    if (!navigator.mediaDevices?.getUserMedia) {
+    const permission = await requestMicrophonePermission();
+
+    if (permission === "granted") {
+      setMicStatus("ready");
+      setMicMessage("Voice notes are ready.");
+      return true;
+    }
+
+    if (permission === "unsupported") {
       setMicStatus("unsupported");
       setMicMessage(
         "This browser can't set up voice notes here. You can still continue."
@@ -67,21 +78,13 @@ export function EmailPrefsScreen() {
       return false;
     }
 
-    setMicStatus("requesting");
-
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      stream.getTracks().forEach((track) => track.stop());
-      setMicStatus("ready");
-      setMicMessage("Voice notes are ready.");
-      return true;
-    } catch {
-      setMicStatus("blocked");
-      setMicMessage(
-        "Your phone blocked the microphone. Turn it on in settings, or set this up later."
-      );
-      return false;
-    }
+    setMicStatus("blocked");
+    setMicMessage(
+      isNativePlatform()
+        ? "Your phone blocked the microphone. Open settings to allow it, or set this up later."
+        : "Your phone blocked the microphone. Turn it on in browser settings, or set this up later."
+    );
+    return false;
   }
 
   async function handleSave() {
@@ -187,6 +190,15 @@ export function EmailPrefsScreen() {
               >
                 {micMessage}
               </p>
+            )}
+            {micStatus === "blocked" && isNativePlatform() && (
+              <button
+                type="button"
+                onClick={() => void openAppSettings()}
+                className="font-inter text-sm text-terracotta underline decoration-terracotta/60 underline-offset-2"
+              >
+                Open settings
+              </button>
             )}
           </section>
 

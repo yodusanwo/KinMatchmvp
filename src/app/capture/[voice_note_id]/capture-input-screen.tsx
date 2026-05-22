@@ -6,6 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import { BrandBar, Eyebrow, Headline, PrimaryButton, Subhead } from "@/components/brand";
 import { AppShell } from "@/components/layout/AppShell";
 import { MiniAvatar } from "@/components/onboarding/MiniAvatar";
+import { AudioFileCaptureFallback } from "@/components/voice-note/AudioFileCaptureFallback";
+import { MicrophonePermissionCard } from "@/components/voice-note/MicrophonePermissionCard";
 import { RecordButton } from "@/components/voice-note/RecordButton";
 import { formatDuration } from "@/components/voice-note/format-duration";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
@@ -156,7 +158,7 @@ export function CaptureInputScreen({
             disabled={saving || transcribing}
             onPress={() => {
               if (recorder.isRecording) {
-                recorder.stopRecording();
+                void recorder.stopRecording();
                 return;
               }
               void recorder.startRecording();
@@ -169,10 +171,34 @@ export function CaptureInputScreen({
                 ? `recording ${formatDuration(recorder.durationSeconds)}`
                 : "tap to voice-note · or type below"}
           </p>
-          {recorder.error && (
-            <p className="mt-2 font-inter text-xs italic text-terracotta-deep">
-              {recorder.error}
-            </p>
+          {recorder.error &&
+          (recorder.errorCode === "permission_denied" ||
+            recorder.errorCode === "permission_blocked" ||
+            recorder.errorCode === "unsupported") ? (
+            <div className="mt-3">
+              <MicrophonePermissionCard
+                errorCode={recorder.errorCode}
+                message={recorder.error}
+                isNative={recorder.isNative}
+                permissionState={recorder.permissionState}
+                disabled={saving || transcribing}
+                onRequestPermission={recorder.requestPermission}
+                onRetryRecording={recorder.startRecording}
+              />
+            </div>
+          ) : (
+            recorder.error && (
+              <p className="mt-2 font-inter text-xs italic text-terracotta-deep">
+                {recorder.error}
+              </p>
+            )
+          )}
+          {!recorder.isNative && (
+            <AudioFileCaptureFallback
+              className="mt-3"
+              disabled={saving || transcribing || recorder.isRecording}
+              onFileSelected={recorder.loadFromFile}
+            />
           )}
         </div>
 
