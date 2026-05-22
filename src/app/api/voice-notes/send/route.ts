@@ -53,6 +53,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Friend not found" }, { status: 404 });
   }
 
+  const { data: profile } = await supabase
+    .from("users")
+    .select("name, email")
+    .eq("id", user.id)
+    .maybeSingle();
+
   const { data: discoveryPrompt } = await supabase
     .from("discovery_prompts")
     .select("id")
@@ -128,5 +134,7 @@ export async function POST(req: Request) {
     voice_note: voiceNote,
     public_url: publicUrl,
     friend_name: friend.name,
+    sender_name:
+      profile?.name?.trim() || profile?.email?.split("@")[0] || null,
   });
 }

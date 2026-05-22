@@ -36,6 +36,22 @@ function voiceNoteFilename(mimeType: string) {
   return `voice-note.${extension}`;
 }
 
+function firstName(name: string | null | undefined) {
+  return name?.trim().split(/\s+/)[0] ?? "";
+}
+
+function shareText(friendName: string | null | undefined) {
+  const name = firstName(friendName);
+  return name
+    ? `Hey ${name}, I left you a quick voice note —`
+    : "Hey — I left you a quick voice note —";
+}
+
+function shareTitle(senderName: string | null | undefined) {
+  const name = firstName(senderName);
+  return name ? `Voice note from ${name}` : "a KinMatch voice note";
+}
+
 async function parseSendError(res: Response) {
   const data = (await res.json().catch(() => ({}))) as { error?: string };
   return data.error ?? "Couldn't send that note — try again.";
@@ -52,6 +68,7 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
     "idle" | "uploading" | "error"
   >("idle");
   const [sendError, setSendError] = useState<string | null>(null);
+  const [sendNotice, setSendNotice] = useState<string | null>(null);
 
   const recorder = useVoiceRecorder();
 
@@ -83,6 +100,7 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
 
     setSendStatus("uploading");
     setSendError(null);
+    setSendNotice(null);
 
     const formData = new FormData();
     const mimeType = recorder.recordedMimeType || recorder.audioBlob.type || "audio/webm";
@@ -107,32 +125,42 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
         voice_note: { id: string };
         public_url: string;
         friend_name: string;
+        sender_name: string | null;
       };
 
       trackEvent("voice_note_sent", { share_sheet: "1" });
 
-      let shareTriggered = false;
       if (navigator.share && sendData.public_url) {
         try {
-          const sharePromise = navigator.share({
+          await navigator.share({
             url: sendData.public_url,
-            title: "Voice note from KinMatch",
+            text: shareText(sendData.friend_name),
+            title: shareTitle(sendData.sender_name),
           });
-          shareTriggered = true;
-          await sharePromise;
-        } catch {
-          // Share sheets can be cancelled; the voice note is already saved.
+        } catch (err) {
+          if (err instanceof DOMException && err.name === "AbortError") {
+            setSendStatus("idle");
+            return;
+          }
+          setSendStatus("error");
+          setSendError("Couldn't open sharing — try again.");
+          console.error("Share failed", err);
+          return;
         }
       } else if (sendData.public_url && navigator.clipboard) {
         await navigator.clipboard.writeText(sendData.public_url);
-        shareTriggered = true;
+        setSendStatus("idle");
+        setSendNotice("Link copied — paste to send");
+        return;
+      } else {
+        setSendStatus("error");
+        setSendError("Couldn't copy the link — try again.");
+        return;
       }
 
-      if (shareTriggered) {
-        await fetch(`/api/voice-notes/${sendData.voice_note.id}/send`, {
-          method: "POST",
-        });
-      }
+      await fetch(`/api/voice-notes/${sendData.voice_note.id}/send`, {
+        method: "POST",
+      });
 
       router.push("/today");
     } catch {
@@ -234,6 +262,12 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
           {sendError && (
             <p className="mt-4 font-inter text-sm italic text-terracotta-deep" role="alert">
               {sendError}
+            </p>
+          )}
+
+          {sendNotice && (
+            <p className="mt-4 font-inter text-sm italic text-ink-soft" role="status">
+              {sendNotice}
             </p>
           )}
         </div>
