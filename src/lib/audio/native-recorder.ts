@@ -1,3 +1,4 @@
+import { requestNativeMicrophonePermission } from "@/lib/audio/permissions";
 import type {
   AudioRecorderAdapter,
   MicrophonePermissionState,
@@ -44,16 +45,7 @@ export class NativeAudioRecorder implements AudioRecorderAdapter {
   }
 
   async requestPermission(): Promise<MicrophonePermissionState> {
-    try {
-      const AudioRecorder = await this.getPlugin();
-      const current = await AudioRecorder.checkPermissions();
-      if (current.recordAudio === "granted") return "granted";
-
-      const requested = await AudioRecorder.requestPermissions();
-      return mapPermission(requested.recordAudio);
-    } catch {
-      return "unsupported";
-    }
+    return requestNativeMicrophonePermission();
   }
 
   async startRecording(): Promise<void> {

@@ -66,7 +66,11 @@ export function VoiceNotesMicSetupSection({
           onClick={() => void onSetup()}
           className="!mt-2"
         >
-          {micStatus === "requesting" ? "Asking…" : "Set up voice notes →"}
+          {micStatus === "requesting"
+            ? "Waiting for Allow…"
+            : micStatus === "blocked"
+              ? "Try again →"
+              : "Set up voice notes →"}
         </ContinueButton>
       )}
     </section>

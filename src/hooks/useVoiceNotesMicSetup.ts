@@ -2,7 +2,10 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { isNativePlatform } from "@/lib/audio/platform";
-import { queryMicrophonePermission } from "@/lib/audio/permissions";
+import {
+  nativeMicBlockedMessage,
+  queryMicrophonePermission,
+} from "@/lib/audio/permissions";
 import { requestMicrophonePermission } from "@/lib/audio/recorder";
 
 export type MicSetupStatus =
@@ -29,29 +32,39 @@ export function useVoiceNotesMicSetup() {
     setMicMessage(null);
     setMicStatus("requesting");
 
-    const permission = await requestMicrophonePermission();
+    try {
+      const permission = await requestMicrophonePermission();
 
-    if (permission === "granted") {
-      setMicStatus("ready");
-      setMicMessage("Voice notes are ready.");
-      return true;
-    }
+      if (permission === "granted") {
+        setMicStatus("ready");
+        setMicMessage("Voice notes are ready.");
+        return true;
+      }
 
-    if (permission === "unsupported") {
-      setMicStatus("unsupported");
+      if (permission === "unsupported") {
+        setMicStatus("unsupported");
+        setMicMessage(
+          "This browser can't set up voice notes here. You can still continue."
+        );
+        return false;
+      }
+
+      setMicStatus("blocked");
       setMicMessage(
-        "This browser can't set up voice notes here. You can still continue."
+        isNativePlatform()
+          ? nativeMicBlockedMessage()
+          : "Your phone blocked the microphone. Turn it on in browser settings, or set this up later."
+      );
+      return false;
+    } catch {
+      setMicStatus("blocked");
+      setMicMessage(
+        isNativePlatform()
+          ? nativeMicBlockedMessage()
+          : "Could not reach the microphone. Try again."
       );
       return false;
     }
-
-    setMicStatus("blocked");
-    setMicMessage(
-      isNativePlatform()
-        ? "Your phone blocked the microphone. Open settings to allow it, or set this up later."
-        : "Your phone blocked the microphone. Turn it on in browser settings, or set this up later."
-    );
-    return false;
   }, []);
 
   return {

@@ -1,4 +1,7 @@
 import { isNativePlatform } from "@/lib/audio/platform";
+import {
+  requestNativeMicrophonePermission,
+} from "@/lib/audio/permissions";
 import { NativeAudioRecorder } from "@/lib/audio/native-recorder";
 import { WebAudioRecorder } from "@/lib/audio/web-recorder";
 import type {
@@ -31,6 +34,9 @@ export function resetAudioRecorder() {
 }
 
 export async function requestMicrophonePermission(): Promise<MicrophonePermissionState> {
+  if (isNativePlatform()) {
+    return requestNativeMicrophonePermission();
+  }
   return getAudioRecorder().requestPermission();
 }
 

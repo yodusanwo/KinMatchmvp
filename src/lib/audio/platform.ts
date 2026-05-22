@@ -9,6 +9,12 @@ export function isNativePlatform(): boolean {
   return Boolean(cap?.isNativePlatform?.());
 }
 
+/** True when running in the iOS Simulator (permission alerts are easy to miss). */
+export function isIosSimulator(): boolean {
+  if (typeof navigator === "undefined") return false;
+  return /Simulator|iPhone Simulator|iPad Simulator/i.test(navigator.userAgent);
+}
+
 export async function getNativePlatform(): Promise<"ios" | "android" | "web"> {
   if (!isNativePlatform()) return "web";
   try {
