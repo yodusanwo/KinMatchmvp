@@ -1,7 +1,10 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { PublicVoiceNote } from "@/lib/api/public-voice-note";
 import { avatarColorFromUserId } from "@/lib/voice-notes/avatar-from-user";
-import { listenPageAudioUrl } from "@/lib/voice-notes/blob-url";
+import {
+  listenPageAudioUrl,
+  normalizeShareToken,
+} from "@/lib/voice-notes/blob-url";
 import type { AvatarColor } from "@/lib/onboarding/types";
 import { NextResponse } from "next/server";
 
@@ -25,7 +28,8 @@ function normalizePeaks(raw: unknown): number[] {
 }
 
 export async function GET(_request: Request, context: RouteContext) {
-  const { shareToken } = await context.params;
+  const { shareToken: rawShareToken } = await context.params;
+  const shareToken = normalizeShareToken(rawShareToken);
 
   if (!shareToken || shareToken.length < 8) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });

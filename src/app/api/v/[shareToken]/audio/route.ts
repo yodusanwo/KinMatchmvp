@@ -1,13 +1,17 @@
 import { get } from "@vercel/blob";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { isVercelBlobUrl } from "@/lib/voice-notes/blob-url";
+import {
+  isVercelBlobUrl,
+  normalizeShareToken,
+} from "@/lib/voice-notes/blob-url";
 import { NextResponse } from "next/server";
 
 type RouteContext = { params: Promise<{ shareToken: string }> };
 
 /** Streams private Vercel Blob audio for a valid share link (no auth). */
 export async function GET(_request: Request, context: RouteContext) {
-  const { shareToken } = await context.params;
+  const { shareToken: rawShareToken } = await context.params;
+  const shareToken = normalizeShareToken(rawShareToken);
 
   if (!shareToken || shareToken.length < 8) {
     return new NextResponse(null, { status: 404 });

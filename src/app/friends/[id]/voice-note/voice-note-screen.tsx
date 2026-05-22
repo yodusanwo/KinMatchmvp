@@ -116,7 +116,6 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
         try {
           const sharePromise = navigator.share({
             url: sendData.public_url,
-            text: `Hey ${sendData.friend_name} — sent you a quick voice note.`,
             title: "Voice note from KinMatch",
           });
           shareTriggered = true;
