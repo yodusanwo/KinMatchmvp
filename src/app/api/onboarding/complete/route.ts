@@ -1,3 +1,4 @@
+import { formatPersonName } from "@/lib/names/format";
 import { sendWelcomeEmail } from "@/lib/klaviyo/send-welcome-email";
 import type { CompleteOnboardingPayload } from "@/lib/onboarding/api-types";
 import type { BarrierId, CircleId } from "@/lib/onboarding/types";
@@ -37,7 +38,8 @@ export async function POST(request: Request) {
   const q1People = dedupePeopleByName(
     Array.isArray(body.q1People) ? body.q1People : []
   );
-  const userName = profile?.name?.trim() || body.userName?.trim();
+  const rawUserName = profile?.name?.trim() || body.userName?.trim();
+  const userName = rawUserName ? formatPersonName(rawUserName) : "";
   const q2People = dedupePeopleByName(
     Array.isArray(body.q2People) ? body.q2People : []
   );
@@ -116,7 +118,7 @@ export async function POST(request: Request) {
         .from("friends")
         .insert({
           user_id: user.id,
-          name: person.name,
+          name: formatPersonName(person.name),
           avatar_color: person.avatarColor,
           vibe: "potential_close",
           category: "inner_circle",
@@ -141,7 +143,7 @@ export async function POST(request: Request) {
         .from("friends")
         .insert({
           user_id: user.id,
-          name: person.name,
+          name: formatPersonName(person.name),
           avatar_color: person.avatarColor,
           vibe: "potential_close",
           category: "village",

@@ -1,3 +1,4 @@
+import { formatPersonName } from "@/lib/names/format";
 import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -38,7 +39,12 @@ export async function POST(req: NextRequest) {
       if (value !== null && typeof value !== "string") {
         return NextResponse.json({ error: "Invalid name" }, { status: 400 });
       }
-      updates.name = typeof value === "string" ? value.trim() || null : null;
+      updates.name =
+        typeof value === "string"
+          ? value.trim()
+            ? formatPersonName(value)
+            : null
+          : null;
       continue;
     }
 

@@ -4,6 +4,7 @@ import { CATEGORY_CADENCE_DAYS, isFriendCategory } from "@/lib/friends/categorie
 import { daysQuiet, isDrifting } from "@/lib/friends/utils";
 import { randomAvatarColor } from "@/lib/onboarding/avatar-colors";
 import type { AvatarColor } from "@/lib/onboarding/types";
+import { formatPersonName } from "@/lib/names/format";
 import { createClient } from "@/lib/supabase/server";
 
 type FriendInsertRow = {
@@ -26,7 +27,7 @@ function normalizeName(name: string) {
 function toSummary(friend: FriendListRow): FriendSummary {
   return {
     id: friend.id,
-    name: friend.name,
+    name: formatPersonName(friend.name),
     avatar_color: friend.avatar_color,
     vibe: friend.vibe,
     category: friend.category ?? "inner_circle",
@@ -88,7 +89,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Name is required" }, { status: 400 });
   }
 
-  const name = body.name.trim().replace(/\s+/g, " ");
+  const name = formatPersonName(body.name);
   const category = isFriendCategory(body.category)
     ? body.category
     : "inner_circle";

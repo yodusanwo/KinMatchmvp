@@ -252,3 +252,16 @@ not like a behavioral science textbook explaining a study.
 
 When in doubt: would a thoughtful friend say this, or would a 
 psychology professor say this? If it's the professor, rewrite.
+
+---
+
+## PERSON NAMES — ALWAYS PROPER CASE
+
+Friend and user names must read naturally in messages and UI — never leave them as the user typed them if the first letter was lowercase.
+
+- **On save:** run `formatPersonName()` from `@/lib/names/format` before writing to `friends.name` or `users.name`.
+- **In copy:** use `firstName()` from `@/lib/memories/categories` (it applies proper case). Do not hand-split names without formatting.
+- **Examples:** `mary` → `Mary`, `MARY JANE` → `Mary Jane`
+
+❌ "Hey mary, I left you a quick voice note —"
+✓ "Hey Mary, I left you a quick voice note —"

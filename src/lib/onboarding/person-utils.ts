@@ -1,10 +1,11 @@
+import { formatPersonName } from "@/lib/names/format";
 import { randomAvatarColor } from "./avatar-colors";
 import type { CircleId, PersonChip } from "./types";
 
 export function createPerson(name: string): PersonChip {
   return {
     id: crypto.randomUUID(),
-    name: name.trim(),
+    name: formatPersonName(name),
     avatarColor: randomAvatarColor(),
   };
 }

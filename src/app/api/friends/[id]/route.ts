@@ -9,6 +9,7 @@ import {
   type FriendRow,
 } from "@/lib/friends/utils";
 import { categoryRelationshipLabel } from "@/lib/friends/categories";
+import { formatPersonName } from "@/lib/names/format";
 import { buildTodayState } from "@/lib/today/get-daily-state";
 import { NextResponse } from "next/server";
 
@@ -161,7 +162,7 @@ export async function GET(_request: Request, context: RouteContext) {
 
   const profile: FriendProfile = {
     id: row.id,
-    name: row.name,
+    name: formatPersonName(row.name),
     avatar_color: row.avatar_color,
     vibe: row.vibe,
     category,

@@ -1,3 +1,4 @@
+import { formatPersonName } from "@/lib/names/format";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
@@ -23,7 +24,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Name is required" }, { status: 400 });
   }
 
-  const name = body.name.trim().replace(/\s+/g, " ");
+  const name = formatPersonName(body.name);
   if (name.length < 2 || name.length > 80) {
     return NextResponse.json(
       { error: "Use at least 2 characters." },

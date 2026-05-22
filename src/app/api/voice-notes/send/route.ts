@@ -1,4 +1,5 @@
 import { randomBytes } from "crypto";
+import { formatPersonName } from "@/lib/names/format";
 import { createClient } from "@/lib/supabase/server";
 import { getAppOrigin } from "@/lib/env";
 import { uploadVoiceAudio } from "@/lib/voice-notes/storage";
@@ -133,8 +134,9 @@ export async function POST(req: Request) {
   return NextResponse.json({
     voice_note: voiceNote,
     public_url: publicUrl,
-    friend_name: friend.name,
-    sender_name:
-      profile?.name?.trim() || profile?.email?.split("@")[0] || null,
+    friend_name: formatPersonName(friend.name),
+    sender_name: profile?.name?.trim()
+      ? formatPersonName(profile.name)
+      : profile?.email?.split("@")[0] || null,
   });
 }

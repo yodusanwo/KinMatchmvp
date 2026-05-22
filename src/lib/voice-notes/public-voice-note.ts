@@ -1,3 +1,5 @@
+import { formatPersonName } from "@/lib/names/format";
+import { firstName as firstNameFromFull } from "@/lib/memories/categories";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { PublicVoiceNote } from "@/lib/api/public-voice-note";
 import type { AvatarColor } from "@/lib/onboarding/types";
@@ -29,7 +31,8 @@ function normalizePeaks(raw: unknown): number[] {
 }
 
 export function firstName(name: string | null | undefined): string {
-  return name?.trim().split(/\s+/)[0] ?? "";
+  if (!name?.trim()) return "";
+  return firstNameFromFull(name);
 }
 
 export type PublicVoiceNoteRecord = PublicVoiceNote & {
@@ -74,8 +77,9 @@ export async function fetchPublicVoiceNote(
     .eq("id", senderId)
     .maybeSingle();
 
-  const senderName =
-    sender?.name?.trim() || sender?.email?.split("@")[0] || "Someone";
+  const senderName = sender?.name?.trim()
+    ? formatPersonName(sender.name)
+    : sender?.email?.split("@")[0] || "Someone";
 
   return {
     data: {

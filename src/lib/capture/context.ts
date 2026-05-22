@@ -1,3 +1,4 @@
+import { formatPersonName } from "@/lib/names/format";
 import type { AvatarColor } from "@/lib/onboarding/types";
 
 export type CaptureVoiceNoteContext = {
@@ -54,7 +55,7 @@ export function mapCaptureVoiceNoteContext(
   return {
     id: row.id,
     friend_id: row.friend_id ?? row.recipient_friend_id ?? friend.id,
-    friend_name: friend.name,
+    friend_name: formatPersonName(friend.name),
     friend_avatar_color: friend.avatar_color,
     created_at: row.created_at,
     original_question: prompt?.question ?? null,

@@ -8,6 +8,7 @@ import {
   Users,
 } from "lucide-react";
 import type { MemoryCategory } from "@/lib/memories/types";
+import { formatPersonName } from "@/lib/names/format";
 
 export type MemoryCategoryConfig = {
   id: MemoryCategory;
@@ -121,9 +122,9 @@ export const MEMORY_CATEGORIES: Record<MemoryCategory, MemoryCategoryConfig> =
   };
 
 export function firstName(fullName: string): string {
-  const trimmed = fullName.trim();
-  if (!trimmed) return fullName;
-  return trimmed.split(/\s+/)[0] ?? trimmed;
+  const formatted = formatPersonName(fullName);
+  if (!formatted) return formatted;
+  return formatted.split(/\s+/)[0] ?? formatted;
 }
 
 export const MEMORY_MODAL_CATEGORIES: MemoryCategory[] = [
