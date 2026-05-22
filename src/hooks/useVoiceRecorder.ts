@@ -1,21 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { openAppSettings, isNativePlatform } from "@/lib/audio/platform";
-import { queryMicrophonePermission, recorderErrorMessage } from "@/lib/audio/permissions";
 import {
-  enrichResultFromFile,
-  getAudioRecorder,
-  isRecorderError,
+  downsamplePeaks,
   MAX_RECORDING_SECONDS,
-  requestMicrophonePermission,
-  type RecorderErrorCode,
-} from "@/lib/audio/recorder";
-import {
-  permissionDeniedError,
-  type RecorderError,
-} from "@/lib/audio/types";
-import { downsamplePeaks } from "@/lib/voice-notes/peaks";
+  readAnalyserLevel,
+} from "@/lib/voice-notes/peaks";
+import { getSupportedAudioMimeType } from "@/lib/audio/mime-type";
 
 export type VoiceRecorderState = {
   isRecording: boolean;
@@ -25,235 +16,188 @@ export type VoiceRecorderState = {
   recordedMimeType: string;
   peaks: number[];
   error: string | null;
-  errorCode: RecorderErrorCode | null;
-  permissionState: "unknown" | "granted" | "denied" | "prompt" | "unsupported";
-  isNative: boolean;
 };
-
-const IDLE_PEAKS = Array.from({ length: 30 }, () => 0.08);
 
 export function useVoiceRecorder() {
   const [state, setState] = useState<VoiceRecorderState>({
     isRecording: false,
     durationSeconds: 0,
-    livePeaks: IDLE_PEAKS,
+    livePeaks: Array.from({ length: 30 }, () => 0.08),
     audioBlob: null,
     recordedMimeType: "",
     peaks: [],
     error: null,
-    errorCode: null,
-    permissionState: "unknown",
-    isNative: false,
   });
 
-  const adapterRef = useRef(getAudioRecorder());
-  const startedAtRef = useRef(0);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+  const samplesRef = useRef<number[]>([]);
+  const startedAtRef = useRef<number>(0);
+  const rafRef = useRef<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const amplitudeRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const clearTimers = useCallback(() => {
+  const cleanupStream = useCallback(() => {
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
-    if (amplitudeRef.current) {
-      clearInterval(amplitudeRef.current);
-      amplitudeRef.current = null;
-    }
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+    void audioContextRef.current?.close();
+    audioContextRef.current = null;
+    analyserRef.current = null;
   }, []);
 
-  useEffect(() => {
-    setState((current) => ({ ...current, isNative: isNativePlatform() }));
+  useEffect(() => cleanupStream, [cleanupStream]);
 
-    void queryMicrophonePermission().then((permissionState) => {
-      setState((current) => ({ ...current, permissionState }));
-    });
+  const tickAnalyser = useCallback(() => {
+    const analyser = analyserRef.current;
+    if (!analyser) return;
 
-    const adapter = adapterRef.current;
-    return () => {
-      clearTimers();
-      void adapter.cancelRecording();
-    };
-  }, [clearTimers]);
+    const level = readAnalyserLevel(analyser);
+    samplesRef.current.push(level);
 
-  const setError = useCallback((error: RecorderError | null) => {
-    if (!error) {
-      setState((current) => ({
-        ...current,
-        error: null,
-        errorCode: null,
-      }));
-      return;
-    }
+    const live = downsamplePeaks(
+      samplesRef.current.slice(-120),
+      30
+    );
+    setState((current) => ({ ...current, livePeaks: live }));
 
-    setState((current) => ({
-      ...current,
-      error: recorderErrorMessage(error),
-      errorCode: error.code,
-      isRecording: false,
-    }));
+    rafRef.current = requestAnimationFrame(tickAnalyser);
+  }, []);
+
+  const stopRecording = useCallback(() => {
+    const recorder = mediaRecorderRef.current;
+    if (!recorder || recorder.state === "inactive") return;
+    recorder.stop();
+    setState((current) => ({ ...current, isRecording: false }));
   }, []);
 
   const startRecording = useCallback(async () => {
-    setError(null);
     setState((current) => ({
       ...current,
+      error: null,
       audioBlob: null,
       recordedMimeType: "",
       peaks: [],
-      durationSeconds: 0,
-      livePeaks: IDLE_PEAKS,
     }));
 
     try {
-      const adapter = adapterRef.current;
-      await adapter.startRecording();
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+        },
+      });
+      streamRef.current = stream;
+
+      const audioContext = new AudioContext();
+      await audioContext.resume();
+      audioContextRef.current = audioContext;
+      const source = audioContext.createMediaStreamSource(stream);
+      const analyser = audioContext.createAnalyser();
+      analyser.fftSize = 256;
+      source.connect(analyser);
+      analyserRef.current = analyser;
+
+      const mimeType = getSupportedAudioMimeType();
+      const recorder = new MediaRecorder(
+        stream,
+        mimeType ? { mimeType } : undefined
+      );
+      mediaRecorderRef.current = recorder;
+      chunksRef.current = [];
+      samplesRef.current = [];
       startedAtRef.current = Date.now();
 
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) chunksRef.current.push(event.data);
+      };
+
+      recorder.onstart = () => {
+        setState((current) => ({
+          ...current,
+          recordedMimeType: recorder.mimeType,
+        }));
+      };
+
+      recorder.onstop = () => {
+        cleanupStream();
+        const recordedMimeType = recorder.mimeType || mimeType || "audio/webm";
+        const blob = new Blob(chunksRef.current, {
+          type: recordedMimeType,
+        });
+        const durationSeconds = Math.max(
+          1,
+          Math.round((Date.now() - startedAtRef.current) / 1000)
+        );
+        const peaks = downsamplePeaks(samplesRef.current, 30);
+
+        setState((current) => ({
+          ...current,
+          isRecording: false,
+          durationSeconds,
+          audioBlob: blob,
+          recordedMimeType,
+          peaks,
+          livePeaks: peaks,
+        }));
+      };
+
+      recorder.start(200);
       setState((current) => ({
         ...current,
         isRecording: true,
-        permissionState: "granted",
+        durationSeconds: 0,
+        livePeaks: Array.from({ length: 30 }, () => 0.08),
       }));
+
+      tickAnalyser();
 
       timerRef.current = setInterval(() => {
-        const elapsed = Math.floor(
-          (Date.now() - startedAtRef.current) / 1000
-        );
+        const elapsed = Math.floor((Date.now() - startedAtRef.current) / 1000);
         setState((current) => ({ ...current, durationSeconds: elapsed }));
+        if (elapsed >= MAX_RECORDING_SECONDS) {
+          stopRecording();
+        }
       }, 250);
-
-      if (adapter.getCurrentAmplitude) {
-        amplitudeRef.current = setInterval(() => {
-          void adapter.getCurrentAmplitude?.().then((level) => {
-            setState((current) => {
-              const samples = [
-                ...current.livePeaks.slice(-29),
-                Math.min(1, Math.max(0.06, level)),
-              ];
-              return {
-                ...current,
-                livePeaks: downsamplePeaks(samples, 30),
-              };
-            });
-          });
-        }, 120);
-      } else {
-        amplitudeRef.current = setInterval(() => {
-          setState((current) => {
-            const samples = [
-              ...current.livePeaks.slice(-29),
-              0.08 + Math.random() * 0.32,
-            ];
-            return {
-              ...current,
-              livePeaks: downsamplePeaks(samples, 30),
-            };
-          });
-        }, 120);
-      }
-    } catch (err) {
-      clearTimers();
-      if (isRecorderError(err)) {
-        const permission = await queryMicrophonePermission();
-        const blocked = permission === "denied";
-        setError(
-          err.code === "permission_denied" && blocked
-            ? permissionDeniedError(true)
-            : err
-        );
-        setState((current) => ({
-          ...current,
-          permissionState: permission,
-        }));
-      } else {
-        setError({ code: "unknown", message: "Could not start recording" });
-      }
-    }
-  }, [clearTimers, setError]);
-
-  const stopRecording = useCallback(async () => {
-    clearTimers();
-    setState((current) => ({ ...current, isRecording: false }));
-
-    try {
-      const result = await adapterRef.current.stopRecording();
-      setState((current) => ({
-        ...current,
-        durationSeconds: result.durationSeconds,
-        audioBlob: result.blob,
-        recordedMimeType: result.mimeType,
-        peaks: result.peaks,
-        livePeaks: result.peaks,
-        error: null,
-        errorCode: null,
-      }));
-    } catch (err) {
-      if (isRecorderError(err)) {
-        setError(err);
-      } else {
-        setError({ code: "unknown", message: "Could not stop recording" });
-      }
-    }
-  }, [clearTimers, setError]);
-
-  const requestPermission = useCallback(async () => {
-    setError(null);
-    const permission = await requestMicrophonePermission();
-    setState((current) => ({ ...current, permissionState: permission }));
-
-    if (permission === "granted") return true;
-    if (permission === "denied") {
-      setError(permissionDeniedError(true));
-    }
-    return false;
-  }, [setError]);
-
-  const loadFromFile = useCallback(async (file: File) => {
-    setError(null);
-    clearTimers();
-    try {
-      const result = await enrichResultFromFile(file);
+    } catch {
+      cleanupStream();
       setState((current) => ({
         ...current,
         isRecording: false,
-        durationSeconds: result.durationSeconds,
-        audioBlob: result.blob,
-        recordedMimeType: result.mimeType,
-        peaks: result.peaks,
-        livePeaks: result.peaks,
-        error: null,
-        errorCode: null,
+        error: "Turn on the microphone to record a voice note.",
       }));
-    } catch {
-      setError({ code: "unknown", message: "Could not use that recording" });
     }
-  }, [clearTimers, setError]);
+  }, [cleanupStream, stopRecording, tickAnalyser]);
 
   const reset = useCallback(() => {
-    clearTimers();
-    void adapterRef.current.cancelRecording();
+    cleanupStream();
+    mediaRecorderRef.current = null;
+    chunksRef.current = [];
+    samplesRef.current = [];
     setState({
       isRecording: false,
       durationSeconds: 0,
-      livePeaks: IDLE_PEAKS,
+      livePeaks: Array.from({ length: 30 }, () => 0.08),
       audioBlob: null,
       recordedMimeType: "",
       peaks: [],
       error: null,
-      errorCode: null,
-      permissionState: state.permissionState,
-      isNative: isNativePlatform(),
     });
-  }, [clearTimers, state.permissionState]);
+  }, [cleanupStream]);
 
   return {
     ...state,
     startRecording,
     stopRecording,
-    requestPermission,
-    loadFromFile,
-    openAppSettings,
     reset,
     maxDurationSeconds: MAX_RECORDING_SECONDS,
   };

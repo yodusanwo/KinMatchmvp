@@ -10,7 +10,6 @@ import {
   TextLink,
 } from "@/components/brand";
 import { createClient } from "@/lib/supabase/client";
-import { getAuthRedirectOrigin } from "@/lib/auth/native-redirect";
 import { cn } from "@/lib/cn";
 
 type SignInFormProps = {
@@ -105,8 +104,7 @@ export function SignInForm({
     setMessage(null);
 
     const supabase = createClient();
-    const redirectOrigin = getAuthRedirectOrigin(authOrigin);
-    const redirectTo = `${redirectOrigin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
+    const redirectTo = `${authOrigin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
 
     const { error } = await supabase.auth.signInWithOtp({
       email: email.trim(),

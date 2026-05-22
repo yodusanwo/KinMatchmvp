@@ -12,18 +12,12 @@ import {
 } from "@/components/brand";
 import { AppShell } from "@/components/layout/AppShell";
 import { MiniAvatar } from "@/components/onboarding/MiniAvatar";
-import { AudioFileCaptureFallback } from "@/components/voice-note/AudioFileCaptureFallback";
 import { LiveWaveform } from "@/components/voice-note/LiveWaveform";
-import { MicrophonePermissionCard } from "@/components/voice-note/MicrophonePermissionCard";
 import { RecordButton } from "@/components/voice-note/RecordButton";
 import { formatDuration } from "@/components/voice-note/format-duration";
 import { VoiceNotePageSkeleton } from "@/components/ui/Skeleton";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
-import { fetchJson } from "@/lib/api/fetch-client";
-import {
-  parseApiError,
-  voiceNoteFilename,
-} from "@/lib/api/parse-api-error";
+import { REACHABILITY_ERROR, fetchJson } from "@/lib/api/fetch-client";
 import { trackEvent } from "@/lib/analytics/events";
 import type { FriendProfile } from "@/lib/api/types";
 
@@ -71,25 +65,12 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
   async function handleSend() {
     if (!friend || !recorder.audioBlob) return;
 
-    if (recorder.audioBlob.size < 100) {
-      setSendStatus("error");
-      setSendError("That recording didn't save — try recording again.");
-      return;
-    }
-
     setSendStatus("uploading");
     setSendError(null);
 
-    const mimeType =
-      recorder.recordedMimeType ||
-      recorder.audioBlob.type ||
-      "audio/mp4";
     const formData = new FormData();
-    formData.append(
-      "audio",
-      recorder.audioBlob,
-      voiceNoteFilename(mimeType)
-    );
+    const mimeType = recorder.recordedMimeType || recorder.audioBlob.type || "audio/webm";
+    formData.append("audio", recorder.audioBlob, "voice-note");
     formData.append("friend_id", friend.id);
     formData.append("duration", String(Math.max(1, recorder.durationSeconds)));
     formData.append("mime_type", mimeType);
@@ -99,11 +80,13 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
       const sendRes = await fetch("/api/voice-notes/send", {
         method: "POST",
         body: formData,
-        credentials: "include",
       });
       if (!sendRes.ok) {
+        const data = await sendRes.json().catch(() => ({}));
         setSendStatus("error");
-        setSendError(await parseApiError(sendRes));
+        setSendError(
+          (data as { error?: string }).error ?? REACHABILITY_ERROR
+        );
         return;
       }
 
@@ -145,13 +128,6 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
       setSendError("Couldn't send — try again");
     }
   }
-
-  const showPermissionHelp =
-    Boolean(recorder.error) &&
-    !recorder.audioBlob &&
-    (recorder.errorCode === "permission_denied" ||
-      recorder.errorCode === "permission_blocked" ||
-      recorder.errorCode === "unsupported");
 
   if (loading || !friend) {
     return (
@@ -207,7 +183,7 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
             disabled={sendStatus === "uploading"}
             onPress={() => {
               if (recorder.isRecording) {
-                void recorder.stopRecording();
+                recorder.stopRecording();
                 return;
               }
               if (!recorder.audioBlob) {
@@ -228,33 +204,19 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
 
           <Subhead className="mt-2 text-center">{helperText}</Subhead>
 
-          {showPermissionHelp ? (
-            <MicrophonePermissionCard
-              errorCode={recorder.errorCode}
-              message={recorder.error}
-              isNative={recorder.isNative}
-              permissionState={recorder.permissionState}
-              disabled={sendStatus === "uploading"}
-              onRequestPermission={recorder.requestPermission}
-              onRetryRecording={recorder.startRecording}
-            />
-          ) : (
-            recorder.error && (
+          {recorder.error && (
+            <div className="mt-4 max-w-[320px] space-y-3 text-center">
               <p
-                className="mt-4 font-inter text-sm italic text-terracotta-deep"
+                className="font-inter text-sm italic text-terracotta-deep"
                 role="alert"
               >
                 {recorder.error}
               </p>
-            )
-          )}
-
-          {!recorder.isNative && !recorder.audioBlob && (
-            <AudioFileCaptureFallback
-              className="mt-4"
-              disabled={sendStatus === "uploading" || recorder.isRecording}
-              onFileSelected={recorder.loadFromFile}
-            />
+              <p className="font-inter text-xs italic leading-relaxed text-ink-soft">
+                If your phone already blocked it, turn on microphone access in
+                browser settings, then try again.
+              </p>
+            </div>
           )}
 
           {sendError && (
@@ -265,6 +227,16 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
         </div>
 
         <div className="mt-8 space-y-4">
+          {recorder.error && !recorder.audioBlob && (
+            <PrimaryButton
+              type="button"
+              disabled={sendStatus === "uploading"}
+              onClick={() => void recorder.startRecording()}
+            >
+              Try microphone again
+            </PrimaryButton>
+          )}
+
           {recorder.audioBlob && (
             <>
               <PrimaryButton

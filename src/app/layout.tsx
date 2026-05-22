@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Instrument_Sans } from "next/font/google";
 import { PlausibleScript } from "@/components/analytics/PlausibleScript";
-import { CapacitorBootstrap } from "@/components/native/CapacitorBootstrap";
 import { OnboardingProvider } from "@/contexts/onboarding-context";
 import "./globals.css";
 
@@ -32,7 +31,6 @@ export default function RootLayout({
         className={`${inter.variable} ${instrumentSans.variable} font-sans antialiased`}
       >
         <PlausibleScript />
-        <CapacitorBootstrap />
         <OnboardingProvider>{children}</OnboardingProvider>
       </body>
     </html>
