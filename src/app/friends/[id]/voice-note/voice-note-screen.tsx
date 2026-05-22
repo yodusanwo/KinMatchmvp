@@ -20,6 +20,11 @@ import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
 import { REACHABILITY_ERROR, fetchJson } from "@/lib/api/fetch-client";
 import { trackEvent } from "@/lib/analytics/events";
 import type { FriendProfile } from "@/lib/api/types";
+import {
+  buildVoiceNoteShareData,
+  isMobileShareTarget,
+  voiceNoteMessageBody,
+} from "@/lib/voice-notes/share-payload";
 
 type VoiceNoteScreenProps = {
   friendId: string;
@@ -34,22 +39,6 @@ function voiceNoteFilename(mimeType: string) {
         ? "ogg"
         : "webm";
   return `voice-note.${extension}`;
-}
-
-function firstName(name: string | null | undefined) {
-  return name?.trim().split(/\s+/)[0] ?? "";
-}
-
-function shareText(friendName: string | null | undefined) {
-  const name = firstName(friendName);
-  return name
-    ? `Hey ${name}, I left you a quick voice note —`
-    : "Hey — I left you a quick voice note —";
-}
-
-function shareTitle(senderName: string | null | undefined) {
-  const name = firstName(senderName);
-  return name ? `Voice note from ${name}` : "a KinMatch voice note";
 }
 
 async function parseSendError(res: Response) {
@@ -130,13 +119,30 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
 
       trackEvent("voice_note_sent", { share_sheet: "1" });
 
+      const messageBody = voiceNoteMessageBody(
+        sendData.friend_name,
+        sendData.public_url
+      );
+
       if (navigator.share && sendData.public_url) {
         try {
-          await navigator.share({
-            url: sendData.public_url,
-            text: shareText(sendData.friend_name),
-            title: shareTitle(sendData.sender_name),
-          });
+          if (navigator.clipboard) {
+            await navigator.clipboard.writeText(messageBody);
+          }
+
+          await navigator.share(
+            buildVoiceNoteShareData({
+              publicUrl: sendData.public_url,
+              friendName: sendData.friend_name,
+              senderName: sendData.sender_name,
+            })
+          );
+
+          if (!isMobileShareTarget()) {
+            setSendNotice(
+              "Message copied — paste into Messages if you only see the link"
+            );
+          }
         } catch (err) {
           if (err instanceof DOMException && err.name === "AbortError") {
             setSendStatus("idle");
@@ -148,9 +154,9 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
           return;
         }
       } else if (sendData.public_url && navigator.clipboard) {
-        await navigator.clipboard.writeText(sendData.public_url);
+        await navigator.clipboard.writeText(messageBody);
         setSendStatus("idle");
-        setSendNotice("Link copied — paste to send");
+        setSendNotice("Message copied — paste to send");
         return;
       } else {
         setSendStatus("error");
