@@ -1,6 +1,3 @@
-"use client";
-
-import { useRef } from "react";
 import { cn } from "@/lib/cn";
 
 type RecordButtonProps = {
@@ -14,33 +11,12 @@ export function RecordButton({
   disabled,
   onPress,
 }: RecordButtonProps) {
-  const lastPressAtRef = useRef(0);
-
-  function handlePress() {
-    if (disabled) return;
-
-    const now = Date.now();
-    if (now - lastPressAtRef.current < 500) return;
-
-    lastPressAtRef.current = now;
-    onPress();
-  }
-
   return (
     <button
       type="button"
       disabled={disabled}
-      onClick={(event) => {
-        event.preventDefault();
-        handlePress();
-      }}
-      onPointerUp={(event) => {
-        if (event.pointerType === "mouse") return;
-        event.preventDefault();
-        handlePress();
-      }}
+      onClick={onPress}
       onContextMenu={(event) => event.preventDefault()}
-      style={{ touchAction: "manipulation", WebkitUserSelect: "none" }}
       className={cn(
         "flex h-[120px] w-[120px] select-none items-center justify-center rounded-full",
         "bg-terracotta text-cream shadow-md transition-transform duration-200",

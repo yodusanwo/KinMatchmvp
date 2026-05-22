@@ -17,7 +17,7 @@ export function AudioFileCaptureFallback({
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <div className={`space-y-1 text-center ${className ?? ""}`}>
+    <div className={className}>
       <input
         ref={inputRef}
         type="file"
@@ -39,12 +39,8 @@ export function AudioFileCaptureFallback({
         onClick={() => inputRef.current?.click()}
         className="font-inter text-sm text-terracotta underline decoration-terracotta/60 underline-offset-2 disabled:text-ink-soft"
       >
-        Use Voice Memos, then add it here →
+        Record in Voice Memos instead →
       </button>
-      <p className="font-inter text-xs italic leading-relaxed text-ink-soft">
-        Voice Memos is the built-in recording app on iPhone — useful when Safari
-        won&apos;t turn on the mic.
-      </p>
     </div>
   );
 }

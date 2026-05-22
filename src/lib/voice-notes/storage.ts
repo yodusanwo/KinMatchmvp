@@ -21,7 +21,7 @@ export async function uploadVoiceAudio(
 
   if (hasVercelBlob()) {
     const blob = await put(pathname, audio, {
-      access: "private",
+      access: "public",
       contentType,
       addRandomSuffix: false,
     });

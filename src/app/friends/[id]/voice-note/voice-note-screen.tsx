@@ -12,11 +12,10 @@ import {
 } from "@/components/brand";
 import { AppShell } from "@/components/layout/AppShell";
 import { MiniAvatar } from "@/components/onboarding/MiniAvatar";
+import { AudioFileCaptureFallback } from "@/components/voice-note/AudioFileCaptureFallback";
 import { LiveWaveform } from "@/components/voice-note/LiveWaveform";
 import { MicrophonePermissionCard } from "@/components/voice-note/MicrophonePermissionCard";
-import { VoiceNotesMicSetupSection } from "@/components/voice-note/VoiceNotesMicSetupSection";
 import { RecordButton } from "@/components/voice-note/RecordButton";
-import { useVoiceNotesMicSetup } from "@/hooks/useVoiceNotesMicSetup";
 import { formatDuration } from "@/components/voice-note/format-duration";
 import { VoiceNotePageSkeleton } from "@/components/ui/Skeleton";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
@@ -45,7 +44,6 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
   const [sendError, setSendError] = useState<string | null>(null);
 
   const recorder = useVoiceRecorder();
-  const micSetup = useVoiceNotesMicSetup();
 
   const loadFriend = useCallback(async () => {
     const result = await fetchJson<FriendProfile>(`/api/friends/${friendId}`);
@@ -148,21 +146,12 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
     }
   }
 
-  const micIsReady =
-    micSetup.micIsReady || recorder.permissionState === "granted";
-  const showMicSetup =
-    !micIsReady &&
+  const showPermissionHelp =
+    Boolean(recorder.error) &&
     !recorder.audioBlob &&
-    !recorder.isRecording &&
-    !recorder.isStarting &&
-    !recorder.isStopping;
-
-  async function handleMicSetup() {
-    const allowed = await micSetup.requestMicrophone();
-    if (allowed) {
-      await recorder.refreshPermissionState();
-    }
-  }
+    (recorder.errorCode === "permission_denied" ||
+      recorder.errorCode === "permission_blocked" ||
+      recorder.errorCode === "unsupported");
 
   if (loading || !friend) {
     return (
@@ -177,15 +166,9 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
 
   const helperText = recorder.isRecording
     ? "Recording… tap to stop"
-    : recorder.isStarting
-      ? "Starting…"
-      : recorder.isStopping
-        ? "Saving your note…"
     : recorder.audioBlob
       ? "Tap send when you're ready"
-      : showMicSetup
-        ? "Set up voice notes first, then tap to record"
-        : "Tap to start recording";
+      : "Tap to start recording";
 
   return (
     <AppShell>
@@ -213,45 +196,25 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
         </div>
 
         <div className="mt-10 flex flex-1 flex-col items-center justify-center">
-          {showMicSetup && (
-            <VoiceNotesMicSetupSection
-              micStatus={micSetup.micStatus}
-              micMessage={micSetup.micMessage}
-              onSetup={handleMicSetup}
-              setupDisabled={sendStatus === "uploading"}
-            />
-          )}
-
           <LiveWaveform
             peaks={recorder.livePeaks}
-            active={
-              recorder.isStarting ||
-              recorder.isRecording ||
-              recorder.isStopping ||
-              Boolean(recorder.audioBlob)
-            }
+            active={recorder.isRecording || Boolean(recorder.audioBlob)}
             className="mb-8 w-full"
           />
 
-          {!showMicSetup && (
-            <RecordButton
-              isRecording={recorder.isRecording || recorder.isStarting}
-              disabled={
-                sendStatus === "uploading" ||
-                recorder.isStarting ||
-                recorder.isStopping
+          <RecordButton
+            isRecording={recorder.isRecording}
+            disabled={sendStatus === "uploading"}
+            onPress={() => {
+              if (recorder.isRecording) {
+                void recorder.stopRecording();
+                return;
               }
-              onPress={() => {
-                if (recorder.isRecording) {
-                  void recorder.stopRecording();
-                  return;
-                }
-                if (!recorder.audioBlob) {
-                  void recorder.startRecording();
-                }
-              }}
-            />
-          )}
+              if (!recorder.audioBlob) {
+                void recorder.startRecording();
+              }
+            }}
+          />
 
           <p className="mt-5 font-mono text-sm text-ink">
             {formatDuration(recorder.durationSeconds)}
@@ -265,39 +228,34 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
 
           <Subhead className="mt-2 text-center">{helperText}</Subhead>
 
-          {!showMicSetup &&
-            recorder.error &&
-            (recorder.errorCode === "permission_denied" ||
-              recorder.errorCode === "permission_blocked" ||
-              recorder.errorCode === "unsupported") && (
-              <MicrophonePermissionCard
-                errorCode={recorder.errorCode}
-                message={recorder.error}
-                isNative={recorder.isNative}
-                permissionState={recorder.permissionState}
-                disabled={sendStatus === "uploading"}
-                onRequestPermission={async () => {
-                  const allowed = await micSetup.requestMicrophone();
-                  if (allowed) {
-                    await recorder.refreshPermissionState();
-                  }
-                }}
-                onRetryRecording={recorder.startRecording}
-              />
-            )}
-
-          {!showMicSetup &&
-            recorder.error &&
-            recorder.errorCode !== "permission_denied" &&
-            recorder.errorCode !== "permission_blocked" &&
-            recorder.errorCode !== "unsupported" && (
+          {showPermissionHelp ? (
+            <MicrophonePermissionCard
+              errorCode={recorder.errorCode}
+              message={recorder.error}
+              isNative={recorder.isNative}
+              permissionState={recorder.permissionState}
+              disabled={sendStatus === "uploading"}
+              onRequestPermission={recorder.requestPermission}
+              onRetryRecording={recorder.startRecording}
+            />
+          ) : (
+            recorder.error && (
               <p
                 className="mt-4 font-inter text-sm italic text-terracotta-deep"
                 role="alert"
               >
                 {recorder.error}
               </p>
-            )}
+            )
+          )}
+
+          {!recorder.isNative && !recorder.audioBlob && (
+            <AudioFileCaptureFallback
+              className="mt-4"
+              disabled={sendStatus === "uploading" || recorder.isRecording}
+              onFileSelected={recorder.loadFromFile}
+            />
+          )}
 
           {sendError && (
             <p className="mt-4 font-inter text-sm italic text-terracotta-deep" role="alert">
@@ -307,47 +265,28 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
         </div>
 
         <div className="mt-8 space-y-4">
-          <PrimaryButton
-            type="button"
-            disabled={
-              (!recorder.audioBlob && !recorder.isRecording) ||
-              recorder.isStarting ||
-              recorder.isStopping ||
-              sendStatus === "uploading"
-            }
-            onClick={() => {
-              if (recorder.isRecording) {
-                void recorder.stopRecording();
-                return;
-              }
-              if (recorder.audioBlob) {
-                void handleSend();
-              }
-            }}
-          >
-            {sendStatus === "uploading"
-              ? "Sending…"
-              : recorder.isStarting
-                ? "Starting…"
-                : recorder.isStopping
-                  ? "Saving…"
-                  : recorder.isRecording
-                    ? "Stop recording"
-                    : recorder.audioBlob
-                      ? `Share with ${friend.name}`
-                      : "Record first"}
-          </PrimaryButton>
-
           {recorder.audioBlob && (
-            <p className="text-center">
-              <button
+            <>
+              <PrimaryButton
                 type="button"
-                onClick={recorder.reset}
-                className="font-inter text-sm text-terracotta underline underline-offset-2"
+                disabled={sendStatus === "uploading"}
+                onClick={() => void handleSend()}
               >
-                Record again
-              </button>
-            </p>
+                {sendStatus === "uploading"
+                  ? "Sending…"
+                  : `Share with ${friend.name}`}
+              </PrimaryButton>
+
+              <p className="text-center">
+                <button
+                  type="button"
+                  onClick={recorder.reset}
+                  className="font-inter text-sm text-terracotta underline underline-offset-2"
+                >
+                  Record again
+                </button>
+              </p>
+            </>
           )}
         </div>
       </div>

@@ -1,7 +1,4 @@
 import { isNativePlatform } from "@/lib/audio/platform";
-import {
-  requestNativeMicrophonePermission,
-} from "@/lib/audio/permissions";
 import { NativeAudioRecorder } from "@/lib/audio/native-recorder";
 import { WebAudioRecorder } from "@/lib/audio/web-recorder";
 import type {
@@ -16,27 +13,21 @@ import {
 } from "@/lib/voice-notes/peaks";
 
 let adapter: AudioRecorderAdapter | null = null;
-let adapterKind: "native" | "web" | null = null;
 
 export function getAudioRecorder(): AudioRecorderAdapter {
-  const kind = isNativePlatform() ? "native" : "web";
-  if (!adapter || adapterKind !== kind) {
-    adapter =
-      kind === "native" ? new NativeAudioRecorder() : new WebAudioRecorder();
-    adapterKind = kind;
+  if (!adapter) {
+    adapter = isNativePlatform()
+      ? new NativeAudioRecorder()
+      : new WebAudioRecorder();
   }
   return adapter;
 }
 
 export function resetAudioRecorder() {
   adapter = null;
-  adapterKind = null;
 }
 
 export async function requestMicrophonePermission(): Promise<MicrophonePermissionState> {
-  if (isNativePlatform()) {
-    return requestNativeMicrophonePermission();
-  }
   return getAudioRecorder().requestPermission();
 }
 
