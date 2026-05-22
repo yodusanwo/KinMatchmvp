@@ -12,7 +12,6 @@ import {
 } from "@/components/brand";
 import { AppShell } from "@/components/layout/AppShell";
 import { MiniAvatar } from "@/components/onboarding/MiniAvatar";
-import { AudioFileCaptureFallback } from "@/components/voice-note/AudioFileCaptureFallback";
 import { LiveWaveform } from "@/components/voice-note/LiveWaveform";
 import { MicrophonePermissionCard } from "@/components/voice-note/MicrophonePermissionCard";
 import { VoiceNotesMicSetupSection } from "@/components/voice-note/VoiceNotesMicSetupSection";
@@ -292,14 +291,6 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
               </p>
             )}
 
-          {!recorder.isNative && !recorder.audioBlob && (
-            <AudioFileCaptureFallback
-              className="mt-4"
-              disabled={sendStatus === "uploading" || recorder.isRecording}
-              onFileSelected={recorder.loadFromFile}
-            />
-          )}
-
           {sendError && (
             <p className="mt-4 font-inter text-sm italic text-terracotta-deep" role="alert">
               {sendError}
@@ -308,28 +299,33 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
         </div>
 
         <div className="mt-8 space-y-4">
-          {recorder.audioBlob && (
-            <>
-              <PrimaryButton
-                type="button"
-                disabled={sendStatus === "uploading"}
-                onClick={() => void handleSend()}
-              >
-                {sendStatus === "uploading"
-                  ? "Sending…"
-                  : `Share with ${friend.name}`}
-              </PrimaryButton>
+          <PrimaryButton
+            type="button"
+            disabled={
+              !recorder.audioBlob ||
+              recorder.isRecording ||
+              recorder.isStarting ||
+              sendStatus === "uploading"
+            }
+            onClick={() => void handleSend()}
+          >
+            {sendStatus === "uploading"
+              ? "Sending…"
+              : recorder.audioBlob
+                ? `Share with ${friend.name}`
+                : "Record first"}
+          </PrimaryButton>
 
-              <p className="text-center">
-                <button
-                  type="button"
-                  onClick={recorder.reset}
-                  className="font-inter text-sm text-terracotta underline underline-offset-2"
-                >
-                  Record again
-                </button>
-              </p>
-            </>
+          {recorder.audioBlob && (
+            <p className="text-center">
+              <button
+                type="button"
+                onClick={recorder.reset}
+                className="font-inter text-sm text-terracotta underline underline-offset-2"
+              >
+                Record again
+              </button>
+            </p>
           )}
         </div>
       </div>
