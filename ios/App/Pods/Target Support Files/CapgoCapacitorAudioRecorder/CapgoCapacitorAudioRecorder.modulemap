@@ -1,0 +1,6 @@
+framework module CapgoCapacitorAudioRecorder {
+  umbrella header "CapgoCapacitorAudioRecorder-umbrella.h"
+
+  export *
+  module * { export * }
+}

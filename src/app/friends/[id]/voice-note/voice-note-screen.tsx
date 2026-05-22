@@ -25,6 +25,22 @@ type VoiceNoteScreenProps = {
   friendId: string;
 };
 
+function voiceNoteFilename(mimeType: string) {
+  const extension = mimeType.includes("mp4")
+    ? "m4a"
+    : mimeType.includes("mpeg")
+      ? "mp3"
+      : mimeType.includes("ogg")
+        ? "ogg"
+        : "webm";
+  return `voice-note.${extension}`;
+}
+
+async function parseSendError(res: Response) {
+  const data = (await res.json().catch(() => ({}))) as { error?: string };
+  return data.error ?? "Couldn't send that note — try again.";
+}
+
 export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
   const router = useRouter();
   const [friend, setFriend] = useState<Pick<
@@ -70,7 +86,7 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
 
     const formData = new FormData();
     const mimeType = recorder.recordedMimeType || recorder.audioBlob.type || "audio/webm";
-    formData.append("audio", recorder.audioBlob, "voice-note");
+    formData.append("audio", recorder.audioBlob, voiceNoteFilename(mimeType));
     formData.append("friend_id", friend.id);
     formData.append("duration", String(Math.max(1, recorder.durationSeconds)));
     formData.append("mime_type", mimeType);
@@ -82,11 +98,8 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
         body: formData,
       });
       if (!sendRes.ok) {
-        const data = await sendRes.json().catch(() => ({}));
         setSendStatus("error");
-        setSendError(
-          (data as { error?: string }).error ?? REACHABILITY_ERROR
-        );
+        setSendError(await parseSendError(sendRes));
         return;
       }
 
@@ -125,7 +138,7 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
       router.push("/today");
     } catch {
       setSendStatus("error");
-      setSendError("Couldn't send — try again");
+      setSendError(REACHABILITY_ERROR);
     }
   }
 

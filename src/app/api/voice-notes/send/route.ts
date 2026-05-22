@@ -82,12 +82,19 @@ export async function POST(req: Request) {
   }
 
   const shareToken = randomBytes(18).toString("base64url");
-  const audioUrl = await uploadVoiceAudio(
-    user.id,
-    shareToken,
-    audioFile,
-    mimeType
-  );
+  let audioUrl: string;
+  try {
+    audioUrl = await uploadVoiceAudio(
+      user.id,
+      shareToken,
+      audioFile,
+      mimeType
+    );
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Could not save the voice note";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
 
   const { data: voiceNote, error: vnError } = await supabase
     .from("voice_notes")
