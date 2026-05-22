@@ -1,5 +1,7 @@
 export { InterestPills } from "./InterestPills";
+export { FriendContactInfoSection } from "./FriendContactInfoSection";
 export { FriendManagementSheet } from "./FriendManagementSheet";
+export { FriendPhoneSection } from "./FriendPhoneSection";
 export { MemoryCaptureModal } from "./MemoryCaptureModal";
 export { MemorySection } from "./MemorySection";
 export { ProfileDetailsHub } from "./ProfileDetailsHub";

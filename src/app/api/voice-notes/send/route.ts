@@ -1,5 +1,6 @@
 import { randomBytes } from "crypto";
 import { formatPersonName } from "@/lib/names/format";
+import { daysQuiet } from "@/lib/friends/utils";
 import { createClient } from "@/lib/supabase/server";
 import { getAppOrigin } from "@/lib/env";
 import { uploadVoiceAudio } from "@/lib/voice-notes/storage";
@@ -44,7 +45,9 @@ export async function POST(req: Request) {
 
   const { data: friend } = await supabase
     .from("friends")
-    .select("id, name")
+    .select(
+      "id, name, phone_number, category, cadence_days, last_touch_at, created_at"
+    )
     .eq("id", friendId)
     .eq("user_id", user.id)
     .is("archived_at", null)
@@ -131,10 +134,24 @@ export async function POST(req: Request) {
 
   const publicUrl = `${getAppOrigin()}/v/${shareToken}`;
 
+  const friendRow = friend as {
+    id: string;
+    name: string;
+    phone_number: string | null;
+    category: string;
+    cadence_days: number;
+    last_touch_at: string | null;
+    created_at: string;
+  };
+
   return NextResponse.json({
     voice_note: voiceNote,
     public_url: publicUrl,
-    friend_name: formatPersonName(friend.name),
+    share_token: shareToken,
+    friend_name: formatPersonName(friendRow.name),
+    friend_phone_number: friendRow.phone_number,
+    friend_category: friendRow.category,
+    friend_days_quiet: daysQuiet(friendRow),
     sender_name: profile?.name?.trim()
       ? formatPersonName(profile.name)
       : profile?.email?.split("@")[0] || null,

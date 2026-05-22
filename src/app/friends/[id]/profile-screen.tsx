@@ -1,11 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/layout/AppShell";
 import { BottomNav } from "@/components/nav/BottomNav";
 import {
   FriendManagementSheet,
+  FriendPhoneSection,
   MemoryCaptureModal,
   MemorySection,
   ProfileHeader,
@@ -185,8 +187,44 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
           whyThisWorks={prompt.kind === "send" ? prompt.why_this_works : null}
           capturePrompt={prompt.kind === "capture" ? prompt.prompt : undefined}
           ctaLabel={prompt.cta_label}
+          sendMethodHint={
+            prompt.kind === "send" ? (
+              friend.phone_number ? (
+                "→ Opens in Messages"
+              ) : (
+                <Link
+                  href={`#friend-phone`}
+                  className="text-terracotta underline decoration-terracotta/60 underline-offset-2"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    document
+                      .getElementById("friend-phone")
+                      ?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                >
+                  Add {name}&apos;s number for one-tap sending →
+                </Link>
+              )
+            ) : undefined
+          }
           className="mt-4"
         />
+
+        {prompt.kind === "send" && (
+          <div id="friend-phone">
+            <FriendPhoneSection
+              friendId={friend.id}
+              friendName={friend.name}
+              phoneNumber={friend.phone_number}
+              onSaved={(phoneNumber) =>
+                setFriend((current) =>
+                  current ? { ...current, phone_number: phoneNumber } : current
+                )
+              }
+              onToast={showToast}
+            />
+          </div>
+        )}
 
         {friend.memories.length > 0 && (
           <div className="mt-5">

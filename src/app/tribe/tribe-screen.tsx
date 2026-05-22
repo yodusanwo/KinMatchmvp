@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { BrandBar, Eyebrow, Headline, Subhead } from "@/components/brand";
+import { OptionalPhoneField } from "@/components/friends/OptionalPhoneField";
 import { AppShell } from "@/components/layout/AppShell";
 import { BottomNav } from "@/components/nav/BottomNav";
 import { TodayPageSkeleton } from "@/components/ui/Skeleton";
@@ -50,6 +51,7 @@ export function TribeScreen() {
   const [error, setError] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   const [newName, setNewName] = useState("");
+  const [newPhone, setNewPhone] = useState("");
   const [newCategory, setNewCategory] =
     useState<FriendCategory>("inner_circle");
   const [addError, setAddError] = useState<string | null>(null);
@@ -96,7 +98,11 @@ export function TribeScreen() {
       const response = await fetch("/api/friends", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, category: newCategory }),
+        body: JSON.stringify({
+          name,
+          category: newCategory,
+          phone_number: newPhone.trim() || undefined,
+        }),
       });
       const payload = (await response.json()) as {
         friend?: FriendSummary;
@@ -109,6 +115,7 @@ export function TribeScreen() {
 
       setFriends((current) => [...current, payload.friend!]);
       setNewName("");
+      setNewPhone("");
       setNewCategory("inner_circle");
       setAddOpen(false);
     } catch (err) {
@@ -241,6 +248,14 @@ export function TribeScreen() {
                     {adding ? "Adding" : "Add"}
                   </button>
                 </div>
+                {newName.trim().length >= 2 && (
+                  <OptionalPhoneField
+                    friendName={newName}
+                    value={newPhone}
+                    onChange={setNewPhone}
+                    id="tribe-add-phone"
+                  />
+                )}
                 <div className="grid grid-cols-3 gap-2">
                   {[
                     ["inner_circle", "Inner"] as const,

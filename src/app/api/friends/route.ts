@@ -5,11 +5,16 @@ import { daysQuiet, isDrifting } from "@/lib/friends/utils";
 import { randomAvatarColor } from "@/lib/onboarding/avatar-colors";
 import type { AvatarColor } from "@/lib/onboarding/types";
 import { formatPersonName } from "@/lib/names/format";
+import {
+  isLikelyInvalidPhone,
+  normalizePhone,
+} from "@/lib/phones/normalize";
 import { createClient } from "@/lib/supabase/server";
 
 type FriendInsertRow = {
   id: string;
   name: string;
+  phone_number: string | null;
   avatar_color: AvatarColor;
   vibe: string;
   category: FriendSummary["category"];
@@ -28,6 +33,7 @@ function toSummary(friend: FriendListRow): FriendSummary {
   return {
     id: friend.id,
     name: formatPersonName(friend.name),
+    phone_number: friend.phone_number ?? null,
     avatar_color: friend.avatar_color,
     vibe: friend.vibe,
     category: friend.category ?? "inner_circle",
@@ -51,7 +57,7 @@ export async function GET() {
 
   const { data, error } = await supabase
     .from("friends")
-    .select("id, name, avatar_color, vibe, category, cadence_days, last_touch_at, created_at")
+    .select("id, name, phone_number, avatar_color, vibe, category, cadence_days, last_touch_at, created_at")
     .eq("user_id", user.id)
     .eq("in_tribe", true)
     .is("archived_at", null)
@@ -78,7 +84,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  let body: { name?: unknown; category?: unknown };
+  let body: { name?: unknown; category?: unknown; phone_number?: unknown };
   try {
     body = await req.json();
   } catch {
@@ -90,6 +96,16 @@ export async function POST(req: NextRequest) {
   }
 
   const name = formatPersonName(body.name);
+  let phoneNumber: string | null = null;
+  if (typeof body.phone_number === "string" && body.phone_number.trim()) {
+    if (isLikelyInvalidPhone(body.phone_number)) {
+      return NextResponse.json(
+        { error: "That doesn't look like a phone number — try with area code." },
+        { status: 400 }
+      );
+    }
+    phoneNumber = normalizePhone(body.phone_number);
+  }
   const category = isFriendCategory(body.category)
     ? body.category
     : "inner_circle";
@@ -127,6 +143,7 @@ export async function POST(req: NextRequest) {
     .insert({
       user_id: user.id,
       name,
+      phone_number: phoneNumber,
       avatar_color: randomAvatarColor(),
       vibe: "potential_close",
       category,
@@ -134,7 +151,7 @@ export async function POST(req: NextRequest) {
       is_wished_closer: false,
       in_tribe: true,
     })
-    .select("id, name, avatar_color, vibe, category, cadence_days, last_touch_at, created_at")
+    .select("id, name, phone_number, avatar_color, vibe, category, cadence_days, last_touch_at, created_at")
     .single<FriendInsertRow>();
 
   if (error || !friend) {

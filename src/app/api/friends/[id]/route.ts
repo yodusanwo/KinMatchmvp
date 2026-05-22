@@ -10,8 +10,12 @@ import {
 } from "@/lib/friends/utils";
 import { categoryRelationshipLabel } from "@/lib/friends/categories";
 import { formatPersonName } from "@/lib/names/format";
+import {
+  isLikelyInvalidPhone,
+  normalizePhone,
+} from "@/lib/phones/normalize";
 import { buildTodayState } from "@/lib/today/get-daily-state";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -188,4 +192,61 @@ export async function GET(_request: Request, context: RouteContext) {
   };
 
   return NextResponse.json(profile);
+}
+
+export async function PATCH(request: NextRequest, context: RouteContext) {
+  const { id } = await context.params;
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  let body: { phone_number?: unknown };
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+
+  if (!("phone_number" in body)) {
+    return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
+  }
+
+  let phoneNumber: string | null = null;
+  const raw = body.phone_number;
+  if (raw !== null && raw !== "") {
+    if (typeof raw !== "string") {
+      return NextResponse.json({ error: "Invalid phone number" }, { status: 400 });
+    }
+    if (isLikelyInvalidPhone(raw)) {
+      return NextResponse.json(
+        { error: "That doesn't look like a phone number — try with area code." },
+        { status: 400 }
+      );
+    }
+    phoneNumber = normalizePhone(raw);
+  }
+
+  const { data, error } = await supabase
+    .from("friends")
+    .update({ phone_number: phoneNumber })
+    .eq("id", id)
+    .eq("user_id", user.id)
+    .is("archived_at", null)
+    .select("id, phone_number")
+    .maybeSingle();
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  if (!data) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  return NextResponse.json({ phone_number: data.phone_number });
 }

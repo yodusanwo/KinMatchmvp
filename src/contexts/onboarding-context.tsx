@@ -33,8 +33,8 @@ type OnboardingContextValue = OnboardingState & {
   setUserName: (name: string) => void;
   setQ1People: React.Dispatch<React.SetStateAction<PersonChip[]>>;
   setQ2People: React.Dispatch<React.SetStateAction<PersonChip[]>>;
-  addQ1Person: (name: string) => boolean;
-  addQ2Person: (name: string) => boolean;
+  addQ1Person: (name: string, phone?: string) => boolean;
+  addQ2Person: (name: string, phone?: string) => boolean;
   removeQ1Person: (id: string) => void;
   removeQ2Person: (id: string) => void;
   setCircleAssignment: (personId: string, circle: CircleId) => void;
@@ -137,7 +137,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     []
   );
 
-  const addQ1Person = useCallback((name: string) => {
+  const addQ1Person = useCallback((name: string, phone = "") => {
     const trimmed = name.trim();
     if (trimmed.length < 3) return false;
     let added = false;
@@ -146,12 +146,15 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         return s;
       }
       added = true;
-      return { ...s, q1People: [...s.q1People, createPerson(trimmed)] };
+      return {
+        ...s,
+        q1People: [...s.q1People, createPerson(trimmed, phone)],
+      };
     });
     return added;
   }, []);
 
-  const addQ2Person = useCallback((name: string) => {
+  const addQ2Person = useCallback((name: string, phone = "") => {
     const trimmed = name.trim();
     if (trimmed.length < 3) return false;
     let added = false;
@@ -166,7 +169,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       added = true;
       return {
         ...s,
-        q2People: [...s.q2People, createPerson(trimmed)],
+        q2People: [...s.q2People, createPerson(trimmed, phone)],
       };
     });
     return added;

@@ -19,16 +19,23 @@ import { VoiceNotePageSkeleton } from "@/components/ui/Skeleton";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
 import { REACHABILITY_ERROR, fetchJson } from "@/lib/api/fetch-client";
 import { trackEvent } from "@/lib/analytics/events";
-import type { FriendProfile } from "@/lib/api/types";
+import type { FriendCategory, FriendProfile } from "@/lib/api/types";
+import { firstName } from "@/lib/memories/categories";
+import { buildSmsLink } from "@/lib/phones/sms-link";
+import { pickShareText } from "@/lib/share-text/voice-note-variants";
 import {
   buildVoiceNoteShareData,
   isMobileShareTarget,
-  voiceNoteMessageBody,
 } from "@/lib/voice-notes/share-payload";
 
 type VoiceNoteScreenProps = {
   friendId: string;
 };
+
+type FriendForSend = Pick<
+  FriendProfile,
+  "id" | "name" | "avatar_color" | "phone_number" | "category" | "days_quiet"
+>;
 
 function voiceNoteFilename(mimeType: string) {
   const extension = mimeType.includes("mp4")
@@ -46,12 +53,19 @@ async function parseSendError(res: Response) {
   return data.error ?? "Couldn't send that note — try again.";
 }
 
+async function markVoiceNoteSent(voiceNoteId: string) {
+  const res = await fetch(`/api/voice-notes/${voiceNoteId}/send`, {
+    method: "POST",
+  });
+  if (!res.ok) {
+    const data = (await res.json().catch(() => ({}))) as { error?: string };
+    throw new Error(data.error ?? "Couldn't mark as sent — try again.");
+  }
+}
+
 export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
   const router = useRouter();
-  const [friend, setFriend] = useState<Pick<
-    FriendProfile,
-    "id" | "name" | "avatar_color"
-  > | null>(null);
+  const [friend, setFriend] = useState<FriendForSend | null>(null);
   const [loading, setLoading] = useState(true);
   const [sendStatus, setSendStatus] = useState<
     "idle" | "uploading" | "error"
@@ -76,6 +90,9 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
       id: data.id,
       name: data.name,
       avatar_color: data.avatar_color,
+      phone_number: data.phone_number,
+      category: data.category,
+      days_quiet: data.days_quiet,
     });
     setLoading(false);
   }, [friendId, router]);
@@ -114,29 +131,46 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
         voice_note: { id: string };
         public_url: string;
         friend_name: string;
+        friend_phone_number: string | null;
+        friend_category: FriendCategory;
+        friend_days_quiet: number;
         sender_name: string | null;
       };
 
-      trackEvent("voice_note_sent", { share_sheet: "1" });
+      const { text } = pickShareText({
+        friend_first_name: sendData.friend_name,
+        days_quiet: sendData.friend_days_quiet,
+        is_inner_circle: sendData.friend_category === "inner_circle",
+      });
 
-      const messageBody = voiceNoteMessageBody(
-        sendData.friend_name,
-        sendData.public_url
-      );
+      const url = sendData.public_url;
+      const fullBody = `${text} ${url}`;
 
-      if (navigator.share && sendData.public_url) {
+      await markVoiceNoteSent(sendData.voice_note.id);
+
+      const phone = sendData.friend_phone_number?.trim();
+
+      if (phone) {
+        trackEvent("voice_note_sent", { method: "sms" });
+        window.location.href = buildSmsLink(phone, fullBody);
+        return;
+      }
+
+      if (navigator.share && url) {
         try {
           if (navigator.clipboard) {
-            await navigator.clipboard.writeText(messageBody);
+            await navigator.clipboard.writeText(fullBody);
           }
 
           await navigator.share(
             buildVoiceNoteShareData({
-              publicUrl: sendData.public_url,
+              publicUrl: url,
               friendName: sendData.friend_name,
               senderName: sendData.sender_name,
             })
           );
+
+          trackEvent("voice_note_sent", { method: "share_sheet" });
 
           if (!isMobileShareTarget()) {
             setSendNotice(
@@ -153,10 +187,12 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
           console.error("Share failed", err);
           return;
         }
-      } else if (sendData.public_url && navigator.clipboard) {
-        await navigator.clipboard.writeText(messageBody);
+      } else if (url && navigator.clipboard) {
+        await navigator.clipboard.writeText(fullBody);
+        trackEvent("voice_note_sent", { method: "clipboard" });
         setSendStatus("idle");
-        setSendNotice("Message copied — paste to send");
+        setSendNotice("Message copied — paste in your texts app");
+        router.push("/today");
         return;
       } else {
         setSendStatus("error");
@@ -164,14 +200,12 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
         return;
       }
 
-      await fetch(`/api/voice-notes/${sendData.voice_note.id}/send`, {
-        method: "POST",
-      });
-
       router.push("/today");
-    } catch {
+    } catch (err) {
       setSendStatus("error");
-      setSendError(REACHABILITY_ERROR);
+      setSendError(
+        err instanceof Error ? err.message : REACHABILITY_ERROR
+      );
     }
   }
 
@@ -186,11 +220,25 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
     );
   }
 
+  const displayName = firstName(friend.name);
+  const hasPhone = Boolean(friend.phone_number?.trim());
+
   const helperText = recorder.isRecording
     ? "Recording… tap to stop"
     : recorder.audioBlob
       ? "Tap send when you're ready"
       : "Tap to start recording";
+
+  const sendButtonLabel =
+    sendStatus === "uploading"
+      ? "Sending…"
+      : hasPhone
+        ? "Send a voice note"
+        : `Share with ${friend.name}`;
+
+  const sendMethodHint = hasPhone
+    ? "→ Opens in Messages"
+    : `Add ${displayName}'s number for one-tap sending →`;
 
   return (
     <AppShell>
@@ -296,10 +344,23 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
                 disabled={sendStatus === "uploading"}
                 onClick={() => void handleSend()}
               >
-                {sendStatus === "uploading"
-                  ? "Sending…"
-                  : `Share with ${friend.name}`}
+                {sendButtonLabel}
               </PrimaryButton>
+
+              <p className="text-center">
+                {hasPhone ? (
+                  <span className="font-inter text-[11px] italic text-ink-soft">
+                    {sendMethodHint}
+                  </span>
+                ) : (
+                  <Link
+                    href={`/friends/${friend.id}`}
+                    className="font-inter text-[11px] italic text-terracotta underline decoration-terracotta/60 underline-offset-2"
+                  >
+                    {sendMethodHint}
+                  </Link>
+                )}
+              </p>
 
               <p className="text-center">
                 <button

@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { Mic } from "lucide-react";
 import { Subhead } from "@/components/brand";
@@ -10,6 +11,7 @@ type SuggestedNextStepCardProps = {
   whyThisWorks?: string | null;
   capturePrompt?: string;
   ctaLabel: string;
+  sendMethodHint?: ReactNode;
   className?: string;
 };
 
@@ -19,6 +21,7 @@ export function SuggestedNextStepCard({
   whyThisWorks,
   capturePrompt,
   ctaLabel,
+  sendMethodHint,
   className,
 }: SuggestedNextStepCardProps) {
   return (
@@ -50,6 +53,11 @@ export function SuggestedNextStepCard({
         )}
         {ctaLabel}
       </Link>
+      {sendMethodHint && (
+        <p className="mt-2 text-center font-inter text-[11px] italic text-ink-soft">
+          {sendMethodHint}
+        </p>
+      )}
     </article>
   );
 }

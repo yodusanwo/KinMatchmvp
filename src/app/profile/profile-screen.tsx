@@ -13,6 +13,7 @@ import {
 } from "@/components/brand";
 import { AppShell } from "@/components/layout/AppShell";
 import { BottomNav } from "@/components/nav/BottomNav";
+import { FriendContactInfoSection } from "@/components/profile/FriendContactInfoSection";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/cn";
 
@@ -97,6 +98,7 @@ export function ProfileScreen({
     held_alerts_enabled: emailPreferences?.held_alerts_enabled ?? true,
   });
   const [prefError, setPrefError] = useState<string | null>(null);
+  const [contactNotice, setContactNotice] = useState<string | null>(null);
   const nameMessageTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null
   );
@@ -161,6 +163,11 @@ export function ProfileScreen({
     }
     setPrefError("Couldn't save — try again");
     prefErrorTimeoutRef.current = setTimeout(() => setPrefError(null), 3000);
+  }
+
+  function showContactNotice(message: string) {
+    setContactNotice(message);
+    window.setTimeout(() => setContactNotice(null), 3000);
   }
 
   async function saveName() {
@@ -326,9 +333,21 @@ export function ProfileScreen({
           )}
         </dl>
 
+        {onboardingComplete && (
+          <>
+            <FriendContactInfoSection onToast={showContactNotice} />
+            {contactNotice && (
+              <p className="mt-2 font-inter text-sm italic text-ink-soft">
+                {contactNotice}
+              </p>
+            )}
+          </>
+        )}
+
         <p className="mt-6 font-inter text-sm text-ink-soft">
           You sign in with a magic link — no password. Use the button below to
-          switch accounts on this device.
+          switch accounts on this device.{" "}
+          <TextLink href="/privacy">Privacy</TextLink>
         </p>
 
         <div className="mt-8 space-y-4">

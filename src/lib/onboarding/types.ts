@@ -6,6 +6,7 @@ export type PersonChip = {
   id: string;
   name: string;
   avatarColor: AvatarColor;
+  phone_number?: string | null;
 };
 
 export type BarrierId =

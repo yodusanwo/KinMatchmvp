@@ -1,4 +1,5 @@
 import { formatPersonName } from "@/lib/names/format";
+import { normalizePhone } from "@/lib/phones/normalize";
 import { sendWelcomeEmail } from "@/lib/klaviyo/send-welcome-email";
 import type { CompleteOnboardingPayload } from "@/lib/onboarding/api-types";
 import type { BarrierId, CircleId } from "@/lib/onboarding/types";
@@ -119,6 +120,9 @@ export async function POST(request: Request) {
         .insert({
           user_id: user.id,
           name: formatPersonName(person.name),
+          phone_number: person.phone_number
+            ? normalizePhone(person.phone_number)
+            : null,
           avatar_color: person.avatarColor,
           vibe: "potential_close",
           category: "inner_circle",
@@ -144,6 +148,9 @@ export async function POST(request: Request) {
         .insert({
           user_id: user.id,
           name: formatPersonName(person.name),
+          phone_number: person.phone_number
+            ? normalizePhone(person.phone_number)
+            : null,
           avatar_color: person.avatarColor,
           vibe: "potential_close",
           category: "village",

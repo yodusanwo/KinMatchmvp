@@ -1,12 +1,14 @@
 import { formatPersonName } from "@/lib/names/format";
+import { normalizePhone } from "@/lib/phones/normalize";
 import { randomAvatarColor } from "./avatar-colors";
 import type { CircleId, PersonChip } from "./types";
 
-export function createPerson(name: string): PersonChip {
+export function createPerson(name: string, phone?: string): PersonChip {
   return {
     id: crypto.randomUUID(),
     name: formatPersonName(name),
     avatarColor: randomAvatarColor(),
+    phone_number: normalizePhone(phone ?? ""),
   };
 }
 

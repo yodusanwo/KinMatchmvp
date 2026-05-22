@@ -1,7 +1,7 @@
 "use client";
 
 import { Eyebrow, Headline, TextLink } from "@/components/brand";
-import { AddNameInput } from "@/components/onboarding/AddNameInput";
+import { AddPersonInput } from "@/components/onboarding/AddPersonInput";
 import { ContinueButton } from "@/components/onboarding/ContinueButton";
 import { NameChipList } from "@/components/onboarding/NameChipList";
 import { ReflectionStepShell } from "@/components/onboarding/ReflectionStepShell";
@@ -62,7 +62,10 @@ export function Q1Screen() {
 
       <NameChipList people={q1People} onRemove={removeQ1Person} />
 
-      <AddNameInput placeholder="Add a name…" onAdd={addQ1Person} />
+      <AddPersonInput
+        placeholder="Add a name…"
+        onAdd={(name, phone) => addQ1Person(name, phone)}
+      />
 
       <p className={REFLECTION_COPY_CLASS}>
         Don&apos;t classify yet. The next step will help you sort each person
