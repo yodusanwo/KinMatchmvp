@@ -204,8 +204,11 @@ export function useVoiceRecorder() {
     clearTimers();
     setState((current) => ({ ...current, isRecording: false }));
 
+    const adapter = adapterRef.current ?? getAudioRecorder();
+    adapterRef.current = adapter;
+
     try {
-      const result = await adapterRef.current.stopRecording();
+      const result = await adapter.stopRecording();
       setState((current) => ({
         ...current,
         durationSeconds: result.durationSeconds,
@@ -253,7 +256,8 @@ export function useVoiceRecorder() {
 
   const reset = useCallback(() => {
     clearTimers();
-    void adapterRef.current.cancelRecording();
+    const adapter = adapterRef.current ?? getAudioRecorder();
+    void adapter.cancelRecording();
     setState({
       isRecording: false,
       durationSeconds: 0,
