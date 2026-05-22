@@ -159,7 +159,7 @@ export function EmailPrefsScreen() {
             {saving
               ? "Saving…"
               : micStatus === "requesting"
-                ? "Asking…"
+                ? "Waiting for Allow…"
                 : "Set up voice notes →"}
           </ContinueButton>
           <p className="text-center">

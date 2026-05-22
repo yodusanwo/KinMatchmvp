@@ -10,14 +10,6 @@ import {
   MAX_RECORDING_SECONDS,
 } from "@/lib/voice-notes/peaks";
 
-function mapPermission(
-  value: string | undefined
-): MicrophonePermissionState {
-  if (value === "granted") return "granted";
-  if (value === "denied") return "denied";
-  return "prompt";
-}
-
 function permissionError(state: MicrophonePermissionState): RecorderError {
   if (state === "denied") {
     return {

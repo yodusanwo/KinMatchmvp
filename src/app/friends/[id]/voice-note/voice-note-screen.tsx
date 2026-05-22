@@ -152,7 +152,10 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
   const micIsReady =
     micSetup.micIsReady || recorder.permissionState === "granted";
   const showMicSetup =
-    !micIsReady && !recorder.audioBlob && !recorder.isRecording;
+    !micIsReady &&
+    !recorder.audioBlob &&
+    !recorder.isRecording &&
+    !recorder.isStarting;
 
   async function handleMicSetup() {
     const allowed = await micSetup.requestMicrophone();
@@ -174,6 +177,8 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
 
   const helperText = recorder.isRecording
     ? "Recording… tap to stop"
+    : recorder.isStarting
+      ? "Starting…"
     : recorder.audioBlob
       ? "Tap send when you're ready"
       : showMicSetup
@@ -217,14 +222,18 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
 
           <LiveWaveform
             peaks={recorder.livePeaks}
-            active={recorder.isRecording || Boolean(recorder.audioBlob)}
+            active={
+              recorder.isStarting ||
+              recorder.isRecording ||
+              Boolean(recorder.audioBlob)
+            }
             className="mb-8 w-full"
           />
 
           {!showMicSetup && (
             <RecordButton
-              isRecording={recorder.isRecording}
-              disabled={sendStatus === "uploading"}
+              isRecording={recorder.isRecording || recorder.isStarting}
+              disabled={sendStatus === "uploading" || recorder.isStarting}
               onPress={() => {
                 if (recorder.isRecording) {
                   void recorder.stopRecording();

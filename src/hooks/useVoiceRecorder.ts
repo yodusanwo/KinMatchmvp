@@ -20,6 +20,7 @@ import { downsamplePeaks } from "@/lib/voice-notes/peaks";
 
 export type VoiceRecorderState = {
   isRecording: boolean;
+  isStarting: boolean;
   durationSeconds: number;
   livePeaks: number[];
   audioBlob: Blob | null;
@@ -32,10 +33,23 @@ export type VoiceRecorderState = {
 };
 
 const IDLE_PEAKS = Array.from({ length: 30 }, () => 0.08);
+const START_RECORDING_TIMEOUT_MS = 8_000;
+
+function timeoutAfter(ms: number): Promise<never> {
+  return new Promise((_, reject) => {
+    setTimeout(() => {
+      reject({
+        code: "unknown",
+        message: "Recording did not start. Try again.",
+      } satisfies RecorderError);
+    }, ms);
+  });
+}
 
 export function useVoiceRecorder() {
   const [state, setState] = useState<VoiceRecorderState>({
     isRecording: false,
+    isStarting: false,
     durationSeconds: 0,
     livePeaks: IDLE_PEAKS,
     audioBlob: null,
@@ -95,6 +109,7 @@ export function useVoiceRecorder() {
       error: recorderErrorMessage(error),
       errorCode: error.code,
       isRecording: false,
+      isStarting: false,
     }));
   }, []);
 
@@ -130,6 +145,8 @@ export function useVoiceRecorder() {
   }, [setError]);
 
   const startRecording = useCallback(async () => {
+    if (state.isStarting || state.isRecording) return;
+
     const permission = await queryMicrophonePermission();
     if (permission !== "granted") {
       const allowed = await requestPermission();
@@ -139,6 +156,7 @@ export function useVoiceRecorder() {
     setError(null);
     setState((current) => ({
       ...current,
+      isStarting: true,
       audioBlob: null,
       recordedMimeType: "",
       peaks: [],
@@ -149,12 +167,16 @@ export function useVoiceRecorder() {
     try {
       const adapter = adapterRef.current ?? getAudioRecorder();
       adapterRef.current = adapter;
-      await adapter.startRecording();
+      await Promise.race([
+        adapter.startRecording(),
+        timeoutAfter(START_RECORDING_TIMEOUT_MS),
+      ]);
       startedAtRef.current = Date.now();
 
       setState((current) => ({
         ...current,
         isRecording: true,
+        isStarting: false,
         permissionState: "granted",
       }));
 
@@ -196,6 +218,15 @@ export function useVoiceRecorder() {
       }
     } catch (err) {
       clearTimers();
+      setState((current) => ({
+        ...current,
+        isRecording: false,
+        isStarting: false,
+      }));
+      const adapter = adapterRef.current;
+      if (adapter) {
+        void adapter.cancelRecording();
+      }
       if (isRecorderError(err)) {
         const permission = await queryMicrophonePermission();
         const blocked = permission === "denied";
@@ -212,11 +243,21 @@ export function useVoiceRecorder() {
         setError({ code: "unknown", message: "Could not start recording" });
       }
     }
-  }, [clearTimers, setError, requestPermission]);
+  }, [
+    clearTimers,
+    setError,
+    requestPermission,
+    state.isRecording,
+    state.isStarting,
+  ]);
 
   const stopRecording = useCallback(async () => {
     clearTimers();
-    setState((current) => ({ ...current, isRecording: false }));
+    setState((current) => ({
+      ...current,
+      isRecording: false,
+      isStarting: false,
+    }));
 
     const adapter = adapterRef.current ?? getAudioRecorder();
     adapterRef.current = adapter;
@@ -255,6 +296,7 @@ export function useVoiceRecorder() {
       setState((current) => ({
         ...current,
         isRecording: false,
+        isStarting: false,
         durationSeconds: result.durationSeconds,
         audioBlob: result.blob,
         recordedMimeType: result.mimeType,
@@ -274,6 +316,7 @@ export function useVoiceRecorder() {
     void adapter.cancelRecording();
     setState({
       isRecording: false,
+      isStarting: false,
       durationSeconds: 0,
       livePeaks: IDLE_PEAKS,
       audioBlob: null,
