@@ -154,7 +154,8 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
     !micIsReady &&
     !recorder.audioBlob &&
     !recorder.isRecording &&
-    !recorder.isStarting;
+    !recorder.isStarting &&
+    !recorder.isStopping;
 
   async function handleMicSetup() {
     const allowed = await micSetup.requestMicrophone();
@@ -178,6 +179,8 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
     ? "Recording… tap to stop"
     : recorder.isStarting
       ? "Starting…"
+      : recorder.isStopping
+        ? "Saving your note…"
     : recorder.audioBlob
       ? "Tap send when you're ready"
       : showMicSetup
@@ -224,6 +227,7 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
             active={
               recorder.isStarting ||
               recorder.isRecording ||
+              recorder.isStopping ||
               Boolean(recorder.audioBlob)
             }
             className="mb-8 w-full"
@@ -232,7 +236,11 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
           {!showMicSetup && (
             <RecordButton
               isRecording={recorder.isRecording || recorder.isStarting}
-              disabled={sendStatus === "uploading" || recorder.isStarting}
+              disabled={
+                sendStatus === "uploading" ||
+                recorder.isStarting ||
+                recorder.isStopping
+              }
               onPress={() => {
                 if (recorder.isRecording) {
                   void recorder.stopRecording();
@@ -302,18 +310,32 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
           <PrimaryButton
             type="button"
             disabled={
-              !recorder.audioBlob ||
-              recorder.isRecording ||
+              (!recorder.audioBlob && !recorder.isRecording) ||
               recorder.isStarting ||
+              recorder.isStopping ||
               sendStatus === "uploading"
             }
-            onClick={() => void handleSend()}
+            onClick={() => {
+              if (recorder.isRecording) {
+                void recorder.stopRecording();
+                return;
+              }
+              if (recorder.audioBlob) {
+                void handleSend();
+              }
+            }}
           >
             {sendStatus === "uploading"
               ? "Sending…"
-              : recorder.audioBlob
-                ? `Share with ${friend.name}`
-                : "Record first"}
+              : recorder.isStarting
+                ? "Starting…"
+                : recorder.isStopping
+                  ? "Saving…"
+                  : recorder.isRecording
+                    ? "Stop recording"
+                    : recorder.audioBlob
+                      ? `Share with ${friend.name}`
+                      : "Record first"}
           </PrimaryButton>
 
           {recorder.audioBlob && (
