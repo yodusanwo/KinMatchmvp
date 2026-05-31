@@ -10,6 +10,13 @@
 	"ios": {
 		"contentInset": "automatic"
 	},
+	"plugins": {
+		"App": {
+			"appUrlOpen": {
+				"enabled": true
+			}
+		}
+	},
 	"packageClassList": [
 		"AppPlugin",
 		"CapacitorAudioRecorderPlugin"

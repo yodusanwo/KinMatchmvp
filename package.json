@@ -8,10 +8,17 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "db:push": "npx supabase db push --include-all"
+    "db:push": "npx supabase db push --include-all",
+    "cap:sync": "cap sync ios",
+    "cap:ios": "cap open ios"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.96.0",
+    "@capacitor/app": "^8.0.1",
+    "@capacitor/cli": "^8.3.4",
+    "@capacitor/core": "^8.3.4",
+    "@capacitor/ios": "^8.3.4",
+    "@capgo/capacitor-audio-recorder": "^8.0.12",
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.105.4",
     "@vercel/blob": "^2.3.3",

@@ -1,19 +1,21 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  canRecordInBrowser,
-} from "@/lib/audio/mime-type";
+import { canRecordInBrowser } from "@/lib/audio/mime-type";
 import {
   formatMicError,
   hasGetUserMedia,
   requestMicAccess as requestMicAccessCore,
   type MicErrorInfo,
 } from "@/lib/audio/mic-permission";
+import { isNativeApp } from "@/lib/audio/native-platform";
+import { NativeCapacitorRecorderAdapter } from "@/lib/audio/native-recorder";
 import {
   captureAudioFile,
   mapRecorderError,
   WebMediaRecorderAdapter,
+  type RecorderLiveUpdate,
+  type RecorderResult,
 } from "@/lib/audio/recorder-adapter";
 import { MAX_RECORDING_SECONDS } from "@/lib/voice-notes/peaks";
 
@@ -36,6 +38,13 @@ export type VoiceRecorderState = {
   micError: MicErrorInfo | null;
   usedFileCapture: boolean;
   canUseWebRecorder: boolean;
+  isNativeApp: boolean;
+};
+
+type RecordingAdapter = {
+  start(): Promise<void>;
+  stop(): Promise<RecorderResult>;
+  reset(): void;
 };
 
 export function useVoiceRecorder() {
@@ -51,14 +60,27 @@ export function useVoiceRecorder() {
     micError: null,
     usedFileCapture: false,
     canUseWebRecorder: false,
+    isNativeApp: false,
   });
 
-  const adapterRef = useRef<WebMediaRecorderAdapter | null>(null);
+  const adapterRef = useRef<RecordingAdapter | null>(null);
+  const onLiveUpdateRef = useRef<(update: RecorderLiveUpdate) => void>(() => undefined);
 
-  useEffect(() => {
+  onLiveUpdateRef.current = (update: RecorderLiveUpdate) => {
     setState((current) => ({
       ...current,
-      canUseWebRecorder: hasGetUserMedia() && canRecordInBrowser(),
+      durationSeconds: update.durationSeconds,
+      livePeaks: update.livePeaks,
+    }));
+  };
+
+  useEffect(() => {
+    const native = isNativeApp();
+    setState((current) => ({
+      ...current,
+      isNativeApp: native,
+      canUseWebRecorder:
+        native || (hasGetUserMedia() && canRecordInBrowser()),
     }));
   }, []);
 
@@ -68,13 +90,20 @@ export function useVoiceRecorder() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!state.isRecording) return;
+    if (state.durationSeconds >= MAX_RECORDING_SECONDS) {
+      void stopRecordingRef.current();
+    }
+  }, [state.isRecording, state.durationSeconds]);
+
+  const stopRecordingRef = useRef<() => Promise<void>>(async () => undefined);
+
   const applyRecordingResult = useCallback(
-    (result: {
-      blob: Blob;
-      mimeType: string;
-      durationSeconds: number;
-      peaks: number[];
-    }, usedFileCapture: boolean) => {
+    (
+      result: RecorderResult,
+      usedFileCapture: boolean
+    ) => {
       setState((current) => ({
         ...current,
         isRecording: false,
@@ -106,7 +135,8 @@ export function useVoiceRecorder() {
         micStatus: "ready",
         micError: null,
         error: null,
-        canUseWebRecorder: canRecordInBrowser(),
+        canUseWebRecorder:
+          isNativeApp() || (hasGetUserMedia() && canRecordInBrowser()),
       }));
       return true;
     }
@@ -123,6 +153,18 @@ export function useVoiceRecorder() {
     return false;
   }, []);
 
+  const createWebAdapter = useCallback(() => {
+    return new WebMediaRecorderAdapter((update) => {
+      onLiveUpdateRef.current(update);
+    });
+  }, []);
+
+  const createNativeAdapter = useCallback(() => {
+    return new NativeCapacitorRecorderAdapter((update) => {
+      onLiveUpdateRef.current(update);
+    });
+  }, []);
+
   const startRecording = useCallback(async () => {
     setState((current) => ({
       ...current,
@@ -133,18 +175,8 @@ export function useVoiceRecorder() {
       usedFileCapture: false,
     }));
 
-    try {
-      if (!adapterRef.current) {
-        adapterRef.current = new WebMediaRecorderAdapter((update) => {
-          setState((current) => ({
-            ...current,
-            durationSeconds: update.durationSeconds,
-            livePeaks: update.livePeaks,
-          }));
-        });
-      }
-
-      await adapterRef.current.start();
+    const beginRecording = async (adapter: RecordingAdapter) => {
+      await adapter.start();
       setState((current) => ({
         ...current,
         isRecording: true,
@@ -153,8 +185,28 @@ export function useVoiceRecorder() {
         micStatus: "ready",
         error: null,
       }));
+    };
+
+    if (isNativeApp()) {
+      try {
+        adapterRef.current?.reset();
+        adapterRef.current = createNativeAdapter();
+        await beginRecording(adapterRef.current);
+        return;
+      } catch (err) {
+        adapterRef.current?.reset();
+        adapterRef.current = null;
+        console.warn("Native recorder failed, falling back to web", err);
+      }
+    }
+
+    try {
+      adapterRef.current?.reset();
+      adapterRef.current = createWebAdapter();
+      await beginRecording(adapterRef.current);
     } catch (err) {
       adapterRef.current?.reset();
+      adapterRef.current = null;
       const micError = mapRecorderError(err);
       if (micError.message === "") return;
 
@@ -167,7 +219,7 @@ export function useVoiceRecorder() {
         error: formatMicError(micError),
       }));
     }
-  }, []);
+  }, [createNativeAdapter, createWebAdapter]);
 
   const stopRecording = useCallback(async () => {
     const adapter = adapterRef.current;
@@ -186,6 +238,8 @@ export function useVoiceRecorder() {
       }));
     }
   }, [applyRecordingResult]);
+
+  stopRecordingRef.current = stopRecording;
 
   const startFileCapture = useCallback(async () => {
     setState((current) => ({
@@ -206,7 +260,9 @@ export function useVoiceRecorder() {
       const micError = mapRecorderError(err);
       setState((current) => ({
         ...current,
-        error: micError.message || "Couldn't use your phone's recorder — try again.",
+        error:
+          micError.message ||
+          "Couldn't use your phone's recorder — try again.",
         micError,
       }));
     }
@@ -214,6 +270,7 @@ export function useVoiceRecorder() {
 
   const reset = useCallback(() => {
     adapterRef.current?.reset();
+    adapterRef.current = null;
     setState((current) => ({
       isRecording: false,
       durationSeconds: 0,
@@ -226,6 +283,7 @@ export function useVoiceRecorder() {
       micError: current.micError,
       usedFileCapture: false,
       canUseWebRecorder: current.canUseWebRecorder,
+      isNativeApp: current.isNativeApp,
     }));
   }, []);
 
