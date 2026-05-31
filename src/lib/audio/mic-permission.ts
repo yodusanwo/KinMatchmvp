@@ -24,8 +24,23 @@ export function isMediaRecorderSupported(): boolean {
   return typeof MediaRecorder !== "undefined";
 }
 
+export function isSecureRecordingContext(): boolean {
+  return typeof window !== "undefined" && window.isSecureContext;
+}
+
 export function hasGetUserMedia(): boolean {
-  return Boolean(navigator.mediaDevices?.getUserMedia);
+  return (
+    isSecureRecordingContext() &&
+    Boolean(navigator.mediaDevices?.getUserMedia)
+  );
+}
+
+export function insecureRecordingHint(): string {
+  return "Open kin-matchmvp.vercel.app on your phone, or pick a recording below.";
+}
+
+export function fileCaptureActionLabel(): string {
+  return isIOS() ? "Pick a recording →" : "Use your phone's recorder →";
 }
 
 export function micSettingsHint(): string | null {
@@ -67,7 +82,9 @@ export function classifyMicError(err: unknown): MicErrorInfo {
       return {
         kind: "security",
         message: "Microphone access needs a secure connection.",
-        settingsHint: null,
+        settingsHint: isSecureRecordingContext()
+          ? null
+          : insecureRecordingHint(),
       };
     default:
       return {
@@ -79,6 +96,17 @@ export function classifyMicError(err: unknown): MicErrorInfo {
 }
 
 export async function requestMicAccess(): Promise<MicAccessResult> {
+  if (!isSecureRecordingContext()) {
+    return {
+      ok: false,
+      error: {
+        kind: "security",
+        message: "Microphone access needs a secure connection.",
+        settingsHint: insecureRecordingHint(),
+      },
+    };
+  }
+
   if (!hasGetUserMedia()) {
     return {
       ok: false,
