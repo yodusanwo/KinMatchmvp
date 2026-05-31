@@ -1,3 +1,6 @@
+import { isNativeApp, nativeMicSettingsHint } from "@/lib/audio/native-platform";
+import { requestNativeMicAccess } from "@/lib/audio/native-recorder";
+
 export type MicErrorKind =
   | "denied"
   | "not_found"
@@ -45,6 +48,9 @@ export function fileCaptureActionLabel(): string {
 
 export function micSettingsHint(): string | null {
   if (typeof navigator === "undefined") return null;
+  if (isNativeApp()) {
+    return nativeMicSettingsHint();
+  }
   if (isIOS()) {
     return "Settings → Safari → Microphone → Allow for this site, then reload.";
   }
@@ -60,9 +66,11 @@ export function classifyMicError(err: unknown): MicErrorInfo {
     case "PermissionDeniedError":
       return {
         kind: "denied",
-        message: isIOS()
-          ? "Safari blocked the microphone."
-          : "Your browser blocked the microphone.",
+        message: isNativeApp()
+          ? "KinMatch needs microphone access."
+          : isIOS()
+            ? "Safari blocked the microphone."
+            : "Your browser blocked the microphone.",
         settingsHint: hint,
       };
     case "NotFoundError":
@@ -75,7 +83,9 @@ export function classifyMicError(err: unknown): MicErrorInfo {
     case "NotSupportedError":
       return {
         kind: "unsupported",
-        message: "This browser can't record here — use your phone's recorder instead.",
+        message: isNativeApp()
+          ? "Native recording isn't available — try again or use your phone's recorder."
+          : "This browser can't record here — use your phone's recorder instead.",
         settingsHint: null,
       };
     case "SecurityError":
@@ -96,6 +106,23 @@ export function classifyMicError(err: unknown): MicErrorInfo {
 }
 
 export async function requestMicAccess(): Promise<MicAccessResult> {
+  if (isNativeApp()) {
+    try {
+      const granted = await requestNativeMicAccess();
+      if (granted) return { ok: true };
+      return {
+        ok: false,
+        error: {
+          kind: "denied",
+          message: "KinMatch needs microphone access.",
+          settingsHint: nativeMicSettingsHint(),
+        },
+      };
+    } catch (err) {
+      return { ok: false, error: classifyMicError(err) };
+    }
+  }
+
   if (!isSecureRecordingContext()) {
     return {
       ok: false,
