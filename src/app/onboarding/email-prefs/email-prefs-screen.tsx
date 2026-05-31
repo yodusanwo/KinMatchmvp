@@ -10,10 +10,18 @@ import { BrandBar } from "@/components/brand";
 import { useOnboarding } from "@/contexts/onboarding-context";
 import type { CompleteOnboardingPayload } from "@/lib/onboarding/api-types";
 import {
-  formatMicError,
   hasGetUserMedia,
+  iosSafariUnlockSteps,
+  isIOS,
   requestMicAccess,
 } from "@/lib/audio/mic-permission";
+
+type MicStatusLocal =
+  | "idle"
+  | "requesting"
+  | "ready"
+  | "blocked"
+  | "unsupported";
 
 const REFLECTION_COPY_CLASS =
   "font-inter text-sm italic leading-[1.5] text-[rgba(31,26,20,0.65)]";
@@ -54,20 +62,19 @@ export function EmailPrefsScreen() {
   } = useOnboarding();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [micStatus, setMicStatus] = useState<
-    "idle" | "requesting" | "ready" | "blocked" | "unsupported"
-  >("idle");
+  const [micStatus, setMicStatus] = useState<MicStatusLocal>("idle");
   const [micMessage, setMicMessage] = useState<string | null>(null);
   const saveInFlight = useRef(false);
 
   async function requestMicrophone() {
+    console.log("[email-prefs] requestMicrophone tapped");
     setError(null);
     setMicMessage(null);
 
     if (!hasGetUserMedia()) {
       setMicStatus("unsupported");
       setMicMessage(
-        "This browser can't set up voice notes here. You can still continue."
+        "This browser can't set up voice notes here. You can still continue.",
       );
       return false;
     }
@@ -76,15 +83,16 @@ export function EmailPrefsScreen() {
 
     const result = await requestMicAccess();
     if (result.ok) {
+      result.stream.getTracks().forEach((track) => track.stop());
       setMicStatus("ready");
       setMicMessage("Voice notes are ready.");
       return true;
     }
 
     setMicStatus(
-      result.error.kind === "unsupported" ? "unsupported" : "blocked"
+      result.error.kind === "unsupported" ? "unsupported" : "blocked",
     );
-    setMicMessage(formatMicError(result.error));
+    setMicMessage(result.error.message);
     return false;
   }
 
@@ -131,7 +139,9 @@ export function EmailPrefsScreen() {
       sessionStorage.removeItem(STORAGE_KEY);
       router.replace("/onboarding/rituals");
     } catch {
-      setError("Could not save your people. Check your connection and try again.");
+      setError(
+        "Could not save your people. Check your connection and try again.",
+      );
       saveInFlight.current = false;
       setSaving(false);
     }
@@ -145,6 +155,8 @@ export function EmailPrefsScreen() {
       await handleSave();
     }
   }
+
+  const showRecoverySteps = micStatus === "blocked";
 
   return (
     <AppShell>
@@ -180,22 +192,67 @@ export function EmailPrefsScreen() {
               Your phone will ask before anything is recorded. We&apos;ll only
               use the microphone when you start a note.
             </p>
-            {micMessage && (
+
+            {micMessage && micStatus === "ready" && (
               <p
-                className={
-                  micStatus === "ready"
-                    ? "font-inter text-sm italic text-ink-soft"
-                    : "font-inter text-sm italic text-terracotta-deep"
-                }
-                role={micStatus === "ready" ? "status" : "alert"}
+                className="font-inter text-sm italic text-ink-soft"
+                role="status"
               >
                 {micMessage}
               </p>
             )}
+
+            {micMessage && micStatus !== "ready" && !showRecoverySteps && (
+              <p
+                className="font-inter text-sm italic text-terracotta-deep"
+                role="alert"
+              >
+                {micMessage}
+              </p>
+            )}
+
+            {showRecoverySteps && (
+              <div className="space-y-3 rounded-xl bg-cream p-4">
+                <p className="font-sans text-sm font-medium text-ink">
+                  {isIOS()
+                    ? "Safari has the microphone blocked."
+                    : "Your browser has the microphone blocked."}
+                </p>
+                {isIOS() ? (
+                  <>
+                    <p className="font-inter text-xs italic text-ink-soft">
+                      Fix it right inside Safari:
+                    </p>
+                    <ol className="space-y-2 font-inter text-sm leading-relaxed text-ink">
+                      {iosSafariUnlockSteps().map((step, index) => (
+                        <li key={step} className="flex gap-3">
+                          <span className="font-mono text-xs text-terracotta">
+                            {index + 1}.
+                          </span>
+                          <span>{step}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </>
+                ) : (
+                  <p className="font-inter text-sm leading-relaxed text-ink">
+                    Open your browser&apos;s site settings, allow the microphone
+                    for this site, then reload this page.
+                  </p>
+                )}
+                <p className="font-inter text-xs italic text-ink-soft">
+                  Or skip this step — you can text your people directly and
+                  KinMatch will still keep the rhythm.
+                </p>
+              </div>
+            )}
           </section>
 
           {error && (
-            <p className="font-inter text-sm italic text-terracotta-deep" role="alert">
+            <p
+              className="font-inter text-sm italic text-terracotta-deep"
+              role="alert"
+            >
               {error}
             </p>
           )}
@@ -211,7 +268,9 @@ export function EmailPrefsScreen() {
               ? "Saving…"
               : micStatus === "requesting"
                 ? "Asking…"
-                : "Set up voice notes →"}
+                : showRecoverySteps
+                  ? "Try again →"
+                  : "Set up voice notes →"}
           </ContinueButton>
           <p className="text-center">
             <button

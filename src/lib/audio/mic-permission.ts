@@ -1,71 +1,129 @@
-import { isNativeApp, nativeMicSettingsHint } from "@/lib/audio/native-platform";
+/**
+ * Microphone permission handling for KinMatch.
+ *
+ * IMPORTANT ARCHITECTURE NOTE:
+ * This file separates two concerns:
+ *
+ * 1. checkMicPermissionState() — Safe to call anywhere (including useEffect).
+ *    Uses navigator.permissions.query() only, NEVER triggers a permission prompt.
+ *
+ * 2. requestMicAccess() — MUST only be called synchronously inside an onClick handler.
+ *    Calls getUserMedia(). On iOS Safari, calling this from useEffect or after
+ *    awaits will silently fail and permanently deny permission for the site.
+ *
+ * The cardinal rule: never call requestMicAccess() outside a direct user tap.
+ */
+
+import {
+  isNativeApp,
+  nativeMicSettingsHint,
+} from "@/lib/audio/native-platform";
 import { requestNativeMicAccess } from "@/lib/audio/native-recorder";
+
+// ============================================================
+// Types
+// ============================================================
+
+export type MicPermissionState = "granted" | "denied" | "prompt" | "unknown";
 
 export type MicErrorKind =
   | "denied"
-  | "not_found"
+  | "no_device"
   | "unsupported"
-  | "security"
+  | "insecure"
   | "unknown";
 
-export type MicErrorInfo = {
+export type MicAccessError = {
   kind: MicErrorKind;
   message: string;
   settingsHint: string | null;
 };
 
 export type MicAccessResult =
-  | { ok: true }
-  | { ok: false; error: MicErrorInfo };
+  | { ok: true; stream: MediaStream }
+  | { ok: false; error: MicAccessError };
+
+// Backwards-compatible alias for files that still import MicErrorInfo
+export type MicErrorInfo = MicAccessError;
+
+// ============================================================
+// Environment checks (all safe to call anywhere)
+// ============================================================
 
 export function isIOS(): boolean {
   if (typeof navigator === "undefined") return false;
   return /iPad|iPhone|iPod/.test(navigator.userAgent);
 }
 
+export function isDesktop(): boolean {
+  if (typeof navigator === "undefined") return false;
+  return !/Mobi|Android/i.test(navigator.userAgent);
+}
+
+export function isSecureRecordingContext(): boolean {
+  if (typeof window === "undefined") return false;
+  return (
+    window.isSecureContext ||
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1"
+  );
+}
+
 export function isMediaRecorderSupported(): boolean {
   return typeof MediaRecorder !== "undefined";
 }
 
-export function isSecureRecordingContext(): boolean {
-  return typeof window !== "undefined" && window.isSecureContext;
-}
-
 export function hasGetUserMedia(): boolean {
-  return (
-    isSecureRecordingContext() &&
-    Boolean(navigator.mediaDevices?.getUserMedia)
+  return Boolean(
+    typeof navigator !== "undefined" &&
+    navigator.mediaDevices &&
+    typeof navigator.mediaDevices.getUserMedia === "function",
   );
 }
 
-export function insecureRecordingHint(): string {
-  return "Open kin-matchmvp.vercel.app on your phone, or pick a recording below.";
-}
+// ============================================================
+// Permission state queries (safe to call anywhere)
+// ============================================================
 
-export type MicPermissionState = "granted" | "denied" | "prompt" | "unknown";
-
-export function iosSafariMicUnlockSteps(): string[] {
-  return [
-    "Tap the aA button left of the address bar.",
-    "Tap Website Settings.",
-    "Set Microphone to Allow.",
-    "Reload this page, then tap Try again.",
-  ];
-}
-
-export function fileCaptureHelperText(): string | null {
-  if (isIOS() && !isNativeApp()) {
-    return "Safari can't record audio here. Record in Voice Memos first, then tap above and choose Choose File → Browse → Voice Memos.";
+/**
+ * Check the current microphone permission state WITHOUT triggering a prompt.
+ *
+ * Safe to call from useEffect, app load, anywhere. Uses navigator.permissions.query()
+ * which is a non-triggering check.
+ *
+ * Returns 'unknown' on iOS Safari (which doesn't support permissions API for microphone)
+ * or when the Permissions API isn't available. The caller should treat 'unknown' as
+ * "we don't know — show the setup intro and let the user opt in."
+ */
+export async function checkMicPermissionState(): Promise<MicPermissionState> {
+  if (typeof navigator === "undefined") {
+    console.log(
+      "[mic-permission] checkMicPermissionState: no navigator, returning unknown",
+    );
+    return "unknown";
   }
-  return null;
-}
 
-export async function queryMicPermissionState(): Promise<MicPermissionState> {
+  if (isNativeApp()) {
+    console.log(
+      "[mic-permission] checkMicPermissionState: native app, returning unknown",
+    );
+    return "unknown";
+  }
+
+  if (!isSecureRecordingContext()) {
+    console.log(
+      "[mic-permission] checkMicPermissionState: insecure context, returning denied",
+    );
+    return "denied";
+  }
+
   if (
-    typeof navigator === "undefined" ||
-    !isSecureRecordingContext() ||
-    !navigator.permissions?.query
+    !navigator.permissions ||
+    typeof navigator.permissions.query !== "function"
   ) {
+    console.log(
+      "[mic-permission] checkMicPermissionState: permissions API not available, returning unknown",
+    );
     return "unknown";
   }
 
@@ -73,113 +131,52 @@ export async function queryMicPermissionState(): Promise<MicPermissionState> {
     const result = await navigator.permissions.query({
       name: "microphone" as PermissionName,
     });
-    if (
-      result.state === "granted" ||
-      result.state === "denied" ||
-      result.state === "prompt"
-    ) {
-      return result.state;
-    }
+    console.log(
+      "[mic-permission] checkMicPermissionState: query returned",
+      result.state,
+    );
+    return result.state as MicPermissionState;
+  } catch (err) {
+    console.log(
+      "[mic-permission] checkMicPermissionState: query threw, returning unknown",
+      err,
+    );
     return "unknown";
-  } catch {
-    return "unknown";
   }
 }
 
-export async function probeMicPermission(): Promise<MicAccessResult | null> {
-  if (isNativeApp()) return null;
+// ============================================================
+// Permission request (MUST be called from a tap handler only)
+// ============================================================
 
-  const permissionState = await queryMicPermissionState();
-
-  if (permissionState === "granted") {
-    return { ok: true };
-  }
-
-  // Don't pre-emptively block on "denied" — let the user tap Enable so we can
-  // show the in-app guidance overlay and call getUserMedia from that gesture.
-  return null;
-}
-
-export function iosSafariFreshPromptSteps(): string[] {
-  return [
-    "Tap Safari's tabs icon at the bottom right.",
-    "Tap Private, then open KinMatch and sign in again.",
-    "Come back here — Safari will ask for your microphone. Tap Allow.",
-  ];
-}
-
-export function shouldPrimeMicPrompt(): boolean {
-  return isIOS() && !isNativeApp() && isSecureRecordingContext();
-}
-
-export function fileCaptureActionLabel(): string {
-  return isIOS() ? "Import from Voice Memos →" : "Use your phone's recorder →";
-}
-
-export function micSettingsHint(): string | null {
-  if (typeof navigator === "undefined") return null;
-  if (isNativeApp()) {
-    return nativeMicSettingsHint();
-  }
-  if (isIOS()) {
-    return "Tap aA in the address bar → Website Settings → Microphone → Allow, then reload.";
-  }
-  return "Allow microphone access in your browser settings, then reload.";
-}
-
-export function classifyMicError(err: unknown): MicErrorInfo {
-  const name = err instanceof DOMException ? err.name : "";
-  const hint = micSettingsHint();
-
-  switch (name) {
-    case "NotAllowedError":
-    case "PermissionDeniedError":
-      return {
-        kind: "denied",
-        message: isNativeApp()
-          ? "KinMatch needs microphone access."
-          : isIOS()
-            ? "Safari isn't allowed to use your mic yet."
-            : "Your browser blocked the microphone.",
-        settingsHint: isIOS() && !isNativeApp() ? null : hint,
-      };
-    case "NotFoundError":
-    case "DevicesNotFoundError":
-      return {
-        kind: "not_found",
-        message: "No microphone found on this device.",
-        settingsHint: null,
-      };
-    case "NotSupportedError":
-      return {
-        kind: "unsupported",
-        message: isNativeApp()
-          ? "Native recording isn't available — try again or use your phone's recorder."
-          : "This browser can't record here — use your phone's recorder instead.",
-        settingsHint: null,
-      };
-    case "SecurityError":
-      return {
-        kind: "security",
-        message: "Microphone access needs a secure connection.",
-        settingsHint: isSecureRecordingContext()
-          ? null
-          : insecureRecordingHint(),
-      };
-    default:
-      return {
-        kind: "unknown",
-        message: "Couldn't start recording — try again.",
-        settingsHint: hint,
-      };
-  }
-}
-
+/**
+ * Request microphone access by calling getUserMedia.
+ *
+ * WARNING: This function MUST only be called synchronously inside an onClick handler.
+ *
+ * Do NOT call it:
+ * - From useEffect or component mount
+ * - After an await of any other operation
+ * - Inside setTimeout, setInterval, or Promise chains
+ * - From any code path that isn't a direct response to a user tap
+ *
+ * iOS Safari is strict: if it doesn't recognize this call as a synchronous response
+ * to a user gesture, it silently denies permission AND blocks future requests
+ * until the user manually clears site data or changes Settings.
+ */
 export async function requestMicAccess(): Promise<MicAccessResult> {
+  console.log("[mic-permission] requestMicAccess: called");
+
   if (isNativeApp()) {
     try {
       const granted = await requestNativeMicAccess();
-      if (granted) return { ok: true };
+      console.log(
+        "[mic-permission] requestMicAccess: native granted =",
+        granted,
+      );
+      if (granted) {
+        return { ok: true, stream: new MediaStream() };
+      }
       return {
         ok: false,
         error: {
@@ -189,27 +186,32 @@ export async function requestMicAccess(): Promise<MicAccessResult> {
         },
       };
     } catch (err) {
-      return { ok: false, error: classifyMicError(err) };
+      console.log("[mic-permission] requestMicAccess: native threw", err);
+      return classifyMicError(err);
     }
   }
 
   if (!isSecureRecordingContext()) {
+    console.log("[mic-permission] requestMicAccess: insecure context");
     return {
       ok: false,
       error: {
-        kind: "security",
-        message: "Microphone access needs a secure connection.",
+        kind: "insecure",
+        message: "Voice notes need a secure connection.",
         settingsHint: insecureRecordingHint(),
       },
     };
   }
 
   if (!hasGetUserMedia()) {
+    console.log(
+      "[mic-permission] requestMicAccess: getUserMedia not available",
+    );
     return {
       ok: false,
       error: {
         kind: "unsupported",
-        message: "This browser can't set up voice notes here.",
+        message: "This browser can't record voice notes.",
         settingsHint: null,
       },
     };
@@ -217,15 +219,160 @@ export async function requestMicAccess(): Promise<MicAccessResult> {
 
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    stream.getTracks().forEach((track) => track.stop());
-    return { ok: true };
+    console.log("[mic-permission] requestMicAccess: getUserMedia succeeded");
+    return { ok: true, stream };
   } catch (err) {
-    return { ok: false, error: classifyMicError(err) };
+    console.log(
+      "[mic-permission] requestMicAccess: getUserMedia rejected",
+      err,
+    );
+    return classifyMicError(err);
   }
 }
 
-export function formatMicError(error: MicErrorInfo): string {
-  return error.settingsHint
-    ? `${error.message} ${error.settingsHint}`
-    : error.message;
+// ============================================================
+// Error classification
+// ============================================================
+
+export function classifyMicError(err: unknown): MicAccessResult {
+  if (!(err instanceof Error)) {
+    return {
+      ok: false,
+      error: {
+        kind: "unknown",
+        message: "Something went wrong with the microphone.",
+        settingsHint: null,
+      },
+    };
+  }
+
+  const hint = micSettingsHint();
+
+  switch (err.name) {
+    case "NotAllowedError":
+    case "PermissionDeniedError":
+      return {
+        ok: false,
+        error: {
+          kind: "denied",
+          message: isIOS()
+            ? "Safari blocked the microphone."
+            : "Your browser blocked the microphone.",
+          settingsHint: hint,
+        },
+      };
+
+    case "NotFoundError":
+    case "DevicesNotFoundError":
+      return {
+        ok: false,
+        error: {
+          kind: "no_device",
+          message: "No microphone was found on this device.",
+          settingsHint: null,
+        },
+      };
+
+    case "NotSupportedError":
+    case "TypeError":
+      return {
+        ok: false,
+        error: {
+          kind: "unsupported",
+          message: "This browser can't record voice notes here.",
+          settingsHint: null,
+        },
+      };
+
+    case "SecurityError":
+      return {
+        ok: false,
+        error: {
+          kind: "insecure",
+          message:
+            "The browser blocked the microphone for security reasons. Try opening this link in Chrome.",
+          settingsHint: null,
+        },
+      };
+
+    case "NotReadableError":
+    case "TrackStartError":
+      return {
+        ok: false,
+        error: {
+          kind: "no_device",
+          message:
+            "The microphone is in use by another app. Close other apps and try again.",
+          settingsHint: null,
+        },
+      };
+
+    default:
+      return {
+        ok: false,
+        error: {
+          kind: "unknown",
+          message: "Couldn't access the microphone.",
+          settingsHint: hint,
+        },
+      };
+  }
+}
+
+// ============================================================
+// Recovery instructions
+// ============================================================
+
+/**
+ * Single recovery path for iOS Safari users whose mic was blocked.
+ */
+export function iosSafariUnlockSteps(): string[] {
+  return [
+    'Tap the "aA" button on the left side of the address bar.',
+    'Tap "Website Settings".',
+    'Set Microphone to "Allow".',
+    'Close this dialog and tap "Try again".',
+  ];
+}
+
+// ============================================================
+// Hints
+// ============================================================
+
+export function micSettingsHint(): string | null {
+  if (typeof navigator === "undefined") return null;
+
+  if (isNativeApp()) {
+    return nativeMicSettingsHint();
+  }
+
+  if (isIOS()) {
+    return null;
+  }
+
+  return "Allow microphone access in your browser settings, then reload this page.";
+}
+
+export function insecureRecordingHint(): string {
+  return "Open kin-matchmvp.vercel.app on your phone over HTTPS to record voice notes.";
+}
+
+// ============================================================
+// UI hint mapping
+// ============================================================
+
+export function permissionStateToUiHint(
+  state: MicPermissionState,
+): "idle" | "ready" | "blocked" | "unknown" {
+  switch (state) {
+    case "granted":
+      return "ready";
+    case "denied":
+      return "blocked";
+    case "prompt":
+      return "idle";
+    case "unknown":
+    default:
+      return "unknown";
+  }
 }

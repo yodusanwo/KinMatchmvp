@@ -1,4 +1,8 @@
-import { classifyMicError, isIOS, type MicErrorInfo } from "@/lib/audio/mic-permission";
+import {
+  classifyMicError,
+  isIOS,
+  type MicErrorInfo,
+} from "@/lib/audio/mic-permission";
 import { getSupportedAudioMimeType } from "@/lib/audio/mime-type";
 import {
   downsamplePeaks,
@@ -30,9 +34,7 @@ export class WebMediaRecorderAdapter {
   private timerId: ReturnType<typeof setInterval> | null = null;
   private stopResolve: ((result: RecorderResult) => void) | null = null;
 
-  constructor(
-    private onLiveUpdate: (update: RecorderLiveUpdate) => void
-  ) {}
+  constructor(private onLiveUpdate: (update: RecorderLiveUpdate) => void) {}
 
   private cleanup() {
     if (this.rafId) {
@@ -90,7 +92,7 @@ export class WebMediaRecorderAdapter {
 
     const recorder = new MediaRecorder(
       stream,
-      mimeType ? { mimeType } : undefined
+      mimeType ? { mimeType } : undefined,
     );
     this.mediaRecorder = recorder;
     this.startedAt = Date.now();
@@ -104,7 +106,7 @@ export class WebMediaRecorderAdapter {
       const blob = new Blob(this.chunks, { type: recordedMimeType });
       const durationSeconds = Math.max(
         1,
-        Math.round((Date.now() - this.startedAt) / 1000)
+        Math.round((Date.now() - this.startedAt) / 1000),
       );
       const peaks = downsamplePeaks(this.samples, 30);
       this.cleanup();
@@ -184,7 +186,6 @@ const IOS_AUDIO_ACCEPT =
 
 function configureAudioFileInput(input: HTMLInputElement) {
   if (isIOS()) {
-    // iOS ignores audio capture and opens the video camera when `capture` is set.
     input.accept = IOS_AUDIO_ACCEPT;
     return;
   }
@@ -247,6 +248,13 @@ export async function captureAudioFile(): Promise<RecorderResult> {
   });
 }
 
+/**
+ * Map an unknown error from a recorder operation to a MicErrorInfo.
+ *
+ * Returns the discriminated-union error from classifyMicError, but handles
+ * AbortError as a "silent" no-op (empty message) so the UI doesn't show
+ * an error when the user simply canceled.
+ */
 export function mapRecorderError(err: unknown): MicErrorInfo {
   if (err instanceof DOMException && err.name === "AbortError") {
     return {
@@ -255,5 +263,19 @@ export function mapRecorderError(err: unknown): MicErrorInfo {
       settingsHint: null,
     };
   }
-  return classifyMicError(err);
+
+  // classifyMicError returns MicAccessResult ({ ok: false, error: {...} }).
+  // Extract the error object for callers that expect MicErrorInfo.
+  const result = classifyMicError(err);
+  if (!result.ok) {
+    return result.error;
+  }
+
+  // Defensive fallback — shouldn't happen since classifyMicError always
+  // returns { ok: false } for error inputs.
+  return {
+    kind: "unknown",
+    message: "Something went wrong with the microphone.",
+    settingsHint: null,
+  };
 }

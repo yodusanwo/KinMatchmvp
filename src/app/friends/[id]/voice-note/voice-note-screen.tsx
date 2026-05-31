@@ -18,7 +18,6 @@ import { RecordButton } from "@/components/voice-note/RecordButton";
 import { formatDuration } from "@/components/voice-note/format-duration";
 import { VoiceNotePageSkeleton } from "@/components/ui/Skeleton";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
-import { fileCaptureActionLabel } from "@/lib/audio/mic-permission";
 import { REACHABILITY_ERROR, fetchJson } from "@/lib/api/fetch-client";
 import { trackEvent } from "@/lib/analytics/events";
 import type { FriendCategory, FriendProfile } from "@/lib/api/types";
@@ -30,14 +29,18 @@ import {
   isMobileShareTarget,
 } from "@/lib/voice-notes/share-payload";
 
-type VoiceNoteScreenProps = {
-  friendId: string;
-};
+type VoiceNoteScreenProps = { friendId: string };
 
-type FriendForSend = Pick<
-  FriendProfile,
-  "id" | "name" | "avatar_color" | "phone_number" | "category" | "days_quiet"
->;
+type FriendForSendKeys =
+  | "id"
+  | "name"
+  | "avatar_color"
+  | "phone_number"
+  | "category"
+  | "days_quiet";
+type FriendForSend = Pick<FriendProfile, FriendForSendKeys>;
+
+type SendStatus = "idle" | "uploading" | "error";
 
 function voiceNoteFilename(mimeType: string) {
   const extension = mimeType.includes("mp4")
@@ -69,9 +72,7 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
   const router = useRouter();
   const [friend, setFriend] = useState<FriendForSend | null>(null);
   const [loading, setLoading] = useState(true);
-  const [sendStatus, setSendStatus] = useState<
-    "idle" | "uploading" | "error"
-  >("idle");
+  const [sendStatus, setSendStatus] = useState<SendStatus>("idle");
   const [sendError, setSendError] = useState<string | null>(null);
   const [sendNotice, setSendNotice] = useState<string | null>(null);
 
@@ -103,6 +104,19 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
     loadFriend();
   }, [loadFriend]);
 
+  const handleTextInstead = useCallback(() => {
+    if (!friend) return;
+    console.log("[voice-note-screen] Text instead tapped");
+    trackEvent("voice_note_sent", { method: "text_fallback" });
+
+    const phone = friend.phone_number?.trim();
+    if (phone) {
+      window.location.href = buildSmsLink(phone, "");
+    } else {
+      window.location.href = "sms:";
+    }
+  }, [friend]);
+
   async function handleSend() {
     if (!friend || !recorder.audioBlob) return;
 
@@ -111,7 +125,8 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
     setSendNotice(null);
 
     const formData = new FormData();
-    const mimeType = recorder.recordedMimeType || recorder.audioBlob.type || "audio/webm";
+    const mimeType =
+      recorder.recordedMimeType || recorder.audioBlob.type || "audio/webm";
     formData.append("audio", recorder.audioBlob, voiceNoteFilename(mimeType));
     formData.append("friend_id", friend.id);
     formData.append("duration", String(Math.max(1, recorder.durationSeconds)));
@@ -163,20 +178,17 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
           if (navigator.clipboard) {
             await navigator.clipboard.writeText(fullBody);
           }
-
           await navigator.share(
             buildVoiceNoteShareData({
               publicUrl: url,
               friendName: sendData.friend_name,
               senderName: sendData.sender_name,
-            })
+            }),
           );
-
           trackEvent("voice_note_sent", { method: "share_sheet" });
-
           if (!isMobileShareTarget()) {
             setSendNotice(
-              "Message copied — paste into Messages if you only see the link"
+              "Message copied — paste into Messages if you only see the link",
             );
           }
         } catch (err) {
@@ -205,9 +217,7 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
       router.push("/today");
     } catch (err) {
       setSendStatus("error");
-      setSendError(
-        err instanceof Error ? err.message : REACHABILITY_ERROR
-      );
+      setSendError(err instanceof Error ? err.message : REACHABILITY_ERROR);
     }
   }
 
@@ -289,7 +299,7 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
               micError={recorder.micError}
               disabled={sendStatus === "uploading"}
               onEnable={() => recorder.requestMicAccess()}
-              onUsePhoneRecorder={() => void recorder.startFileCapture()}
+              onTextInstead={handleTextInstead}
             />
           ) : showRecorder ? (
             <RecordButton
@@ -336,13 +346,19 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
           )}
 
           {sendError && (
-            <p className="mt-4 font-inter text-sm italic text-terracotta-deep" role="alert">
+            <p
+              className="mt-4 font-inter text-sm italic text-terracotta-deep"
+              role="alert"
+            >
               {sendError}
             </p>
           )}
 
           {sendNotice && (
-            <p className="mt-4 font-inter text-sm italic text-ink-soft" role="status">
+            <p
+              className="mt-4 font-inter text-sm italic text-ink-soft"
+              role="status"
+            >
               {sendNotice}
             </p>
           )}
@@ -350,25 +366,13 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
 
         <div className="mt-8 space-y-4">
           {recorder.error && !recorder.audioBlob && micReady && (
-            <>
-              <PrimaryButton
-                type="button"
-                disabled={sendStatus === "uploading"}
-                onClick={() => void recorder.startRecording()}
-              >
-                Try again
-              </PrimaryButton>
-              <p className="text-center">
-                <button
-                  type="button"
-                  disabled={sendStatus === "uploading"}
-                  onClick={() => void recorder.startFileCapture()}
-                  className="font-inter text-sm text-terracotta underline underline-offset-2"
-                >
-                  {fileCaptureActionLabel()}
-                </button>
-              </p>
-            </>
+            <PrimaryButton
+              type="button"
+              disabled={sendStatus === "uploading"}
+              onClick={() => void recorder.startRecording()}
+            >
+              Try again
+            </PrimaryButton>
           )}
 
           {recorder.audioBlob && (

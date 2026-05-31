@@ -3,11 +3,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { canRecordInBrowser } from "@/lib/audio/mime-type";
 import {
-  formatMicError,
+  checkMicPermissionState,
   hasGetUserMedia,
-  probeMicPermission,
   requestMicAccess as requestMicAccessCore,
-  type MicErrorInfo,
+  type MicAccessError,
 } from "@/lib/audio/mic-permission";
 import { isNativeApp } from "@/lib/audio/native-platform";
 import { NativeCapacitorRecorderAdapter } from "@/lib/audio/native-recorder";
@@ -27,6 +26,9 @@ export type MicStatus =
   | "blocked"
   | "unsupported";
 
+// Backwards-compatible alias so existing imports of MicErrorInfo keep working
+export type MicErrorInfo = MicAccessError;
+
 export type VoiceRecorderState = {
   isRecording: boolean;
   durationSeconds: number;
@@ -36,7 +38,7 @@ export type VoiceRecorderState = {
   peaks: number[];
   error: string | null;
   micStatus: MicStatus;
-  micError: MicErrorInfo | null;
+  micError: MicAccessError | null;
   usedFileCapture: boolean;
   canUseWebRecorder: boolean;
   isNativeApp: boolean;
@@ -47,6 +49,15 @@ type RecordingAdapter = {
   stop(): Promise<RecorderResult>;
   reset(): void;
 };
+
+/**
+ * Map a MicAccessError to a user-facing string for display.
+ * The error.message is already user-friendly (set in classifyMicError),
+ * so we mostly just return it directly.
+ */
+function formatMicErrorForDisplay(error: MicAccessError): string {
+  return error.message;
+}
 
 export function useVoiceRecorder() {
   const [state, setState] = useState<VoiceRecorderState>({
@@ -65,7 +76,9 @@ export function useVoiceRecorder() {
   });
 
   const adapterRef = useRef<RecordingAdapter | null>(null);
-  const onLiveUpdateRef = useRef<(update: RecorderLiveUpdate) => void>(() => undefined);
+  const onLiveUpdateRef = useRef<(update: RecorderLiveUpdate) => void>(
+    () => undefined,
+  );
 
   onLiveUpdateRef.current = (update: RecorderLiveUpdate) => {
     setState((current) => ({
@@ -75,38 +88,54 @@ export function useVoiceRecorder() {
     }));
   };
 
+  // On mount: detect environment and check permission state WITHOUT triggering a prompt.
+  // This is safe to call here because checkMicPermissionState only uses
+  // navigator.permissions.query() and never calls getUserMedia.
   useEffect(() => {
     const native = isNativeApp();
     setState((current) => ({
       ...current,
       isNativeApp: native,
-      canUseWebRecorder:
-        native || (hasGetUserMedia() && canRecordInBrowser()),
+      canUseWebRecorder: native || (hasGetUserMedia() && canRecordInBrowser()),
     }));
 
     if (native) return;
 
     void (async () => {
-      const probe = await probeMicPermission();
-      if (!probe) return;
+      const permissionState = await checkMicPermissionState();
+      console.log(
+        "[useVoiceRecorder] mount: permission state =",
+        permissionState,
+      );
 
-      if (probe.ok) {
+      if (permissionState === "granted") {
         setState((current) => ({
           ...current,
           micStatus: "ready",
           micError: null,
           error: null,
-          canUseWebRecorder: hasGetUserMedia() && canRecordInBrowser(),
         }));
         return;
       }
 
+      if (permissionState === "denied") {
+        setState((current) => ({
+          ...current,
+          micStatus: "blocked",
+          micError: null,
+          error: null,
+        }));
+        return;
+      }
+
+      // 'prompt' or 'unknown' (iOS Safari case): stay in 'idle' until
+      // the user explicitly taps to set up the microphone.
+      // Do NOT call getUserMedia here — that would silently fail on iOS Safari.
       setState((current) => ({
         ...current,
-        micStatus:
-          probe.error.kind === "unsupported" ? "unsupported" : "blocked",
-        micError: probe.error,
-        error: formatMicError(probe.error),
+        micStatus: "idle",
+        micError: null,
+        error: null,
       }));
     })();
   }, []);
@@ -127,10 +156,7 @@ export function useVoiceRecorder() {
   const stopRecordingRef = useRef<() => Promise<void>>(async () => undefined);
 
   const applyRecordingResult = useCallback(
-    (
-      result: RecorderResult,
-      usedFileCapture: boolean
-    ) => {
+    (result: RecorderResult, usedFileCapture: boolean) => {
       setState((current) => ({
         ...current,
         isRecording: false,
@@ -143,10 +169,19 @@ export function useVoiceRecorder() {
         usedFileCapture,
       }));
     },
-    []
+    [],
   );
 
+  /**
+   * Request microphone access. Must be called from a user tap handler.
+   *
+   * The underlying requestMicAccessCore() calls getUserMedia synchronously,
+   * so as long as this function is invoked from an onClick handler
+   * (with no awaits before the call), iOS Safari will show the native prompt.
+   */
   const requestMicAccess = useCallback(async (): Promise<boolean> => {
+    console.log("[useVoiceRecorder] requestMicAccess: tapped");
+
     setState((current) => ({
       ...current,
       micStatus: "requesting",
@@ -157,6 +192,11 @@ export function useVoiceRecorder() {
     const result = await requestMicAccessCore();
 
     if (result.ok) {
+      console.log("[useVoiceRecorder] requestMicAccess: granted");
+      // Stop the stream — we just wanted the permission grant.
+      // The actual recording stream is created later in startRecording.
+      result.stream.getTracks().forEach((track) => track.stop());
+
       setState((current) => ({
         ...current,
         micStatus: "ready",
@@ -168,6 +208,7 @@ export function useVoiceRecorder() {
       return true;
     }
 
+    console.log("[useVoiceRecorder] requestMicAccess: failed", result.error);
     const micStatus =
       result.error.kind === "unsupported" ? "unsupported" : "blocked";
 
@@ -175,7 +216,7 @@ export function useVoiceRecorder() {
       ...current,
       micStatus,
       micError: result.error,
-      error: formatMicError(result.error),
+      error: formatMicErrorForDisplay(result.error),
     }));
     return false;
   }, []);
@@ -240,10 +281,9 @@ export function useVoiceRecorder() {
       setState((current) => ({
         ...current,
         isRecording: false,
-        micStatus:
-          micError.kind === "unsupported" ? "unsupported" : "blocked",
+        micStatus: micError.kind === "unsupported" ? "unsupported" : "blocked",
         micError,
-        error: formatMicError(micError),
+        error: formatMicErrorForDisplay(micError),
       }));
     }
   }, [createNativeAdapter, createWebAdapter]);
@@ -288,8 +328,7 @@ export function useVoiceRecorder() {
       setState((current) => ({
         ...current,
         error:
-          micError.message ||
-          "Couldn't use your phone's recorder — try again.",
+          micError.message || "Couldn't use your phone's recorder — try again.",
         micError,
       }));
     }
