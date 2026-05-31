@@ -2,11 +2,27 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  downsamplePeaks,
-  MAX_RECORDING_SECONDS,
-  readAnalyserLevel,
-} from "@/lib/voice-notes/peaks";
-import { getSupportedAudioMimeType } from "@/lib/audio/mime-type";
+  canRecordInBrowser,
+} from "@/lib/audio/mime-type";
+import {
+  formatMicError,
+  hasGetUserMedia,
+  requestMicAccess as requestMicAccessCore,
+  type MicErrorInfo,
+} from "@/lib/audio/mic-permission";
+import {
+  captureAudioFile,
+  mapRecorderError,
+  WebMediaRecorderAdapter,
+} from "@/lib/audio/recorder-adapter";
+import { MAX_RECORDING_SECONDS } from "@/lib/voice-notes/peaks";
+
+export type MicStatus =
+  | "idle"
+  | "requesting"
+  | "ready"
+  | "blocked"
+  | "unsupported";
 
 export type VoiceRecorderState = {
   isRecording: boolean;
@@ -16,6 +32,10 @@ export type VoiceRecorderState = {
   recordedMimeType: string;
   peaks: number[];
   error: string | null;
+  micStatus: MicStatus;
+  micError: MicErrorInfo | null;
+  usedFileCapture: boolean;
+  canUseWebRecorder: boolean;
 };
 
 export function useVoiceRecorder() {
@@ -27,57 +47,80 @@ export function useVoiceRecorder() {
     recordedMimeType: "",
     peaks: [],
     error: null,
+    micStatus: "idle",
+    micError: null,
+    usedFileCapture: false,
+    canUseWebRecorder: false,
   });
 
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const analyserRef = useRef<AnalyserNode | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
-  const samplesRef = useRef<number[]>([]);
-  const startedAtRef = useRef<number>(0);
-  const rafRef = useRef<number | null>(null);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const adapterRef = useRef<WebMediaRecorderAdapter | null>(null);
 
-  const cleanupStream = useCallback(() => {
-    if (rafRef.current) {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
-    }
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-    streamRef.current?.getTracks().forEach((track) => track.stop());
-    streamRef.current = null;
-    void audioContextRef.current?.close();
-    audioContextRef.current = null;
-    analyserRef.current = null;
+  useEffect(() => {
+    setState((current) => ({
+      ...current,
+      canUseWebRecorder: hasGetUserMedia() && canRecordInBrowser(),
+    }));
   }, []);
 
-  useEffect(() => cleanupStream, [cleanupStream]);
-
-  const tickAnalyser = useCallback(() => {
-    const analyser = analyserRef.current;
-    if (!analyser) return;
-
-    const level = readAnalyserLevel(analyser);
-    samplesRef.current.push(level);
-
-    const live = downsamplePeaks(
-      samplesRef.current.slice(-120),
-      30
-    );
-    setState((current) => ({ ...current, livePeaks: live }));
-
-    rafRef.current = requestAnimationFrame(tickAnalyser);
+  useEffect(() => {
+    return () => {
+      adapterRef.current?.reset();
+    };
   }, []);
 
-  const stopRecording = useCallback(() => {
-    const recorder = mediaRecorderRef.current;
-    if (!recorder || recorder.state === "inactive") return;
-    recorder.stop();
-    setState((current) => ({ ...current, isRecording: false }));
+  const applyRecordingResult = useCallback(
+    (result: {
+      blob: Blob;
+      mimeType: string;
+      durationSeconds: number;
+      peaks: number[];
+    }, usedFileCapture: boolean) => {
+      setState((current) => ({
+        ...current,
+        isRecording: false,
+        durationSeconds: result.durationSeconds,
+        audioBlob: result.blob,
+        recordedMimeType: result.mimeType,
+        peaks: result.peaks,
+        livePeaks: result.peaks,
+        error: null,
+        usedFileCapture,
+      }));
+    },
+    []
+  );
+
+  const requestMicAccess = useCallback(async (): Promise<boolean> => {
+    setState((current) => ({
+      ...current,
+      micStatus: "requesting",
+      micError: null,
+      error: null,
+    }));
+
+    const result = await requestMicAccessCore();
+
+    if (result.ok) {
+      setState((current) => ({
+        ...current,
+        micStatus: "ready",
+        micError: null,
+        error: null,
+        canUseWebRecorder: canRecordInBrowser(),
+      }));
+      return true;
+    }
+
+    const micStatus =
+      result.error.kind === "unsupported" ? "unsupported" : "blocked";
+
+    setState((current) => ({
+      ...current,
+      micStatus,
+      micError: result.error,
+      error: formatMicError(result.error),
+    }));
+    return false;
   }, []);
 
   const startRecording = useCallback(async () => {
@@ -87,103 +130,91 @@ export function useVoiceRecorder() {
       audioBlob: null,
       recordedMimeType: "",
       peaks: [],
+      usedFileCapture: false,
     }));
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-        },
-      });
-      streamRef.current = stream;
-
-      const audioContext = new AudioContext();
-      await audioContext.resume();
-      audioContextRef.current = audioContext;
-      const source = audioContext.createMediaStreamSource(stream);
-      const analyser = audioContext.createAnalyser();
-      analyser.fftSize = 256;
-      source.connect(analyser);
-      analyserRef.current = analyser;
-
-      const mimeType = getSupportedAudioMimeType();
-      const recorder = new MediaRecorder(
-        stream,
-        mimeType ? { mimeType } : undefined
-      );
-      mediaRecorderRef.current = recorder;
-      chunksRef.current = [];
-      samplesRef.current = [];
-      startedAtRef.current = Date.now();
-
-      recorder.ondataavailable = (event) => {
-        if (event.data.size > 0) chunksRef.current.push(event.data);
-      };
-
-      recorder.onstart = () => {
-        setState((current) => ({
-          ...current,
-          recordedMimeType: recorder.mimeType,
-        }));
-      };
-
-      recorder.onstop = () => {
-        cleanupStream();
-        const recordedMimeType = recorder.mimeType || mimeType || "audio/webm";
-        const blob = new Blob(chunksRef.current, {
-          type: recordedMimeType,
+      if (!adapterRef.current) {
+        adapterRef.current = new WebMediaRecorderAdapter((update) => {
+          setState((current) => ({
+            ...current,
+            durationSeconds: update.durationSeconds,
+            livePeaks: update.livePeaks,
+          }));
         });
-        const durationSeconds = Math.max(
-          1,
-          Math.round((Date.now() - startedAtRef.current) / 1000)
-        );
-        const peaks = downsamplePeaks(samplesRef.current, 30);
+      }
 
-        setState((current) => ({
-          ...current,
-          isRecording: false,
-          durationSeconds,
-          audioBlob: blob,
-          recordedMimeType,
-          peaks,
-          livePeaks: peaks,
-        }));
-      };
-
-      recorder.start(200);
+      await adapterRef.current.start();
       setState((current) => ({
         ...current,
         isRecording: true,
         durationSeconds: 0,
         livePeaks: Array.from({ length: 30 }, () => 0.08),
+        micStatus: "ready",
+        error: null,
       }));
+    } catch (err) {
+      adapterRef.current?.reset();
+      const micError = mapRecorderError(err);
+      if (micError.message === "") return;
 
-      tickAnalyser();
-
-      timerRef.current = setInterval(() => {
-        const elapsed = Math.floor((Date.now() - startedAtRef.current) / 1000);
-        setState((current) => ({ ...current, durationSeconds: elapsed }));
-        if (elapsed >= MAX_RECORDING_SECONDS) {
-          stopRecording();
-        }
-      }, 250);
-    } catch {
-      cleanupStream();
       setState((current) => ({
         ...current,
         isRecording: false,
-        error: "Turn on the microphone to record a voice note.",
+        micStatus:
+          micError.kind === "unsupported" ? "unsupported" : "blocked",
+        micError,
+        error: formatMicError(micError),
       }));
     }
-  }, [cleanupStream, stopRecording, tickAnalyser]);
+  }, []);
+
+  const stopRecording = useCallback(async () => {
+    const adapter = adapterRef.current;
+    if (!adapter) return;
+
+    setState((current) => ({ ...current, isRecording: false }));
+
+    try {
+      const result = await adapter.stop();
+      applyRecordingResult(result, false);
+    } catch {
+      setState((current) => ({
+        ...current,
+        isRecording: false,
+        error: "Couldn't finish recording — try again.",
+      }));
+    }
+  }, [applyRecordingResult]);
+
+  const startFileCapture = useCallback(async () => {
+    setState((current) => ({
+      ...current,
+      error: null,
+      audioBlob: null,
+      recordedMimeType: "",
+      peaks: [],
+    }));
+
+    try {
+      const result = await captureAudioFile();
+      applyRecordingResult(result, true);
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") {
+        return;
+      }
+      const micError = mapRecorderError(err);
+      setState((current) => ({
+        ...current,
+        error: micError.message || "Couldn't use your phone's recorder — try again.",
+        micError,
+      }));
+    }
+  }, [applyRecordingResult]);
 
   const reset = useCallback(() => {
-    cleanupStream();
-    mediaRecorderRef.current = null;
-    chunksRef.current = [];
-    samplesRef.current = [];
-    setState({
+    adapterRef.current?.reset();
+    setState((current) => ({
       isRecording: false,
       durationSeconds: 0,
       livePeaks: Array.from({ length: 30 }, () => 0.08),
@@ -191,13 +222,19 @@ export function useVoiceRecorder() {
       recordedMimeType: "",
       peaks: [],
       error: null,
-    });
-  }, [cleanupStream]);
+      micStatus: current.micStatus,
+      micError: current.micError,
+      usedFileCapture: false,
+      canUseWebRecorder: current.canUseWebRecorder,
+    }));
+  }, []);
 
   return {
     ...state,
+    requestMicAccess,
     startRecording,
     stopRecording,
+    startFileCapture,
     reset,
     maxDurationSeconds: MAX_RECORDING_SECONDS,
   };

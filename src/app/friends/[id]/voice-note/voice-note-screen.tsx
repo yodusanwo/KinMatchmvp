@@ -13,6 +13,7 @@ import {
 import { AppShell } from "@/components/layout/AppShell";
 import { MiniAvatar } from "@/components/onboarding/MiniAvatar";
 import { LiveWaveform } from "@/components/voice-note/LiveWaveform";
+import { MicPermissionCard } from "@/components/voice-note/MicPermissionCard";
 import { RecordButton } from "@/components/voice-note/RecordButton";
 import { formatDuration } from "@/components/voice-note/format-duration";
 import { VoiceNotePageSkeleton } from "@/components/ui/Skeleton";
@@ -222,12 +223,18 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
 
   const displayName = firstName(friend.name);
   const hasPhone = Boolean(friend.phone_number?.trim());
+  const micReady = recorder.micStatus === "ready";
+  const showRecorder = micReady && !recorder.audioBlob;
 
   const helperText = recorder.isRecording
     ? "Recording… tap to stop"
     : recorder.audioBlob
-      ? "Tap send when you're ready"
-      : "Tap to start recording";
+      ? recorder.usedFileCapture
+        ? "Ready to send"
+        : "Tap send when you're ready"
+      : micReady
+        ? "Tap to start recording"
+        : "Set up the microphone to begin";
 
   const sendButtonLabel =
     sendStatus === "uploading"
@@ -266,39 +273,51 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
         </div>
 
         <div className="mt-10 flex flex-1 flex-col items-center justify-center">
-          <LiveWaveform
-            peaks={recorder.livePeaks}
-            active={recorder.isRecording || Boolean(recorder.audioBlob)}
-            className="mb-8 w-full"
-          />
+          {(micReady || recorder.audioBlob) && (
+            <LiveWaveform
+              peaks={recorder.livePeaks}
+              active={recorder.isRecording || Boolean(recorder.audioBlob)}
+              className="mb-8 w-full"
+            />
+          )}
 
-          <RecordButton
-            isRecording={recorder.isRecording}
-            disabled={sendStatus === "uploading"}
-            onPress={() => {
-              if (recorder.isRecording) {
-                recorder.stopRecording();
-                return;
-              }
-              if (!recorder.audioBlob) {
+          {!micReady && !recorder.audioBlob ? (
+            <MicPermissionCard
+              micStatus={recorder.micStatus}
+              micError={recorder.micError}
+              disabled={sendStatus === "uploading"}
+              onEnable={() => void recorder.requestMicAccess()}
+              onUsePhoneRecorder={() => void recorder.startFileCapture()}
+            />
+          ) : showRecorder ? (
+            <RecordButton
+              isRecording={recorder.isRecording}
+              disabled={sendStatus === "uploading"}
+              onPress={() => {
+                if (recorder.isRecording) {
+                  void recorder.stopRecording();
+                  return;
+                }
                 void recorder.startRecording();
-              }
-            }}
-          />
+              }}
+            />
+          ) : null}
 
-          <p className="mt-5 font-mono text-sm text-ink">
-            {formatDuration(recorder.durationSeconds)}
-            {recorder.maxDurationSeconds > 0 && (
-              <span className="text-ink-soft">
-                {" "}
-                / {formatDuration(recorder.maxDurationSeconds)}
-              </span>
-            )}
-          </p>
+          {(micReady || recorder.audioBlob) && (
+            <p className="mt-5 font-mono text-sm text-ink">
+              {formatDuration(recorder.durationSeconds)}
+              {recorder.maxDurationSeconds > 0 && !recorder.usedFileCapture && (
+                <span className="text-ink-soft">
+                  {" "}
+                  / {formatDuration(recorder.maxDurationSeconds)}
+                </span>
+              )}
+            </p>
+          )}
 
           <Subhead className="mt-2 text-center">{helperText}</Subhead>
 
-          {recorder.error && (
+          {recorder.error && !recorder.audioBlob && micReady && (
             <div className="mt-4 max-w-[320px] space-y-3 text-center">
               <p
                 className="font-inter text-sm italic text-terracotta-deep"
@@ -306,10 +325,11 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
               >
                 {recorder.error}
               </p>
-              <p className="font-inter text-xs italic leading-relaxed text-ink-soft">
-                If your phone already blocked it, turn on microphone access in
-                browser settings, then try again.
-              </p>
+              {recorder.micError?.settingsHint && (
+                <p className="font-inter text-xs italic leading-relaxed text-ink-soft">
+                  {recorder.micError.settingsHint}
+                </p>
+              )}
             </div>
           )}
 
@@ -327,14 +347,26 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
         </div>
 
         <div className="mt-8 space-y-4">
-          {recorder.error && !recorder.audioBlob && (
-            <PrimaryButton
-              type="button"
-              disabled={sendStatus === "uploading"}
-              onClick={() => void recorder.startRecording()}
-            >
-              Try microphone again
-            </PrimaryButton>
+          {recorder.error && !recorder.audioBlob && micReady && (
+            <>
+              <PrimaryButton
+                type="button"
+                disabled={sendStatus === "uploading"}
+                onClick={() => void recorder.startRecording()}
+              >
+                Try again
+              </PrimaryButton>
+              <p className="text-center">
+                <button
+                  type="button"
+                  disabled={sendStatus === "uploading"}
+                  onClick={() => void recorder.startFileCapture()}
+                  className="font-inter text-sm text-terracotta underline underline-offset-2"
+                >
+                  Use your phone&apos;s recorder →
+                </button>
+              </p>
+            </>
           )}
 
           {recorder.audioBlob && (

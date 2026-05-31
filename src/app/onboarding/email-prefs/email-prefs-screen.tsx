@@ -9,6 +9,11 @@ import { AppShell } from "@/components/layout/AppShell";
 import { BrandBar } from "@/components/brand";
 import { useOnboarding } from "@/contexts/onboarding-context";
 import type { CompleteOnboardingPayload } from "@/lib/onboarding/api-types";
+import {
+  formatMicError,
+  hasGetUserMedia,
+  requestMicAccess,
+} from "@/lib/audio/mic-permission";
 
 const REFLECTION_COPY_CLASS =
   "font-inter text-sm italic leading-[1.5] text-[rgba(31,26,20,0.65)]";
@@ -59,7 +64,7 @@ export function EmailPrefsScreen() {
     setError(null);
     setMicMessage(null);
 
-    if (!navigator.mediaDevices?.getUserMedia) {
+    if (!hasGetUserMedia()) {
       setMicStatus("unsupported");
       setMicMessage(
         "This browser can't set up voice notes here. You can still continue."
@@ -69,19 +74,18 @@ export function EmailPrefsScreen() {
 
     setMicStatus("requesting");
 
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      stream.getTracks().forEach((track) => track.stop());
+    const result = await requestMicAccess();
+    if (result.ok) {
       setMicStatus("ready");
       setMicMessage("Voice notes are ready.");
       return true;
-    } catch {
-      setMicStatus("blocked");
-      setMicMessage(
-        "Your phone blocked the microphone. Turn it on in settings, or set this up later."
-      );
-      return false;
     }
+
+    setMicStatus(
+      result.error.kind === "unsupported" ? "unsupported" : "blocked"
+    );
+    setMicMessage(formatMicError(result.error));
+    return false;
   }
 
   async function handleSave() {
