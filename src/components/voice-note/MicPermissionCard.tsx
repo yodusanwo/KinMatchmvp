@@ -3,7 +3,7 @@
 import { PrimaryButton } from "@/components/brand";
 import type { MicStatus } from "@/hooks/useVoiceRecorder";
 import type { MicErrorInfo } from "@/lib/audio/mic-permission";
-import { micSettingsHint } from "@/lib/audio/mic-permission";
+import { micSettingsHint, fileCaptureActionLabel } from "@/lib/audio/mic-permission";
 
 type MicPermissionCardProps = {
   micStatus: MicStatus;
@@ -23,7 +23,8 @@ export function MicPermissionCard({
   const showFileFallback =
     micStatus === "blocked" ||
     micStatus === "unsupported" ||
-    micError?.kind === "denied";
+    micError?.kind === "denied" ||
+    micError?.kind === "security";
 
   return (
     <section className="w-full max-w-[320px] space-y-4 rounded-2xl border border-ink/[0.12] bg-cream-deep/60 p-4 text-center">
@@ -69,7 +70,7 @@ export function MicPermissionCard({
           onClick={onUsePhoneRecorder}
           className="font-inter text-sm text-terracotta underline decoration-terracotta/60 underline-offset-2 disabled:opacity-60"
         >
-          Use your phone&apos;s recorder →
+          {fileCaptureActionLabel()}
         </button>
       )}
 

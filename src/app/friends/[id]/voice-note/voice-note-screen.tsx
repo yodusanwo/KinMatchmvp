@@ -18,6 +18,7 @@ import { RecordButton } from "@/components/voice-note/RecordButton";
 import { formatDuration } from "@/components/voice-note/format-duration";
 import { VoiceNotePageSkeleton } from "@/components/ui/Skeleton";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
+import { fileCaptureActionLabel } from "@/lib/audio/mic-permission";
 import { REACHABILITY_ERROR, fetchJson } from "@/lib/api/fetch-client";
 import { trackEvent } from "@/lib/analytics/events";
 import type { FriendCategory, FriendProfile } from "@/lib/api/types";
@@ -363,7 +364,7 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
                   onClick={() => void recorder.startFileCapture()}
                   className="font-inter text-sm text-terracotta underline underline-offset-2"
                 >
-                  Use your phone&apos;s recorder →
+                  {fileCaptureActionLabel()}
                 </button>
               </p>
             </>

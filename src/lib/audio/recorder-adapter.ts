@@ -1,4 +1,4 @@
-import { classifyMicError, type MicErrorInfo } from "@/lib/audio/mic-permission";
+import { classifyMicError, isIOS, type MicErrorInfo } from "@/lib/audio/mic-permission";
 import { getSupportedAudioMimeType } from "@/lib/audio/mime-type";
 import {
   downsamplePeaks,
@@ -179,6 +179,30 @@ async function readAudioDuration(blob: Blob): Promise<number> {
   });
 }
 
+const IOS_AUDIO_ACCEPT =
+  "audio/mp4,audio/x-m4a,audio/m4a,audio/aac,audio/wav,audio/mpeg,audio/*";
+
+function configureAudioFileInput(input: HTMLInputElement) {
+  if (isIOS()) {
+    // iOS ignores audio capture and opens the video camera when `capture` is set.
+    input.accept = IOS_AUDIO_ACCEPT;
+    return;
+  }
+
+  input.accept = "audio/*";
+  input.setAttribute("capture", "user");
+}
+
+function attachHiddenFileInput(input: HTMLInputElement) {
+  input.style.position = "fixed";
+  input.style.left = "0";
+  input.style.top = "0";
+  input.style.width = "1px";
+  input.style.height = "1px";
+  input.style.opacity = "0";
+  document.body.appendChild(input);
+}
+
 export async function captureAudioFile(): Promise<RecorderResult> {
   if (typeof document === "undefined") {
     throw new DOMException("File capture unavailable", "NotSupportedError");
@@ -187,11 +211,16 @@ export async function captureAudioFile(): Promise<RecorderResult> {
   return new Promise((resolve, reject) => {
     const input = document.createElement("input");
     input.type = "file";
-    input.accept = "audio/*";
-    input.setAttribute("capture", "user");
+    configureAudioFileInput(input);
+    attachHiddenFileInput(input);
+
+    const cleanup = () => {
+      input.remove();
+    };
 
     input.addEventListener("change", () => {
       const file = input.files?.[0];
+      cleanup();
       if (!file) {
         reject(new DOMException("Capture cancelled", "AbortError"));
         return;
@@ -210,6 +239,7 @@ export async function captureAudioFile(): Promise<RecorderResult> {
     });
 
     input.addEventListener("cancel", () => {
+      cleanup();
       reject(new DOMException("Capture cancelled", "AbortError"));
     });
 
