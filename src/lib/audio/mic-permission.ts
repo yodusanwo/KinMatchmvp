@@ -95,18 +95,21 @@ export async function probeMicPermission(): Promise<MicAccessResult | null> {
     return { ok: true };
   }
 
-  if (permissionState === "denied") {
-    return {
-      ok: false,
-      error: {
-        kind: "denied",
-        message: "Safari isn't allowed to use your mic yet.",
-        settingsHint: null,
-      },
-    };
-  }
-
+  // Don't pre-emptively block on "denied" — let the user tap Enable so we can
+  // show the in-app guidance overlay and call getUserMedia from that gesture.
   return null;
+}
+
+export function iosSafariFreshPromptSteps(): string[] {
+  return [
+    "Tap Safari's tabs icon at the bottom right.",
+    "Tap Private, then open KinMatch and sign in again.",
+    "Come back here — Safari will ask for your microphone. Tap Allow.",
+  ];
+}
+
+export function shouldPrimeMicPrompt(): boolean {
+  return isIOS() && !isNativeApp() && isSecureRecordingContext();
 }
 
 export function fileCaptureActionLabel(): string {

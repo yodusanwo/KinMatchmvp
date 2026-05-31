@@ -13,7 +13,7 @@ import {
 import { AppShell } from "@/components/layout/AppShell";
 import { MiniAvatar } from "@/components/onboarding/MiniAvatar";
 import { LiveWaveform } from "@/components/voice-note/LiveWaveform";
-import { MicPermissionCard } from "@/components/voice-note/MicPermissionCard";
+import { MicEnableFlow } from "@/components/voice-note/MicEnableFlow";
 import { RecordButton } from "@/components/voice-note/RecordButton";
 import { formatDuration } from "@/components/voice-note/format-duration";
 import { VoiceNotePageSkeleton } from "@/components/ui/Skeleton";
@@ -283,11 +283,12 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
           )}
 
           {!micReady && !recorder.audioBlob ? (
-            <MicPermissionCard
+            <MicEnableFlow
+              friendName={friend.name}
               micStatus={recorder.micStatus}
               micError={recorder.micError}
               disabled={sendStatus === "uploading"}
-              onEnable={() => void recorder.requestMicAccess()}
+              onEnable={() => recorder.requestMicAccess()}
               onUsePhoneRecorder={() => void recorder.startFileCapture()}
             />
           ) : showRecorder ? (
