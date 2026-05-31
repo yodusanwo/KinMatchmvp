@@ -3,7 +3,13 @@
 import { PrimaryButton } from "@/components/brand";
 import type { MicStatus } from "@/hooks/useVoiceRecorder";
 import type { MicErrorInfo } from "@/lib/audio/mic-permission";
-import { micSettingsHint, fileCaptureActionLabel } from "@/lib/audio/mic-permission";
+import {
+  fileCaptureActionLabel,
+  fileCaptureHelperText,
+  iosSafariMicUnlockSteps,
+  isIOS,
+  micSettingsHint,
+} from "@/lib/audio/mic-permission";
 
 type MicPermissionCardProps = {
   micStatus: MicStatus;
@@ -12,6 +18,12 @@ type MicPermissionCardProps = {
   onUsePhoneRecorder?: () => void;
   disabled?: boolean;
 };
+
+function micEnableButtonLabel(micStatus: MicStatus): string {
+  if (micStatus === "requesting") return "Asking…";
+  if (micStatus === "blocked") return "Try again →";
+  return "Enable microphone →";
+}
 
 export function MicPermissionCard({
   micStatus,
@@ -25,6 +37,11 @@ export function MicPermissionCard({
     micStatus === "unsupported" ||
     micError?.kind === "denied" ||
     micError?.kind === "security";
+
+  const showIosUnlockSteps =
+    isIOS() && micError?.kind === "denied" && micStatus === "blocked";
+
+  const fileHelper = showFileFallback ? fileCaptureHelperText() : null;
 
   return (
     <section className="w-full max-w-[320px] space-y-4 rounded-2xl border border-ink/[0.12] bg-cream-deep/60 p-4 text-center">
@@ -46,6 +63,17 @@ export function MicPermissionCard({
         </p>
       )}
 
+      {showIosUnlockSteps && (
+        <ol className="space-y-2 text-left font-inter text-sm leading-relaxed text-ink-soft">
+          {iosSafariMicUnlockSteps().map((step) => (
+            <li key={step} className="flex gap-2">
+              <span className="text-terracotta">·</span>
+              <span>{step}</span>
+            </li>
+          ))}
+        </ol>
+      )}
+
       {!micError && micStatus === "ready" && (
         <p className="font-inter text-sm italic text-ink-soft" role="status">
           Voice notes are ready.
@@ -59,22 +87,29 @@ export function MicPermissionCard({
           onClick={onEnable}
           className="w-full"
         >
-          {micStatus === "requesting" ? "Asking…" : "Enable microphone →"}
+          {micEnableButtonLabel(micStatus)}
         </PrimaryButton>
       )}
 
       {showFileFallback && onUsePhoneRecorder && (
-        <button
-          type="button"
-          disabled={disabled}
-          onClick={onUsePhoneRecorder}
-          className="font-inter text-sm text-terracotta underline decoration-terracotta/60 underline-offset-2 disabled:opacity-60"
-        >
-          {fileCaptureActionLabel()}
-        </button>
+        <div className="space-y-2">
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={onUsePhoneRecorder}
+            className="font-inter text-sm text-terracotta underline decoration-terracotta/60 underline-offset-2 disabled:opacity-60"
+          >
+            {fileCaptureActionLabel()}
+          </button>
+          {fileHelper && (
+            <p className="font-inter text-xs italic leading-relaxed text-ink-soft">
+              {fileHelper}
+            </p>
+          )}
+        </div>
       )}
 
-      {showFileFallback && !micError?.settingsHint && micSettingsHint() && (
+      {showFileFallback && !micError?.settingsHint && !showIosUnlockSteps && micSettingsHint() && (
         <p className="font-inter text-xs italic leading-relaxed text-ink-soft">
           {micSettingsHint()}
         </p>

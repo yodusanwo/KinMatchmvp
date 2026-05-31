@@ -5,6 +5,7 @@ import { canRecordInBrowser } from "@/lib/audio/mime-type";
 import {
   formatMicError,
   hasGetUserMedia,
+  probeMicPermission,
   requestMicAccess as requestMicAccessCore,
   type MicErrorInfo,
 } from "@/lib/audio/mic-permission";
@@ -82,6 +83,32 @@ export function useVoiceRecorder() {
       canUseWebRecorder:
         native || (hasGetUserMedia() && canRecordInBrowser()),
     }));
+
+    if (native) return;
+
+    void (async () => {
+      const probe = await probeMicPermission();
+      if (!probe) return;
+
+      if (probe.ok) {
+        setState((current) => ({
+          ...current,
+          micStatus: "ready",
+          micError: null,
+          error: null,
+          canUseWebRecorder: hasGetUserMedia() && canRecordInBrowser(),
+        }));
+        return;
+      }
+
+      setState((current) => ({
+        ...current,
+        micStatus:
+          probe.error.kind === "unsupported" ? "unsupported" : "blocked",
+        micError: probe.error,
+        error: formatMicError(probe.error),
+      }));
+    })();
   }, []);
 
   useEffect(() => {

@@ -42,8 +42,75 @@ export function insecureRecordingHint(): string {
   return "Open kin-matchmvp.vercel.app on your phone, or pick a recording below.";
 }
 
+export type MicPermissionState = "granted" | "denied" | "prompt" | "unknown";
+
+export function iosSafariMicUnlockSteps(): string[] {
+  return [
+    "Tap the aA button left of the address bar.",
+    "Tap Website Settings.",
+    "Set Microphone to Allow.",
+    "Reload this page, then tap Try again.",
+  ];
+}
+
+export function fileCaptureHelperText(): string | null {
+  if (isIOS() && !isNativeApp()) {
+    return "Safari can't record audio here. Record in Voice Memos first, then tap above and choose Choose File → Browse → Voice Memos.";
+  }
+  return null;
+}
+
+export async function queryMicPermissionState(): Promise<MicPermissionState> {
+  if (
+    typeof navigator === "undefined" ||
+    !isSecureRecordingContext() ||
+    !navigator.permissions?.query
+  ) {
+    return "unknown";
+  }
+
+  try {
+    const result = await navigator.permissions.query({
+      name: "microphone" as PermissionName,
+    });
+    if (
+      result.state === "granted" ||
+      result.state === "denied" ||
+      result.state === "prompt"
+    ) {
+      return result.state;
+    }
+    return "unknown";
+  } catch {
+    return "unknown";
+  }
+}
+
+export async function probeMicPermission(): Promise<MicAccessResult | null> {
+  if (isNativeApp()) return null;
+
+  const permissionState = await queryMicPermissionState();
+
+  if (permissionState === "granted") {
+    return { ok: true };
+  }
+
+  if (permissionState === "denied") {
+    return {
+      ok: false,
+      error: {
+        kind: "denied",
+        message: "Safari isn't allowed to use your mic yet.",
+        settingsHint: null,
+      },
+    };
+  }
+
+  return null;
+}
+
 export function fileCaptureActionLabel(): string {
-  return isIOS() ? "Pick a recording →" : "Use your phone's recorder →";
+  return isIOS() ? "Import from Voice Memos →" : "Use your phone's recorder →";
 }
 
 export function micSettingsHint(): string | null {
@@ -52,7 +119,7 @@ export function micSettingsHint(): string | null {
     return nativeMicSettingsHint();
   }
   if (isIOS()) {
-    return "Settings → Safari → Microphone → Allow for this site, then reload.";
+    return "Tap aA in the address bar → Website Settings → Microphone → Allow, then reload.";
   }
   return "Allow microphone access in your browser settings, then reload.";
 }
@@ -69,9 +136,9 @@ export function classifyMicError(err: unknown): MicErrorInfo {
         message: isNativeApp()
           ? "KinMatch needs microphone access."
           : isIOS()
-            ? "Safari blocked the microphone."
+            ? "Safari isn't allowed to use your mic yet."
             : "Your browser blocked the microphone.",
-        settingsHint: hint,
+        settingsHint: isIOS() && !isNativeApp() ? null : hint,
       };
     case "NotFoundError":
     case "DevicesNotFoundError":
