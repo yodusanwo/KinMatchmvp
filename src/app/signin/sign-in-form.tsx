@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
   Eyebrow,
   Headline,
@@ -40,6 +41,7 @@ export function SignInForm({
   nextPath = "/today",
   initialError = false,
 }: SignInFormProps) {
+  const router = useRouter();
   const authError = initialError;
   const finishingOnboarding = nextPath === "/onboarding/finish";
   const gettingStarted = isNewUserFlow(nextPath);
@@ -49,6 +51,41 @@ export function SignInForm({
     "idle"
   );
   const [message, setMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (status !== "sent") return;
+
+    const supabase = createClient();
+    let cancelled = false;
+
+    async function redirectIfSignedIn() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user && !cancelled) {
+        router.push(nextPath);
+        router.refresh();
+      }
+    }
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" && session && !cancelled) {
+        router.push(nextPath);
+        router.refresh();
+      }
+    });
+
+    void redirectIfSignedIn();
+    const interval = window.setInterval(() => void redirectIfSignedIn(), 2000);
+
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+      window.clearInterval(interval);
+    };
+  }, [status, nextPath, router]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -80,10 +117,10 @@ export function SignInForm({
         <Subhead>
           We emailed a sign-in link to <span className="text-ink">{email}</span>.
           {finishingOnboarding
-            ? " Click it to finish setup and open your Today view — no password needed."
+            ? " Click it to finish setup — this page will open when you do."
             : gettingStarted
-              ? " Click it to begin your reflection — no password needed."
-              : " Click it to continue — no password needed."}
+              ? " Click it to begin — this page will open when you do."
+              : " Click it to continue — this page will open when you do."}
         </Subhead>
         <button
           type="button"
