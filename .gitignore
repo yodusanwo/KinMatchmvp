@@ -52,3 +52,11 @@ android/local.properties
 
 # clerk configuration (can include secrets)
 /.clerk/
+
+# Python agent
+agent/venv/
+agent/.venv/
+agent/__pycache__/
+agent/*.pyc
+agent/.env
+agent/*.json
