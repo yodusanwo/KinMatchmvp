@@ -11,12 +11,12 @@ type TribeCircleGraphicProps = {
 };
 
 const CIRCLE_SLOTS: { top: string; left: string }[] = [
-  { top: "9%", left: "50%" },
-  { top: "34%", left: "20%" },
-  { top: "34%", left: "80%" },
-  { top: "71%", left: "32%" },
-  { top: "71%", left: "68%" },
-  { top: "52%", left: "50%" },
+  { top: "18%", left: "50%" },
+  { top: "40%", left: "20%" },
+  { top: "40%", left: "80%" },
+  { top: "74%", left: "32%" },
+  { top: "74%", left: "68%" },
+  { top: "57%", left: "50%" },
 ];
 
 function quietLabel(friend: FriendSummary) {
@@ -43,7 +43,7 @@ export function TribeCircleGraphic({
   return (
     <div
       className={cn(
-        "relative mx-auto h-[170px] w-full max-w-[320px] rounded-[2rem] border border-ink/[0.1] bg-cream-deep/35",
+        "relative mx-auto h-[200px] w-full max-w-[320px] rounded-[2rem] border border-ink/[0.1] bg-cream-deep/35",
         className
       )}
     >
