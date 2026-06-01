@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { Mic } from "lucide-react";
 import { MiniAvatar } from "@/components/onboarding/MiniAvatar";
 import { primaryButtonClassName } from "@/components/brand/primary-button-styles";
@@ -71,7 +72,7 @@ export function SendSpotlight({ state }: SendSpotlightProps) {
       </Link>
 
       <p className="mt-4 font-inter text-sm italic leading-relaxed text-ink">
-        “{question}”
+        &ldquo;{question}&rdquo;
       </p>
       <p className="mt-3 font-inter text-xs italic leading-relaxed text-ink-soft">
         {whyItWorks(state)}
@@ -99,12 +100,24 @@ export function SendSpotlight({ state }: SendSpotlightProps) {
 export function CaptureSpotlight({ state, onRefresh }: CaptureSpotlightProps) {
   const name = firstName(state.friend.name);
   const sentDaysAgo = daysSince(state.voice_note.created_at);
+  const [dismissing, setDismissing] = useState(false);
 
   async function skipCapture() {
+    setDismissing(true);
     await fetch(`/api/capture/${state.voice_note.id}/defer`, {
       method: "POST",
     });
     onRefresh();
+  }
+
+  if (dismissing) {
+    return (
+      <article className="rounded-3xl bg-cream-deep/80 p-4">
+        <p className="font-inter text-sm italic text-ink-soft">
+          Got it &mdash; see you tomorrow.
+        </p>
+      </article>
+    );
   }
 
   return (
@@ -125,11 +138,11 @@ export function CaptureSpotlight({ state, onRefresh }: CaptureSpotlightProps) {
 
       {state.original_question && (
         <p className="mt-4 font-inter text-sm italic leading-relaxed text-ink-soft">
-          You asked: “{state.original_question}”
+          You asked: &ldquo;{state.original_question}&rdquo;
         </p>
       )}
       <p className="mt-4 font-sans text-sm font-semibold leading-relaxed text-ink">
-        Anything to remember from their response?
+        Anything you want to remember about this?
       </p>
 
       <div className="mt-4 flex items-center gap-2">

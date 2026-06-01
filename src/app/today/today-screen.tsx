@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BrandBar, Eyebrow, Headline, Subhead } from "@/components/brand";
 import { AppShell } from "@/components/layout/AppShell";
@@ -48,25 +48,26 @@ export function TodayScreen() {
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
-  async function load() {
-      const result = await fetchJson<TodayResponse>("/api/today");
-      if (result.status === 401) {
-        router.replace("/signin?next=/today");
-        return;
-      }
-      if (!result.ok) {
-        setError(result.error);
-        setLoading(false);
-        return;
-      }
-      setData(result.data);
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    const result = await fetchJson<TodayResponse>("/api/today");
+    if (result.status === 401) {
+      router.replace("/signin?next=/today");
+      return;
+    }
+    if (!result.ok) {
+      setError(result.error);
       setLoading(false);
-  }
+      return;
+    }
+    setData(result.data);
+    setLoading(false);
+  }, [router]);
 
   useEffect(() => {
     void load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router]);
+  }, [load]);
 
   useEffect(() => {
     const storedToast = sessionStorage.getItem("kinmatch-toast");
@@ -104,10 +105,7 @@ export function TodayScreen() {
               state.kind === "capture" ? (
                 <CaptureSpotlight
                   state={state}
-                  onRefresh={() => {
-                    setLoading(true);
-                    void load();
-                  }}
+                  onRefresh={() => void load()}
                 />
               ) : (
                 <SendSpotlight state={state} />
