@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
   Eyebrow,
@@ -31,7 +30,7 @@ function friendlyAuthError(message: string): string {
     return "Too many sign-in emails sent recently. Wait about an hour, or set up custom SMTP in Supabase for higher limits.";
   }
   if (lower.includes("redirect") || lower.includes("url")) {
-    return "Sign-in link misconfigured. Check Supabase redirect URLs match your Vercel site.";
+    return "Sign-in link misconfigured. Check Supabase redirect URLs match your production domain.";
   }
   return message;
 }
@@ -41,7 +40,6 @@ export function SignInForm({
   nextPath = "/today",
   initialError = false,
 }: SignInFormProps) {
-  const router = useRouter();
   const authError = initialError;
   const finishingOnboarding = nextPath === "/onboarding/finish";
   const gettingStarted = isNewUserFlow(nextPath);
@@ -51,52 +49,6 @@ export function SignInForm({
     "idle"
   );
   const [message, setMessage] = useState<string | null>(null);
-
-  const devBypassEnabled =
-    process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS === "true";
-
-  async function handleDevBypass() {
-    const trimmed = email.trim();
-    if (!trimmed) {
-      setMessage("Enter your email above first.");
-      setStatus("error");
-      return;
-    }
-
-    setStatus("loading");
-    setMessage(null);
-
-    try {
-      const res = await fetch("/api/dev/sign-in", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: trimmed,
-          next: nextPath,
-          origin: window.location.origin,
-        }),
-      });
-      const data = (await res.json()) as {
-        ok?: boolean;
-        next?: string;
-        error?: string;
-      };
-      if (!res.ok || !data.ok) {
-        setStatus("error");
-        setMessage(
-          data.error === "Not available"
-            ? "Dev bypass is off on the server. Set NEXT_PUBLIC_DEV_AUTH_BYPASS=true in Vercel and redeploy."
-            : (data.error ?? "Dev sign-in failed")
-        );
-        return;
-      }
-      router.push(data.next ?? nextPath);
-      router.refresh();
-    } catch {
-      setStatus("error");
-      setMessage("Dev sign-in failed");
-    }
-  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -193,17 +145,6 @@ export function SignInForm({
       <PrimaryButton type="submit" disabled={status === "loading"}>
         {status === "loading" ? "Sending link…" : "Email me a sign-in link"}
       </PrimaryButton>
-
-      {devBypassEnabled && (
-        <button
-          type="button"
-          onClick={() => void handleDevBypass()}
-          disabled={status === "loading"}
-          className="w-full rounded-xl border border-dashed border-ink/25 py-3 font-inter text-sm text-ink-soft hover:border-terracotta/40 hover:text-ink"
-        >
-          Continue without email (dev only)
-        </button>
-      )}
 
       <p className="text-center">
         <TextLink href="/">← Back to welcome</TextLink>
