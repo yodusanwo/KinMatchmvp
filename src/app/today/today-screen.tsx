@@ -85,7 +85,7 @@ export function TodayScreen() {
   return (
     <AppShell>
       <BrandBar className="py-2" />
-      <div className="flex h-[calc(100dvh-49px)] flex-col overflow-hidden px-5 pb-20 pt-3">
+      <div className="flex min-h-[calc(100dvh-49px)] flex-col px-5 pb-28 pt-3">
         <Eyebrow>{dayLabel(state)}</Eyebrow>
         <Headline className="mt-1 text-[23px] leading-tight">
           {headlineForState(state)}
