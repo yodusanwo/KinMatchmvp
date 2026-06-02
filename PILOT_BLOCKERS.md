@@ -380,4 +380,12 @@ Before implementing this pivot:
 **Estimated effort:** 2-3 hours (proper investigation + implementation + testing 
 of share flow + capture pivot)
 
----
+**Related stale text observation (June 2, 2026 afternoon):**
+The "You haven't reached out to [Friend] yet" prompt text on the home screen 
+also doesn't refresh after a voice note is sent. This is the same root cause 
+as the capture pivot — no client-side state refresh after send. Both will be 
+fixed together when Fix 2 is properly designed and implemented post-contest.
+
+This is a UI display issue only. The agent's data layer is unaffected because 
+the backend correctly updates `friends.last_touch_at` and creates an 
+interactions row on voice note send (verified June 2 by Cursor investigation).

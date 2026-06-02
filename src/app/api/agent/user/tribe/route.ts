@@ -2,8 +2,12 @@
  * GET /api/agent/user/tribe
  *
  * Returns the authenticated user's active friends with the data needed for
- * relational care decisions, including memory_notes (emotional context) for
- * each friend.
+ * relational care decisions, including:
+ *   - Memory notes (emotional context)
+ *   - Voice note engagement statistics (listen signals)
+ *
+ * Listen signals enable the agent to reason about WHETHER friends engaged
+ * with the voice notes the user sent, not just WHEN they were sent.
  *
  * Authentication: Bearer token (agent) or cookies (browser).
  * RLS enforces user_id = auth.uid().
@@ -71,7 +75,25 @@ export async function GET(req: NextRequest) {
 
   if (notesError) {
     console.error("[agent-user-tribe] Memory notes query failed:", notesError);
-    // Don't fail the whole request — just return without notes
+  }
+
+  // Fetch voice note engagement stats per friend
+  // We query voice_notes where the friend is the recipient
+  const { data: voiceNotes, error: voiceNotesError } =
+    friendIds.length > 0
+      ? await supabase
+          .from("voice_notes")
+          .select("friend_id, listened_at, listen_count, created_at")
+          .in("friend_id", friendIds)
+          .order("created_at", { ascending: false })
+      : { data: [], error: null };
+
+  if (voiceNotesError) {
+    console.error(
+      "[agent-user-tribe] Voice notes query failed:",
+      voiceNotesError,
+    );
+    // Don't fail the whole request — listen stats are enrichment
   }
 
   // Group notes by friend_id
@@ -97,7 +119,71 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  // Compute days_quiet and enrich each friend with their notes
+  // Compute listen stats per friend
+  const listenStatsByFriend = new Map<
+    string,
+    {
+      total_voice_notes_sent_count: number;
+      voice_notes_listened_count: number;
+      last_voice_note_sent_at: string | null;
+      last_voice_note_listened_at: string | null;
+      engagement_status: "engaged" | "no_engagement" | "no_data";
+    }
+  >();
+
+  // Pre-initialize all friends with empty stats
+  for (const friendId of friendIds) {
+    listenStatsByFriend.set(friendId, {
+      total_voice_notes_sent_count: 0,
+      voice_notes_listened_count: 0,
+      last_voice_note_sent_at: null,
+      last_voice_note_listened_at: null,
+      engagement_status: "no_data",
+    });
+  }
+
+  // Aggregate voice note data per friend
+  for (const vn of voiceNotes ?? []) {
+    const stats = listenStatsByFriend.get(vn.friend_id);
+    if (!stats) continue;
+
+    stats.total_voice_notes_sent_count += 1;
+
+    if (vn.listened_at) {
+      stats.voice_notes_listened_count += 1;
+    }
+
+    // Track most recent sent timestamp
+    if (
+      vn.created_at &&
+      (!stats.last_voice_note_sent_at ||
+        vn.created_at > stats.last_voice_note_sent_at)
+    ) {
+      stats.last_voice_note_sent_at = vn.created_at;
+    }
+
+    // Track most recent listened timestamp
+    if (
+      vn.listened_at &&
+      (!stats.last_voice_note_listened_at ||
+        vn.listened_at > stats.last_voice_note_listened_at)
+    ) {
+      stats.last_voice_note_listened_at = vn.listened_at;
+    }
+  }
+
+  // Compute engagement_status based on aggregated data
+  for (const [friendId, stats] of listenStatsByFriend.entries()) {
+    if (stats.total_voice_notes_sent_count === 0) {
+      stats.engagement_status = "no_data";
+    } else if (stats.voice_notes_listened_count > 0) {
+      stats.engagement_status = "engaged";
+    } else {
+      stats.engagement_status = "no_engagement";
+    }
+  }
+
+  // Compute days_quiet and enrich each friend
   const now = Date.now();
   const enrichedFriends = (friends ?? []).map((friend) => {
     const daysQuiet = friend.last_touch_at
@@ -108,6 +194,22 @@ export async function GET(req: NextRequest) {
       : null;
 
     const friendNotes = notesByFriend.get(friend.id) ?? [];
+    const friendListenStats = listenStatsByFriend.get(friend.id) ?? {
+      total_voice_notes_sent_count: 0,
+      voice_notes_listened_count: 0,
+      last_voice_note_sent_at: null,
+      last_voice_note_listened_at: null,
+      engagement_status: "no_data" as const,
+    };
+
+    // Compute days_since_listen (helpful derived field)
+    const daysSinceLisen = friendListenStats.last_voice_note_listened_at
+      ? Math.floor(
+          (now -
+            new Date(friendListenStats.last_voice_note_listened_at).getTime()) /
+            (1000 * 60 * 60 * 24),
+        )
+      : null;
 
     return {
       friend_id: friend.id,
@@ -121,10 +223,19 @@ export async function GET(req: NextRequest) {
       days_quiet: daysQuiet,
       in_tribe: friend.in_tribe,
       is_wished_closer: friend.is_wished_closer,
-      // Notes: emotional context the user has captured about this friend.
-      // Most recent first. Agent uses these for tone-aware decisions.
+      // Memory notes: emotional context
       notes: friendNotes,
       notes_count: friendNotes.length,
+      // Listen signals: engagement data
+      engagement: {
+        total_voice_notes_sent: friendListenStats.total_voice_notes_sent_count,
+        voice_notes_listened: friendListenStats.voice_notes_listened_count,
+        last_voice_note_sent_at: friendListenStats.last_voice_note_sent_at,
+        last_voice_note_listened_at:
+          friendListenStats.last_voice_note_listened_at,
+        days_since_listen: daysSinceLisen,
+        status: friendListenStats.engagement_status,
+      },
     };
   });
 
