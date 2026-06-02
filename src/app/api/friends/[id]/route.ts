@@ -99,11 +99,10 @@ export async function GET(_request: Request, context: RouteContext) {
   const { data: friend, error: friendError } = await supabase
     .from("friends")
     .select(
-      "id, name, avatar_color, vibe, category, cadence_days, last_touch_at, created_at, where_met, phone_number, is_wished_closer"
+      "id, name, avatar_color, vibe, category, cadence_days, last_touch_at, created_at, where_met, phone_number, is_wished_closer, archived_at"
     )
     .eq("id", id)
     .eq("user_id", user.id)
-    .is("archived_at", null)
     .maybeSingle();
 
   if (friendError) {
@@ -179,6 +178,7 @@ export async function GET(_request: Request, context: RouteContext) {
     is_wished_closer: row.is_wished_closer,
     cadence_label: cadenceLabel(row.cadence_days),
     vibe_label: categoryRelationshipLabel(category),
+    archived_at: row.archived_at,
     memories: (memoriesRes.data ?? []).map(mapMemoryNoteRow),
     shared_interests: interestsRes.data ?? [],
     rituals: ritualsRes.data ?? [],
