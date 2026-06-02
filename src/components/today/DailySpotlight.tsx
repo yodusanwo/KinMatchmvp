@@ -20,7 +20,9 @@ type CaptureSpotlightProps = {
 
 function cadenceStatus(friend: SendSpotlightProps["state"]["friend"]) {
   if (!friend.last_touch_at) return "not reached out yet";
-  if (friend.days_quiet === 0) return "reached out today";
+  // Changed from "reached out today" to "today" to avoid implying inbound communication
+  // KinMatch can only track outbound interactions (voice notes sent through the app)
+  if (friend.days_quiet === 0) return "today";
   if (friend.days_quiet === 1) return "1 day quiet";
   return `${friend.days_quiet} days quiet`;
 }
