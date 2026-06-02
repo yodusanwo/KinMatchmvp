@@ -383,7 +383,7 @@ export function ProfileScreen({
                   Set up voice notes
                 </h3>
                 <p className={mutedHelperClassName}>
-                  We'll ask for mic access so you can record voice notes for
+                  We&apos;ll ask for mic access so you can record voice notes for
                   your people.
                 </p>
 
