@@ -178,7 +178,7 @@ export async function GET(_request: Request, context: RouteContext) {
     is_wished_closer: row.is_wished_closer,
     cadence_label: cadenceLabel(row.cadence_days),
     vibe_label: categoryRelationshipLabel(category),
-    archived_at: row.archived_at,
+    archived_at: row.archived_at ?? null,
     memories: (memoriesRes.data ?? []).map(mapMemoryNoteRow),
     shared_interests: interestsRes.data ?? [],
     rituals: ritualsRes.data ?? [],

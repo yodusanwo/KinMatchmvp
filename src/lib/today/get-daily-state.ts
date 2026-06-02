@@ -110,6 +110,7 @@ function toSummary(friend: FriendContextRow | FriendRow): FriendSummary {
     days_quiet: quiet,
     is_drifting: isDrifting(friend),
     last_touch_at: friend.last_touch_at,
+    archived_at: friend.archived_at ?? null,
   };
 }
 
