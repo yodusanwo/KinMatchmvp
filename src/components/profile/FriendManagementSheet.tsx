@@ -1,6 +1,6 @@
 "use client";
 
-import { Circle, CircleDot, Trash2, Users } from "lucide-react";
+import { Archive, Circle, CircleDot, Users } from "lucide-react";
 import type { FriendCategory, FriendProfile } from "@/lib/api/types";
 import {
   categoryActionLabel,
@@ -9,13 +9,13 @@ import {
 
 type FriendManagementSheetProps = {
   open: boolean;
-  mode: "actions" | "confirm-remove";
+  mode: "actions" | "confirm-archive";
   friend: Pick<FriendProfile, "name" | "category">;
   saving?: boolean;
   onClose: () => void;
   onRecategorize: (category: FriendCategory) => void;
-  onStartRemove: () => void;
-  onConfirmRemove: () => void;
+  onStartArchive: () => void;
+  onConfirmArchive: () => void;
 };
 
 const CATEGORY_ICONS: Record<FriendCategory, typeof Circle> = {
@@ -35,8 +35,8 @@ export function FriendManagementSheet({
   saving = false,
   onClose,
   onRecategorize,
-  onStartRemove,
-  onConfirmRemove,
+  onStartArchive,
+  onConfirmArchive,
 }: FriendManagementSheetProps) {
   if (!open) return null;
 
@@ -78,13 +78,13 @@ export function FriendManagementSheet({
 
             <button
               type="button"
-              onClick={onStartRemove}
+              onClick={onStartArchive}
               disabled={saving}
               className="flex w-full items-center gap-4 rounded-xl px-4 py-3.5 text-left transition-colors hover:bg-ink/[0.04] disabled:opacity-50"
             >
-              <Trash2 className="h-4 w-4 text-terracotta-deep" aria-hidden />
+              <Archive className="h-4 w-4 text-terracotta-deep" aria-hidden />
               <span className="font-sans text-base font-semibold text-terracotta-deep">
-                Remove from KinMatch
+                Archive {name}
               </span>
             </button>
 
@@ -101,24 +101,20 @@ export function FriendManagementSheet({
         ) : (
           <div className="space-y-4 text-center">
             <h2 className="font-sans text-xl font-medium text-ink">
-              Remove {name} from KinMatch?
+              Archive {name}?
             </h2>
             <p className="font-inter text-xs italic leading-[1.5] text-[rgba(31,26,20,0.75)]">
-              This will hide {name}&apos;s profile and the notes you&apos;ve
-              saved about them. KinMatch will no longer suggest reaching out to
-              them.
-            </p>
-            <p className="font-inter text-[11px] italic leading-[1.5] text-[rgba(31,26,20,0.55)]">
-              Voice notes you&apos;ve already sent will remain on their share
-              links — only your profile data is hidden.
+              Archiving hides {name}&apos;s profile and notes from your active
+              tribe. You can restore them anytime from the archived section.
+              Their voice notes and shared links remain unchanged.
             </p>
             <button
               type="button"
-              onClick={onConfirmRemove}
+              onClick={onConfirmArchive}
               disabled={saving}
               className="w-full rounded-full bg-terracotta-deep px-6 py-3.5 font-sans text-sm font-semibold text-cream disabled:opacity-50"
             >
-              {saving ? "Removing…" : `Remove ${name}`}
+              {saving ? "Archiving…" : `Archive ${name}`}
             </button>
             <button
               type="button"

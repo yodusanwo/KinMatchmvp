@@ -45,7 +45,7 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
     MemoryCategory | undefined
   >(undefined);
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [sheetMode, setSheetMode] = useState<"actions" | "confirm-remove">(
+  const [sheetMode, setSheetMode] = useState<"actions" | "confirm-archive">(
     "actions"
   );
   const [savingAction, setSavingAction] = useState(false);
@@ -140,16 +140,16 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
       };
 
       if (!response.ok) {
-        throw new Error(data.error ?? "Couldn't remove — try again");
+        throw new Error(data.error ?? "Couldn't archive — try again");
       }
 
       sessionStorage.setItem(
         "kinmatch-toast",
-        `${firstName(friend.name)} removed from your tribe.`
+        `${firstName(friend.name)} archived.`
       );
       router.replace("/today");
     } catch (err) {
-      showToast(err instanceof Error ? err.message : "Couldn't remove — try again");
+      showToast(err instanceof Error ? err.message : "Couldn't archive — try again");
       setSavingAction(false);
     }
   }
@@ -289,8 +289,8 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
           setSheetMode("actions");
         }}
         onRecategorize={(category) => void handleRecategorize(category)}
-        onStartRemove={() => setSheetMode("confirm-remove")}
-        onConfirmRemove={() => void handleArchive()}
+        onStartArchive={() => setSheetMode("confirm-archive")}
+        onConfirmArchive={() => void handleArchive()}
       />
     </AppShell>
   );
