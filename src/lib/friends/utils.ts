@@ -11,6 +11,7 @@ export type FriendRow = {
   last_touch_at: string | null;
   created_at: string;
   is_wished_closer?: boolean;
+  archived_at?: string | null;
 };
 
 export function daysQuiet(friend: Pick<FriendRow, "last_touch_at" | "created_at">): number {
