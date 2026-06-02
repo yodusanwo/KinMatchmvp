@@ -416,7 +416,7 @@ export function ProfileScreen({
                             </ol>
                           ) : (
                             <p className="font-inter text-[13px] text-ink">
-                              Open your browser's site settings and allow
+                              Open your browser&apos;s site settings and allow
                               microphone access for this site.
                             </p>
                           )}
