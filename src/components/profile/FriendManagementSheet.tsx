@@ -1,6 +1,6 @@
 "use client";
 
-import { Archive, Circle, CircleDot, Users } from "lucide-react";
+import { Archive, Circle, CircleDot, RotateCcw, Trash2, Users } from "lucide-react";
 import type { FriendCategory, FriendProfile } from "@/lib/api/types";
 import {
   categoryActionLabel,
@@ -9,13 +9,16 @@ import {
 
 type FriendManagementSheetProps = {
   open: boolean;
-  mode: "actions" | "confirm-archive";
-  friend: Pick<FriendProfile, "name" | "category">;
+  mode: "actions" | "confirm-archive" | "confirm-delete";
+  friend: Pick<FriendProfile, "name" | "category"> & { archived_at?: string | null };
   saving?: boolean;
   onClose: () => void;
   onRecategorize: (category: FriendCategory) => void;
   onStartArchive: () => void;
   onConfirmArchive: () => void;
+  onRestore?: () => void;
+  onStartDelete?: () => void;
+  onConfirmDelete?: () => void;
 };
 
 const CATEGORY_ICONS: Record<FriendCategory, typeof Circle> = {
@@ -37,6 +40,9 @@ export function FriendManagementSheet({
   onRecategorize,
   onStartArchive,
   onConfirmArchive,
+  onRestore,
+  onStartDelete,
+  onConfirmDelete,
 }: FriendManagementSheetProps) {
   if (!open) return null;
 
@@ -44,6 +50,7 @@ export function FriendManagementSheet({
   const availableCategories = FRIEND_CATEGORIES.filter(
     (category) => category !== friend.category
   );
+  const isArchived = !!friend.archived_at;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/35 px-3 pb-3">
@@ -54,39 +61,71 @@ export function FriendManagementSheet({
               about {name}
             </p>
 
-            <div className="space-y-1">
-              {availableCategories.map((category) => {
-                const Icon = CATEGORY_ICONS[category];
-                return (
-                  <button
-                    key={category}
-                    type="button"
-                    onClick={() => onRecategorize(category)}
-                    disabled={saving}
-                    className="flex w-full items-center gap-4 rounded-xl px-4 py-3.5 text-left transition-colors hover:bg-ink/[0.04] disabled:opacity-50"
-                  >
-                    <Icon className="h-4 w-4 text-ink-soft" aria-hidden />
-                    <span className="font-sans text-base font-semibold text-ink">
-                      Move to {categoryActionLabel(category)}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+            {isArchived ? (
+              <>
+                <button
+                  type="button"
+                  onClick={onRestore}
+                  disabled={saving}
+                  className="flex w-full items-center gap-4 rounded-xl px-4 py-3.5 text-left transition-colors hover:bg-ink/[0.04] disabled:opacity-50"
+                >
+                  <RotateCcw className="h-4 w-4 text-ink-soft" aria-hidden />
+                  <span className="font-sans text-base font-semibold text-ink">
+                    Restore to active tribe
+                  </span>
+                </button>
 
-            <div className="my-4 h-px bg-ink/[0.12]" />
+                <div className="my-4 h-px bg-ink/[0.12]" />
 
-            <button
-              type="button"
-              onClick={onStartArchive}
-              disabled={saving}
-              className="flex w-full items-center gap-4 rounded-xl px-4 py-3.5 text-left transition-colors hover:bg-ink/[0.04] disabled:opacity-50"
-            >
-              <Archive className="h-4 w-4 text-terracotta-deep" aria-hidden />
-              <span className="font-sans text-base font-semibold text-terracotta-deep">
-                Archive {name}
-              </span>
-            </button>
+                <button
+                  type="button"
+                  onClick={onStartDelete}
+                  disabled={saving}
+                  className="flex w-full items-center gap-4 rounded-xl px-4 py-3.5 text-left transition-colors hover:bg-ink/[0.04] disabled:opacity-50"
+                >
+                  <Trash2 className="h-4 w-4 text-terracotta-deep" aria-hidden />
+                  <span className="font-sans text-base font-semibold text-terracotta-deep">
+                    Delete permanently
+                  </span>
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="space-y-1">
+                  {availableCategories.map((category) => {
+                    const Icon = CATEGORY_ICONS[category];
+                    return (
+                      <button
+                        key={category}
+                        type="button"
+                        onClick={() => onRecategorize(category)}
+                        disabled={saving}
+                        className="flex w-full items-center gap-4 rounded-xl px-4 py-3.5 text-left transition-colors hover:bg-ink/[0.04] disabled:opacity-50"
+                      >
+                        <Icon className="h-4 w-4 text-ink-soft" aria-hidden />
+                        <span className="font-sans text-base font-semibold text-ink">
+                          Move to {categoryActionLabel(category)}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="my-4 h-px bg-ink/[0.12]" />
+
+                <button
+                  type="button"
+                  onClick={onStartArchive}
+                  disabled={saving}
+                  className="flex w-full items-center gap-4 rounded-xl px-4 py-3.5 text-left transition-colors hover:bg-ink/[0.04] disabled:opacity-50"
+                >
+                  <Archive className="h-4 w-4 text-terracotta-deep" aria-hidden />
+                  <span className="font-sans text-base font-semibold text-terracotta-deep">
+                    Archive {name}
+                  </span>
+                </button>
+              </>
+            )}
 
             <div className="my-4 h-px bg-ink/[0.12]" />
 
@@ -98,6 +137,33 @@ export function FriendManagementSheet({
               Cancel
             </button>
           </>
+        ) : mode === "confirm-delete" ? (
+          <div className="space-y-4 text-center">
+            <h2 className="font-sans text-xl font-medium text-ink">
+              Delete {name} permanently?
+            </h2>
+            <p className="font-inter text-xs italic leading-[1.5] text-[rgba(31,26,20,0.75)]">
+              This permanently deletes {name}&apos;s profile, all memory notes
+              you&apos;ve saved about them, and their voice notes. This cannot
+              be undone.
+            </p>
+            <button
+              type="button"
+              onClick={onConfirmDelete}
+              disabled={saving}
+              className="w-full rounded-full bg-terracotta-deep px-6 py-3.5 font-sans text-sm font-semibold text-cream disabled:opacity-50"
+            >
+              {saving ? "Deleting…" : `Delete permanently`}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={saving}
+              className="w-full rounded-full border border-ink/[0.2] px-6 py-3.5 font-sans text-sm font-semibold text-ink"
+            >
+              Cancel
+            </button>
+          </div>
         ) : (
           <div className="space-y-4 text-center">
             <h2 className="font-sans text-xl font-medium text-ink">

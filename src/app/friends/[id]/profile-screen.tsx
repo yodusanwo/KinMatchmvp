@@ -45,9 +45,9 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
     MemoryCategory | undefined
   >(undefined);
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [sheetMode, setSheetMode] = useState<"actions" | "confirm-archive">(
-    "actions"
-  );
+  const [sheetMode, setSheetMode] = useState<
+    "actions" | "confirm-archive" | "confirm-delete"
+  >("actions");
   const [savingAction, setSavingAction] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
@@ -150,6 +150,65 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
       router.replace("/today");
     } catch (err) {
       showToast(err instanceof Error ? err.message : "Couldn't archive — try again");
+      setSavingAction(false);
+    }
+  }
+
+  async function handleRestore() {
+    if (!friend || savingAction) return;
+    setSavingAction(true);
+    setSheetOpen(false);
+
+    try {
+      const response = await fetch(`/api/friends/${friend.id}/restore`, {
+        method: "POST",
+      });
+      const data = (await response.json().catch(() => ({}))) as {
+        error?: string;
+        category?: FriendCategory;
+      };
+
+      if (!response.ok) {
+        throw new Error(data.error ?? "Couldn't restore — try again");
+      }
+
+      const category = data.category ?? friend.category;
+      sessionStorage.setItem(
+        "kinmatch-toast",
+        `${firstName(friend.name)} restored to ${categoryToastLabel(category)}. Tap to change.`
+      );
+      sessionStorage.setItem("kinmatch-toast-action", "change-category");
+      sessionStorage.setItem("kinmatch-toast-friend-id", friend.id);
+      router.replace("/tribe");
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "Couldn't restore — try again");
+      setSavingAction(false);
+    }
+  }
+
+  async function handleDelete() {
+    if (!friend || savingAction) return;
+    setSavingAction(true);
+
+    try {
+      const response = await fetch(`/api/friends/${friend.id}/delete`, {
+        method: "DELETE",
+      });
+      const data = (await response.json().catch(() => ({}))) as {
+        error?: string;
+      };
+
+      if (!response.ok) {
+        throw new Error(data.error ?? "Couldn't delete — try again");
+      }
+
+      sessionStorage.setItem(
+        "kinmatch-toast",
+        `${firstName(friend.name)} permanently deleted.`
+      );
+      router.replace("/tribe");
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "Couldn't delete — try again");
       setSavingAction(false);
     }
   }
@@ -291,6 +350,9 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
         onRecategorize={(category) => void handleRecategorize(category)}
         onStartArchive={() => setSheetMode("confirm-archive")}
         onConfirmArchive={() => void handleArchive()}
+        onRestore={() => void handleRestore()}
+        onStartDelete={() => setSheetMode("confirm-delete")}
+        onConfirmDelete={() => void handleDelete()}
       />
     </AppShell>
   );

@@ -23,7 +23,9 @@ type FriendInsertRow = {
   created_at: string;
 };
 
-type FriendListRow = FriendInsertRow;
+type FriendListRow = FriendInsertRow & {
+  archived_at: string | null;
+};
 
 function normalizeName(name: string) {
   return name.trim().replace(/\s+/g, " ").toLowerCase();
@@ -41,6 +43,7 @@ function toSummary(friend: FriendListRow): FriendSummary {
     days_quiet: daysQuiet(friend),
     is_drifting: isDrifting(friend),
     last_touch_at: friend.last_touch_at,
+    archived_at: friend.archived_at,
   };
 }
 
@@ -57,10 +60,9 @@ export async function GET() {
 
   const { data, error } = await supabase
     .from("friends")
-    .select("id, name, phone_number, avatar_color, vibe, category, cadence_days, last_touch_at, created_at")
+    .select("id, name, phone_number, avatar_color, vibe, category, cadence_days, last_touch_at, created_at, archived_at")
     .eq("user_id", user.id)
     .eq("in_tribe", true)
-    .is("archived_at", null)
     .order("last_touch_at", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: true });
 
@@ -151,8 +153,8 @@ export async function POST(req: NextRequest) {
       is_wished_closer: false,
       in_tribe: true,
     })
-    .select("id, name, phone_number, avatar_color, vibe, category, cadence_days, last_touch_at, created_at")
-    .single<FriendInsertRow>();
+    .select("id, name, phone_number, avatar_color, vibe, category, cadence_days, last_touch_at, created_at, archived_at")
+    .single<FriendListRow>();
 
   if (error || !friend) {
     return NextResponse.json(

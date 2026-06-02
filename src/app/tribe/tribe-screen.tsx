@@ -44,6 +44,16 @@ function quietLabel(friend: FriendSummary) {
   return `${friend.days_quiet}d quiet`;
 }
 
+function archivedDaysAgo(archivedAt: string) {
+  const archived = new Date(archivedAt);
+  const now = new Date();
+  const diffMs = now.getTime() - archived.getTime();
+  const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  if (days === 0) return "archived today";
+  if (days === 1) return "archived 1 day ago";
+  return `archived ${days} days ago`;
+}
+
 export function TribeScreen() {
   const router = useRouter();
   const [friends, setFriends] = useState<FriendSummary[]>([]);
@@ -57,6 +67,10 @@ export function TribeScreen() {
   const [addError, setAddError] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
   const [showAcquaintances, setShowAcquaintances] = useState(false);
+  const [showArchived, setShowArchived] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+  const [toastClickable, setToastClickable] = useState(false);
+  const [toastFriendId, setToastFriendId] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -72,14 +86,40 @@ export function TribeScreen() {
       }
       setFriends(result.data.friends);
       setLoading(false);
+
+      // Check for restoration toast
+      const toastMsg = sessionStorage.getItem("kinmatch-toast");
+      const toastAction = sessionStorage.getItem("kinmatch-toast-action");
+      const friendId = sessionStorage.getItem("kinmatch-toast-friend-id");
+      if (toastMsg) {
+        sessionStorage.removeItem("kinmatch-toast");
+        sessionStorage.removeItem("kinmatch-toast-action");
+        sessionStorage.removeItem("kinmatch-toast-friend-id");
+        setToast(toastMsg);
+        setToastClickable(toastAction === "change-category");
+        setToastFriendId(friendId);
+        setTimeout(() => {
+          setToast(null);
+          setToastClickable(false);
+          setToastFriendId(null);
+        }, 5000);
+      }
     }
     void load();
   }, [router]);
 
-  const tribeCount = friends.length;
-  const innerCircle = friends.filter((friend) => friend.category === "inner_circle");
-  const village = friends.filter((friend) => friend.category === "village");
-  const acquaintances = friends.filter(
+  function handleToastClick() {
+    if (toastClickable && toastFriendId) {
+      router.push(`/friends/${toastFriendId}`);
+    }
+  }
+
+  const activeFriends = friends.filter((friend) => !friend.archived_at);
+  const archivedFriends = friends.filter((friend) => !!friend.archived_at);
+  const tribeCount = activeFriends.length;
+  const innerCircle = activeFriends.filter((friend) => friend.category === "inner_circle");
+  const village = activeFriends.filter((friend) => friend.category === "village");
+  const acquaintances = activeFriends.filter(
     (friend) => friend.category === "acquaintance"
   );
 
@@ -201,6 +241,33 @@ export function TribeScreen() {
                     />
                   )}
                 </section>
+
+                {archivedFriends.length > 0 && (
+                  <section>
+                    <div className="flex items-center justify-between gap-3">
+                      <Eyebrow>archived · {archivedFriends.length}</Eyebrow>
+                      <button
+                        type="button"
+                        onClick={() => setShowArchived((value) => !value)}
+                        className="font-inter text-[11px] text-terracotta underline decoration-terracotta/60 underline-offset-2"
+                      >
+                        {showArchived ? "hide" : "show"}
+                      </button>
+                    </div>
+                    <p className="mt-1 font-inter text-[10px] italic text-[rgba(31,26,20,0.45)]">
+                      Hidden from active tribe. Tap to restore.
+                    </p>
+                    {showArchived && (
+                      <FriendGrid
+                        friends={archivedFriends}
+                        avatarSize={32}
+                        avatarTextSize={10}
+                        className="mt-4"
+                        isArchived
+                      />
+                    )}
+                  </section>
+                )}
               </>
             )}
 
@@ -285,6 +352,16 @@ export function TribeScreen() {
             )}
           </div>
         )}
+
+        {toast && (
+          <button
+            type="button"
+            onClick={handleToastClick}
+            className={`fixed bottom-24 left-1/2 z-50 w-[calc(100%-40px)] max-w-[420px] -translate-x-1/2 rounded-full bg-ink px-4 py-3 text-center font-inter text-sm italic text-cream shadow-lg ${toastClickable ? "cursor-pointer hover:bg-ink/90" : "cursor-default"}`}
+          >
+            {toast}
+          </button>
+        )}
       </div>
       <BottomNav />
     </AppShell>
@@ -332,12 +409,14 @@ function FriendGrid({
   avatarTextSize,
   halo = false,
   className,
+  isArchived = false,
 }: {
   friends: FriendSummary[];
   avatarSize: number;
   avatarTextSize: number;
   halo?: boolean;
   className?: string;
+  isArchived?: boolean;
 }) {
   return (
     <div className={`flex flex-wrap justify-center gap-x-[18px] gap-y-5 ${className ?? ""}`}>
@@ -345,29 +424,42 @@ function FriendGrid({
         <Link
           key={friend.id}
           href={`/friends/${friend.id}`}
-          className="flex w-[58px] flex-col items-center text-center"
+          className={`flex w-[58px] flex-col items-center text-center ${isArchived ? "opacity-50" : ""}`}
         >
-          <span
-            className="flex items-center justify-center rounded-full font-sans font-semibold text-cream"
-            style={{
-              width: avatarSize,
-              height: avatarSize,
-              backgroundColor: categoryColor(friend),
-              fontSize: avatarTextSize,
-              boxShadow: halo
-                ? "0 0 0 1.5px #F2EAD9, 0 0 0 3px rgba(31,26,20,0.18)"
-                : undefined,
-            }}
-          >
-            {initials(friend.name)}
-          </span>
+          <div className="relative">
+            <span
+              className="flex items-center justify-center rounded-full font-sans font-semibold text-cream"
+              style={{
+                width: avatarSize,
+                height: avatarSize,
+                backgroundColor: categoryColor(friend),
+                fontSize: avatarTextSize,
+                boxShadow: halo
+                  ? "0 0 0 1.5px #F2EAD9, 0 0 0 3px rgba(31,26,20,0.18)"
+                  : undefined,
+              }}
+            >
+              {initials(friend.name)}
+            </span>
+            {isArchived && (
+              <span className="absolute bottom-0 right-0 rounded-full bg-ink/80 px-1.5 py-0.5 font-sans text-[7px] font-semibold uppercase tracking-wider text-cream">
+                archived
+              </span>
+            )}
+          </div>
           <span className="mt-2 truncate font-sans text-[10px] font-medium text-ink">
             {firstName(friend.name)}
           </span>
-          {quietLabel(friend) && (
+          {isArchived && friend.archived_at ? (
             <span className="mt-0.5 font-inter text-[9px] text-[rgba(31,26,20,0.5)]">
-              {quietLabel(friend)}
+              {archivedDaysAgo(friend.archived_at)}
             </span>
+          ) : (
+            quietLabel(friend) && (
+              <span className="mt-0.5 font-inter text-[9px] text-[rgba(31,26,20,0.5)]">
+                {quietLabel(friend)}
+              </span>
+            )
           )}
         </Link>
       ))}

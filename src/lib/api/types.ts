@@ -12,6 +12,7 @@ export type FriendSummary = {
   is_drifting: boolean;
   last_touch_at: string | null;
   phone_number?: string | null;
+  archived_at: string | null;
 };
 
 export type FriendCategory = "inner_circle" | "village" | "acquaintance";
