@@ -16,6 +16,12 @@ import { BottomNav } from "@/components/nav/BottomNav";
 import { FriendContactInfoSection } from "@/components/profile/FriendContactInfoSection";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/cn";
+import {
+  hasGetUserMedia,
+  iosSafariUnlockSteps,
+  isIOS,
+  requestMicAccess,
+} from "@/lib/audio/mic-permission";
 
 type EmailPreferences = {
   daily_checkin_enabled: boolean;
@@ -31,6 +37,13 @@ type ProfileScreenProps = {
 };
 
 type PreferenceField = keyof EmailPreferences;
+
+type MicStatusLocal =
+  | "idle"
+  | "requesting"
+  | "ready"
+  | "blocked"
+  | "unsupported";
 
 const PREFERENCES: {
   field: PreferenceField;
@@ -99,6 +112,8 @@ export function ProfileScreen({
   });
   const [prefError, setPrefError] = useState<string | null>(null);
   const [contactNotice, setContactNotice] = useState<string | null>(null);
+  const [micStatus, setMicStatus] = useState<MicStatusLocal>("idle");
+  const [micMessage, setMicMessage] = useState<string | null>(null);
   const nameMessageTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null
   );
@@ -224,6 +239,34 @@ export function ProfileScreen({
     }
   }
 
+  async function requestMicrophone() {
+    setMicMessage(null);
+
+    if (!hasGetUserMedia()) {
+      setMicStatus("unsupported");
+      setMicMessage(
+        "This browser can't set up voice notes here. You can still continue."
+      );
+      return false;
+    }
+
+    setMicStatus("requesting");
+
+    const result = await requestMicAccess();
+    if (result.ok) {
+      result.stream.getTracks().forEach((track) => track.stop());
+      setMicStatus("ready");
+      setMicMessage("Voice notes are ready.");
+      return true;
+    }
+
+    setMicStatus(
+      result.error.kind === "unsupported" ? "unsupported" : "blocked"
+    );
+    setMicMessage(result.error.message);
+    return false;
+  }
+
   async function handleSignOut() {
     setSigningOut(true);
     const supabase = createClient();
@@ -329,6 +372,74 @@ export function ProfileScreen({
                   </button>
                 );
               })}
+
+              <div className="border-t border-ink/[0.08] pt-4">
+                <p className="font-sans text-[11px] font-medium uppercase tracking-[0.12em] text-ink-soft">
+                  voice notes
+                </p>
+              </div>
+              <div className="space-y-3">
+                <h3 className="font-inter text-sm font-medium text-ink">
+                  Set up voice notes
+                </h3>
+                <p className={mutedHelperClassName}>
+                  We'll ask for mic access so you can record voice notes for
+                  your people.
+                </p>
+
+                {micStatus === "ready" && micMessage && (
+                  <div className="rounded-xl bg-cream-deep/45 p-3">
+                    <p className="font-inter text-sm text-[#2D5016]">
+                      {micMessage}
+                    </p>
+                  </div>
+                )}
+
+                {(micStatus === "blocked" || micStatus === "unsupported") &&
+                  micMessage && (
+                    <div className="space-y-3 rounded-xl border border-terracotta/20 bg-terracotta/[0.03] p-4">
+                      <p className="font-inter text-sm text-terracotta">
+                        {micMessage}
+                      </p>
+                      {micStatus === "blocked" && (
+                        <div className="space-y-2 rounded-xl bg-cream p-4">
+                          <p className="font-inter text-[13px] font-medium text-ink">
+                            {isIOS()
+                              ? "To enable the mic:"
+                              : "To fix this:"}
+                          </p>
+                          {isIOS() ? (
+                            <ol className="ml-4 list-decimal space-y-1 font-inter text-[13px] text-ink">
+                              {iosSafariUnlockSteps().map((step, i) => (
+                                <li key={i}>{step}</li>
+                              ))}
+                            </ol>
+                          ) : (
+                            <p className="font-inter text-[13px] text-ink">
+                              Open your browser's site settings and allow
+                              microphone access for this site.
+                            </p>
+                          )}
+                          <p className={`mt-2 ${mutedHelperClassName}`}>
+                            Or skip — you can text your people instead.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                <PrimaryButton
+                  type="button"
+                  onClick={() => void requestMicrophone()}
+                  disabled={micStatus === "requesting"}
+                >
+                  {micStatus === "requesting"
+                    ? "Requesting access…"
+                    : micStatus === "blocked"
+                      ? "Try again →"
+                      : "Set up voice notes →"}
+                </PrimaryButton>
+              </div>
             </>
           )}
         </dl>
