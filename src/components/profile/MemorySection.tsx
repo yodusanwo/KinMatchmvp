@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { MemoryCategory, MemoryNote } from "@/lib/api/types";
 import {
   MEMORY_CATEGORIES,
@@ -9,6 +9,8 @@ import {
 } from "@/lib/memories/categories";
 import { cn } from "@/lib/cn";
 import { Plus } from "lucide-react";
+import { MemoryCategoryFilters } from "./MemoryCategoryFilters";
+import { MemorySearchInput } from "./MemorySearchInput";
 
 type MemorySectionProps = {
   friendName: string;
@@ -28,22 +30,61 @@ export function MemorySection({
   showAddControls = true,
 }: MemorySectionProps) {
   const name = firstName(friendName);
+  const [expandedCategories, setExpandedCategories] = useState<Set<MemoryCategory>>(new Set());
+  const [activeFilters, setActiveFilters] = useState<Set<MemoryCategory>>(new Set());
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Filter memories by search query
+  const filteredMemories = useMemo(() => {
+    if (!searchQuery) return memories;
+    const query = searchQuery.toLowerCase();
+    return memories.filter((note) => note.text.toLowerCase().includes(query));
+  }, [memories, searchQuery]);
 
   const byCategory = useMemo(
     () =>
       DISPLAY_CATEGORIES.reduce(
         (acc, category) => {
-          acc[category] = memories.filter((note) => note.category === category);
+          acc[category] = filteredMemories.filter((note) => note.category === category);
           return acc;
         },
         {} as Record<MemoryCategory, MemoryNote[]>
       ),
-    [memories]
+    [filteredMemories]
   );
 
   const categoriesWithContent = DISPLAY_CATEGORIES.filter(
     (category) => byCategory[category].length > 0
   );
+
+  // Filter categories based on active filters
+  const visibleCategories = useMemo(() => {
+    if (activeFilters.size === 0) return categoriesWithContent;
+    return categoriesWithContent.filter((cat) => activeFilters.has(cat));
+  }, [categoriesWithContent, activeFilters]);
+
+  // Calculate memory counts for filter chips (use unfiltered memories)
+  const memoryCounts = useMemo(() => {
+    return DISPLAY_CATEGORIES.reduce(
+      (acc, category) => {
+        acc[category] = memories.filter((note) => note.category === category).length;
+        return acc;
+      },
+      {} as Record<MemoryCategory, number>
+    );
+  }, [memories]);
+
+  const toggleCategory = (categoryId: MemoryCategory) => {
+    setExpandedCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(categoryId)) {
+        next.delete(categoryId);
+      } else {
+        next.add(categoryId);
+      }
+      return next;
+    });
+  };
 
   return (
     <section className="space-y-4">
@@ -82,20 +123,46 @@ export function MemorySection({
       )}
 
       {categoriesWithContent.length > 0 && (
-        <div className="space-y-3">
-        {categoriesWithContent.map((categoryId) => (
-          <MemoryPromptCard
-            key={categoryId}
-            categoryId={categoryId}
+        <>
+          <MemorySearchInput
             friendName={friendName}
-            firstName={name}
-            notes={byCategory[categoryId]}
-            highlightId={highlightId}
-            onAddCategory={onAddCategory}
-            showAddControls={showAddControls}
+            onSearchChange={setSearchQuery}
           />
-        ))}
-        </div>
+
+          <MemoryCategoryFilters
+            categories={categoriesWithContent}
+            memoryCounts={memoryCounts}
+            activeFilters={activeFilters}
+            onFilterChange={setActiveFilters}
+          />
+
+          {visibleCategories.length > 0 ? (
+            <div className="space-y-3">
+              {visibleCategories.map((categoryId) => (
+                <MemoryPromptCard
+                  key={categoryId}
+                  categoryId={categoryId}
+                  friendName={friendName}
+                  firstName={name}
+                  notes={byCategory[categoryId]}
+                  highlightId={highlightId}
+                  onAddCategory={onAddCategory}
+                  showAddControls={showAddControls}
+                  isExpanded={expandedCategories.has(categoryId)}
+                  onToggleExpand={toggleCategory}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-ink/[0.08] bg-cream-deep/25 p-6 text-center">
+              <p className="font-inter text-sm italic text-ink-soft">
+                {searchQuery
+                  ? `No notes match "${searchQuery}"`
+                  : "No notes in selected categories"}
+              </p>
+            </div>
+          )}
+        </>
       )}
     </section>
   );
@@ -109,6 +176,8 @@ type MemoryPromptCardProps = {
   onAddCategory: (category: MemoryCategory) => void;
   highlightId?: string | null;
   showAddControls: boolean;
+  isExpanded: boolean;
+  onToggleExpand: (categoryId: MemoryCategory) => void;
 };
 
 function MemoryPromptCard({
@@ -119,11 +188,14 @@ function MemoryPromptCard({
   onAddCategory,
   highlightId,
   showAddControls,
+  isExpanded,
+  onToggleExpand,
 }: MemoryPromptCardProps) {
   const config = MEMORY_CATEGORIES[categoryId];
   const Icon = config.icon;
   const empty = config.emptyPrompt(name);
-  const visibleNotes = notes.slice(0, 2);
+  const visibleNotes = isExpanded ? notes : notes.slice(0, 2);
+  const hasMoreNotes = notes.length > 2;
 
   return (
     <article
@@ -195,10 +267,24 @@ function MemoryPromptCard({
             </ul>
           )}
 
-          {notes.length > visibleNotes.length && (
-            <p className="mt-1.5 font-inter text-[11px] italic text-ink-soft">
+          {hasMoreNotes && !isExpanded && (
+            <button
+              type="button"
+              onClick={() => onToggleExpand(categoryId)}
+              className="mt-1.5 font-inter text-[11px] italic text-ink-soft hover:text-terracotta transition-colors"
+            >
               +{notes.length - visibleNotes.length} more saved
-            </p>
+            </button>
+          )}
+
+          {isExpanded && hasMoreNotes && (
+            <button
+              type="button"
+              onClick={() => onToggleExpand(categoryId)}
+              className="mt-1.5 font-inter text-[11px] italic text-ink-soft hover:text-terracotta transition-colors"
+            >
+              Show less
+            </button>
           )}
         </div>
       </div>

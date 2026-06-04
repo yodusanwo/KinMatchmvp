@@ -455,3 +455,84 @@ work post-contest is approximately:
 with KinMatch's Vertex AI credentials. Build this properly post-contest.
 
 ---
+## 🟢 Future Feature: Friend Rituals (scheduled connection)
+
+**Suggested:** June 3, 2026 (Yewande, evening of contest Day 4)
+**Status:** Designed during contest sprint, deliberately deferred to post-contest pilot.
+
+**The feature concept:**
+
+Users can schedule a "ritual" — a planned in-person or virtual activity — with 
+a friend from their tribe. The flow:
+
+1. User picks an activity (lunch, walk, coffee, etc.)
+2. User offers 3-4 possible dates/times
+3. User selects a friend from their tribe
+4. User can attach a voice note explaining the ritual
+5. KinMatch sends an email or text with a public link to the friend
+6. Friend lands on a public page (similar to voice note landing)
+7. Friend selects a date/time OR declines and provides email for future planning
+8. Agent schedules the time on user's calendar (requires Google Calendar OAuth)
+9. Agent sends calendar invite to friend's email
+10. Confirmation state for both user and friend
+
+**Why this fits KinMatch's brand:**
+
+KinMatch's mission is to make relational care easier for working adults. 
+"Reaching out" is one form of care; "actually showing up" is the deeper form. 
+Rituals turn good intentions into scheduled commitments — and shifts the agent 
+from prompter to enabler.
+
+**Agent capabilities to add:**
+
+- suggest_ritual_topic (based on shared interests, memory notes, past activities)
+- recommend_ritual_dates (avoiding user's existing calendar conflicts)
+- compose_ritual_invite (italic-soft voice for the email/text)
+- log_ritual_proposed, log_ritual_confirmed (new decision types)
+- monitor_ritual_followthrough (was the ritual kept? agent learns)
+
+**Technical scope:**
+
+Backend:
+- New tables: rituals, ritual_proposals, ritual_responses
+- API endpoints for CRUD on rituals and friend responses
+- Google Calendar OAuth integration
+- Email sending integration (Resend, Postmark, or production Klaviyo)
+- .ics calendar invite generation
+
+Frontend:
+- User flow for creating a ritual (multi-step form)
+- Public landing page for friend's response
+- "Can't make it" flow with email capture
+- Pending/confirmed rituals view in user's profile
+- Mobile-responsive throughout
+
+Agent:
+- New tools (above)
+- System prompt updates for ritual reasoning
+- Decision logic for when to suggest rituals vs nudges
+
+**Privacy considerations:**
+
+- Friend's email is collected on landing page — needs disclosure
+- Calendar access is sensitive — proper OAuth scopes, transparent permissions
+- Voice notes in rituals follow same per-note consent model as future transcription
+
+**Estimated total effort:** 25-35 hours engineering + design
+
+**Severity:** GREEN — high-value future feature, explicitly post-contest
+
+**Why deferred to post-contest:**
+
+Contest submission is June 11, 2026. Rituals require 25+ hours of new build 
+across backend, frontend, agent capabilities, and integrations (calendar OAuth, 
+email sending). That's an entire additional product on top of the agent we're 
+already submitting.
+
+The contest narrative is already complete with: engagement-aware reasoning, 
+tone calibration, frequency discipline, MCP architecture, privacy-by-design. 
+Adding rituals would dilute the demo and risk shipping two half-built features 
+instead of one polished one.
+
+Rituals is a Q3 2026 feature drop. After contest submission, this should be 
+the next major product workstream.

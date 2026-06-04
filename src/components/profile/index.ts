@@ -3,6 +3,8 @@ export { FriendContactInfoSection } from "./FriendContactInfoSection";
 export { FriendManagementSheet } from "./FriendManagementSheet";
 export { FriendPhoneSection } from "./FriendPhoneSection";
 export { MemoryCaptureModal } from "./MemoryCaptureModal";
+export { MemoryCategoryFilters } from "./MemoryCategoryFilters";
+export { MemorySearchInput } from "./MemorySearchInput";
 export { MemorySection } from "./MemorySection";
 export { ProfileDetailsHub } from "./ProfileDetailsHub";
 export { ProfileHeader } from "./ProfileHeader";
