@@ -389,3 +389,69 @@ fixed together when Fix 2 is properly designed and implemented post-contest.
 This is a UI display issue only. The agent's data layer is unaffected because 
 the backend correctly updates `friends.last_touch_at` and creates an 
 interactions row on voice note send (verified June 2 by Cursor investigation).
+---
+
+## 🟡 Future Feature: Per-note consent-based voice note transcription
+
+**Suggested:** June 2, 2026 (Yewande, during contest planning)
+**Status:** Designed but deliberately not built. Documented as pre-pilot work.
+
+**Why this is deferred:**
+Transcribing voice notes would unlock richer agent reasoning over actual 
+conversational content (what topics came up, emotional context, etc.). However, 
+voice notes are recorded with an expectation of intimacy. Building transcription 
+without explicit user consent would violate that expectation.
+
+We chose to delay this feature until the proper consent UX is designed, rather 
+than ship transcription with weak privacy handling.
+
+**Design intent (when built post-contest):**
+
+Per-note consent model — NOT blanket consent at signup. Specifically:
+
+1. After user records a voice note, before sending, show a control:
+   "Transcribe this note for your agent's insights? Yes / No / Decide later"
+
+2. Default state for "Decide later": no transcript generated, but the user can 
+   change their mind from a management view
+
+3. Add a "Your voice notes" view where users can:
+   - See all sent voice notes
+   - See which have transcripts (and what those transcripts say)
+   - Toggle transcript visibility to the agent on a per-note basis
+   - Delete transcripts entirely
+
+4. Default at the system level: transcription OFF unless user opts in per-note.
+
+**Privacy commitments to make in marketing:**
+
+- Voice note content is never analyzed without per-note user consent
+- Transcripts are stored in the user's account only — never shared with recipients
+- Users can revoke consent and delete transcripts at any time
+- Transcription processing happens on user's behalf (Gemini Audio via Vertex AI)
+- Transcripts are NOT used to train AI models (Google's enterprise data policy)
+
+**Why this is a competitive differentiator:**
+
+Most AI products extract maximum information from user data by default. 
+KinMatch's brand promise is intimate, low-anxiety relational care. Per-note 
+consent is a brand-aligned design choice that signals respect for the user's 
+private content.
+
+**Technical foundation:**
+
+The Gemini Audio integration was proven working on June 2, 2026 via 
+test_gemini_audio.py (Apollo 11 audio successfully transcribed). The wiring 
+work post-contest is approximately:
+- Backend: 3-4 hours (pipeline, consent column, agent endpoint)
+- Frontend: 3-4 hours (per-note toggle, management view)
+- Product/legal: 1-2 hours (privacy policy update, copy)
+
+**Estimated total effort:** 7-10 hours engineering + design review
+
+**Severity:** MEDIUM — high-value feature but explicitly post-pilot
+
+**Reference:** test_gemini_audio.py demonstrates the Gemini Audio API works 
+with KinMatch's Vertex AI credentials. Build this properly post-contest.
+
+---
