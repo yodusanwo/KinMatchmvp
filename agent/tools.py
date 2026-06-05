@@ -27,10 +27,10 @@ AGENT_MODE = os.environ.get("AGENT_MODE", "production").lower()
 
 # Import the right data source based on mode
 if AGENT_MODE == "demo":
-    from fake_data import get_active_scenario
+    from .fake_data import get_active_scenario
     api_client = None
 else:
-    from api_client import get_client
+    from .api_client import get_client
     get_active_scenario = None
     # Lazy-init the API client per agent run
     _api_client_instance = None
