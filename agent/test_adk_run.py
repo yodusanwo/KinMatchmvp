@@ -45,11 +45,12 @@ async def main():
     )
 
     # Synthetic prompt that should trigger compose_nudge_message
+    # Realistic prompt: run the full agent decision flow for user_yewande_demo
     prompt_text = (
-        "Use the compose_nudge_message tool to draft a nudge for me. "
-        "Friend name: Mary. My first name: Yewande. Days quiet: 21. "
-        "Category: inner_circle. Emotional context: Mary has been carrying "
-        "a lot since her dad got sick."
+        "Run your relational care analysis for user_id='user_yewande_demo'. "
+        "Follow your full reasoning loop: check the tribe, identify quiet friends, "
+        "verify nudge eligibility, and decide what action (if any) to take today. "
+        "End with a logged decision and a finish call."
     )
 
     print(f"Sending prompt to agent...")

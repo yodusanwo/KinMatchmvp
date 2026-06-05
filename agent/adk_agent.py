@@ -28,7 +28,22 @@ from google.adk.agents import LlmAgent
 from system_prompt import SYSTEM_PROMPT
 
 # Reuse one existing tool to start — we'll add mo this works
-from tools import compose_nudge_message
+from tools import (
+    get_user_profile,
+    get_user_tribe,
+    get_user_rituals,
+    get_recent_user_activity,
+    get_recent_agent_history,
+    get_recent_voice_note_transcripts,
+    identify_quiet_friends,
+    check_nudge_eligibility,
+    compose_nudge_message,
+    suggest_ritual_time,
+    send_nudge,
+    log_decision,
+    finish,
+)
+
 
 
 # Build the ADK agent
@@ -41,7 +56,19 @@ root_agent = LlmAgent(
     description="KinMatch's relational care agent — reasons about a user's friendships and decides whether to nudge, suggest a ritual, or take no action today.",
     instruction=SYSTEM_PROMPT,
     tools=[
+        get_user_profile,
+        get_user_tribe,
+        get_user_rituals,
+        get_recent_user_activity,
+        get_recent_agent_history,
+        get_recent_voice_note_transcripts,
+        identify_quiet_friends,
+        check_nudge_eligibility,
         compose_nudge_message,
+        suggest_ritual_time,
+        send_nudge,
+        log_decision,
+        finish,
     ],
 )
 
