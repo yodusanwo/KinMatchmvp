@@ -17,6 +17,65 @@ from google.genai import types
 from system_prompt import SYSTEM_PROMPT
 from tools import TOOLS
 
+# ============================================================
+# MCP integration (Phase 3)
+# ============================================================
+# When USE_MCP_FOR_NUDGES=true, compose_nudge_message is invoked via the
+# Model Context Protocol (MCP) instead of as a direct Python function call.
+# This demonstrates that KinMatch's brand voice is a composable capability,
+# not locked inside the agent's reasoning loop. The MCP server (mcp_server.py)
+# exposes the same logic — but any MCP-compatible client can use it.
+#
+# Required env: USE_MCP_FOR_NUDGES=true (in .env or shell environment)
+import os
+import asyncio
+from contextlib import asynccontextmanager
+
+USE_MCP_FOR_NUDGES = os.environ.get("USE_MCP_FOR_NUDGES", "false").lower() == "true"
+
+# MCP imports are deferred — only loaded if MCP is enabled, so the agent still
+# runs cleanly even if fastmcp isn't installed.
+if USE_MCP_FOR_NUDGES:
+    from fastmcp import Client
+    from fastmcp.client.transports import PythonStdioTransport
+
+    _MCP_SERVER_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mcp_server.py")
+    _MCP_PYTHON_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "venv", "bin", "python")
+
+
+def call_tool_via_mcp(tool_name: str, tool_args: dict) -> dict:
+    """
+    Invoke a tool through the MCP protocol instead of as a direct function call.
+
+    Spawns the MCP server as a subprocess, connects via stdio, calls the tool,
+    parses the result, and returns. The agent's reasoning loop is unchanged —
+    only the execution path for this one tool is different.
+
+    For the contest demo: this is the line where KinMatch's agent becomes a
+    real MCP CLIENT, demonstrating end-to-end protocol use within our own system.
+    """
+    async def _call():
+        transport = PythonStdioTransport(
+            script_path=_MCP_SERVER_PATH,
+            python_cmd=_MCP_PYTHON_PATH,
+        )
+        async with Client(transport) as client:
+            result = await client.call_tool(tool_name, tool_args)
+            # FastMCP returns a CallToolResult; extract the structured content
+            if hasattr(result, "structured_content") and result.structured_content:
+                return result.structured_content
+            elif hasattr(result, "content") and result.content:
+                # Fall back to text content if structured isn't available
+                first = result.content[0]
+                if hasattr(first, "text"):
+                    import json
+                    try:
+                        return json.loads(first.text)
+                    except json.JSONDecodeError:
+                        return {"message": first.text, "tone": "unknown", "reasoning": "MCP returned non-JSON"}
+            return {"error": "MCP tool returned no content"}
+
+    return asyncio.run(_call())
 
 # ============================================================
 # Gemini configuration
@@ -281,7 +340,15 @@ def run_agent(user_id: str) -> dict:
                     result = {"error": f"Unknown tool: {tool_name}"}
                 else:
                     try:
-                        result = TOOLS[tool_name](**tool_args)
+                        # Phase 3: Route compose_nudge_message through MCP if enabled.
+                        # Demonstrates KinMatch agent is itself an MCP client —
+                        # invoking its own brand-voice tool through the Model
+                        # Context Protocol rather than as a direct function call.
+                        if USE_MCP_FOR_NUDGES and tool_name == "compose_nudge_message":
+                            print(f"  [mcp] Routing {tool_name} through MCP server")
+                            result = call_tool_via_mcp(tool_name, tool_args)
+                        else:
+                            result = TOOLS[tool_name](**tool_args)
                     except Exception as e:
                         print(f"  ⚠ Tool error: {e}")
                         result = {"error": str(e)}
