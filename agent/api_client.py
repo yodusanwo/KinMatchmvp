@@ -45,7 +45,7 @@ class KinMatchAPIClient:
         if not self.base_url:
             raise ValueError("KINMATCH_API_BASE_URL not set in agent/.env")
         if not self.agent_secret:
-            raise ValueError("KINMATCH_AGENT_SECRET not set in agent/.env")
+            raise ValueError("KINMATCH_AGENT_SECRET environment variable is not set. In local dev, set it in agent/.env. In Cloud Run, configure it via Secret Manager.")
 
         # Strip trailing slash from base URL
         self.base_url = self.base_url.rstrip("/")
