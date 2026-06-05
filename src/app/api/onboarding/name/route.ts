@@ -34,8 +34,17 @@ export async function POST(request: NextRequest) {
 
   const { error } = await supabase
     .from("users")
-    .update({ name, email: user.email ?? undefined })
-    .eq("id", user.id);
+    .upsert(
+      { 
+        id: user.id, 
+        name, 
+        email: user.email ?? undefined 
+      },
+      { 
+        onConflict: "id",
+        ignoreDuplicates: false 
+      }
+    );
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
