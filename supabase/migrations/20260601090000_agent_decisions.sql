@@ -31,11 +31,13 @@ CREATE INDEX IF NOT EXISTS idx_agent_decisions_user_type
 
 ALTER TABLE public.agent_decisions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "agent_decisions_select_own" ON public.agent_decisions;
 CREATE POLICY "agent_decisions_select_own"
   ON public.agent_decisions
   FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "agent_decisions_insert_own" ON public.agent_decisions;
 CREATE POLICY "agent_decisions_insert_own"
   ON public.agent_decisions
   FOR INSERT
