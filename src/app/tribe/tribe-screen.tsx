@@ -310,7 +310,7 @@ export function TribeScreen() {
                   <button
                     type="submit"
                     disabled={adding}
-                    className="shrink-0 rounded-full bg-terracotta px-5 py-3 font-sans text-sm font-semibold text-cream transition-colors hover:bg-terracotta-deep disabled:cursor-not-allowed disabled:opacity-60"
+                    className="shrink-0 rounded-full bg-terracotta px-4 py-3 font-sans text-sm font-semibold text-cream transition-colors hover:bg-terracotta-deep disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {adding ? "Adding" : "Add"}
                   </button>

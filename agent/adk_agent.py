@@ -25,10 +25,10 @@ os.environ.setdefault("AGENT_MODE", "demo")
 from google.adk.agents import LlmAgent
 
 # Reuse the existing system prompt — same instructions, just wrapped in ADK
-from system_prompt import SYSTEM_PROMPT
+from .system_prompt import SYSTEM_PROMPT
 
 # Reuse one existing tool to start — we'll add mo this works
-from tools import (
+from .tools import (
     get_user_profile,
     get_user_tribe,
     get_user_rituals,
