@@ -202,6 +202,13 @@ export function TribeScreen() {
             {tribeCount > 0 && (
               <>
                 <CategorySection
+                  title="family"
+                  friends={family}
+                  avatarSize={38}
+                  avatarTextSize={12}
+                  emptyCopy="Family members you want to stay connected with."
+                />
+                <CategorySection
                   title="inner circle"
                   friends={innerCircle}
                   avatarSize={42}
@@ -215,13 +222,6 @@ export function TribeScreen() {
                   avatarTextSize={11}
                   halo
                   emptyCopy="Friends you check in with regularly. Add them anytime."
-                />
-                <CategorySection
-                  title="family"
-                  friends={family}
-                  avatarSize={38}
-                  avatarTextSize={12}
-                  emptyCopy="Family members you want to stay connected with."
                 />
                 <section>
                   <div className="flex items-center justify-between gap-3">
