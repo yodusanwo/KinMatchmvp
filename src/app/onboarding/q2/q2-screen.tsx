@@ -16,6 +16,7 @@ const REFLECTION_COPY_CLASS =
 const CIRCLE_OPTIONS: { id: CircleId; label: string }[] = [
   { id: "inner", label: "Inner circle" },
   { id: "village", label: "Village" },
+  { id: "family", label: "Family" },
   { id: "acquaintance", label: "Acquaintance" },
 ];
 
@@ -86,7 +87,7 @@ export function Q2Screen() {
               <MiniAvatar name={person.name} avatarColor={person.avatarColor} />
               <p className="font-sans text-sm font-medium text-ink">{person.name}</p>
             </div>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               {CIRCLE_OPTIONS.map((option) => {
                 const selected = circleAssignments[person.id] === option.id;
                 return (

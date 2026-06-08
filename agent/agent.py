@@ -200,7 +200,7 @@ TOOL_DECLARATIONS = [
                 "friend_id": {"type": "string"},
                 "user_context": {"type": "object", "description": "The user's profile and preferences."},
                 "days_quiet": {"type": "integer"},
-                "friend_category": {"type": "string", "description": "inner_circle, village, or acquaintance."},
+                "friend_category": {"type": "string", "description": "family, inner_circle, village, or acquaintance."},
             },
             "required": ["friend_id", "user_context", "days_quiet", "friend_category"],
         },

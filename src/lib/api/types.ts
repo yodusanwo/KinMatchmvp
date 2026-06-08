@@ -15,7 +15,7 @@ export type FriendSummary = {
   archived_at: string | null;
 };
 
-export type FriendCategory = "inner_circle" | "village" | "acquaintance";
+export type FriendCategory = "inner_circle" | "village" | "family" | "acquaintance";
 
 export type TodaySpotlight = {
   friend_id: string;

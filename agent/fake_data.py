@@ -80,7 +80,7 @@ FRIENDS_BASE = {
     "friend_mom": {
         "friend_id": "friend_mom",
         "name": "Mom",
-        "category": "inner_circle",
+        "category": "family",
         "phone_number": "+15555550003",
         "note": "Sunday coffee is our thing. She lights up when we talk.",
         "avatar_color": "#663092",

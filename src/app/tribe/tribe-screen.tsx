@@ -20,6 +20,7 @@ type FriendsResponse = {
 const CATEGORY_COLORS: Record<FriendCategory, string[]> = {
   inner_circle: ["#B65232", "#2F4032"],
   village: ["#6B7A5C", "#C68F3E"],
+  family: ["#8E3D22", "#463C2E"],
   acquaintance: ["rgba(107,122,92,0.85)", "rgba(198,143,62,0.85)"],
 };
 
@@ -119,6 +120,7 @@ export function TribeScreen() {
   const tribeCount = activeFriends.length;
   const innerCircle = activeFriends.filter((friend) => friend.category === "inner_circle");
   const village = activeFriends.filter((friend) => friend.category === "village");
+  const family = activeFriends.filter((friend) => friend.category === "family");
   const acquaintances = activeFriends.filter(
     (friend) => friend.category === "acquaintance"
   );
@@ -213,6 +215,13 @@ export function TribeScreen() {
                   avatarTextSize={11}
                   halo
                   emptyCopy="Friends you check in with regularly. Add them anytime."
+                />
+                <CategorySection
+                  title="family"
+                  friends={family}
+                  avatarSize={38}
+                  avatarTextSize={12}
+                  emptyCopy="Family members you want to stay connected with."
                 />
                 <section>
                   <div className="flex items-center justify-between gap-3">
@@ -323,10 +332,11 @@ export function TribeScreen() {
                     id="tribe-add-phone"
                   />
                 )}
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 gap-2">
                   {[
                     ["inner_circle", "Inner"] as const,
                     ["village", "Village"] as const,
+                    ["family", "Family"] as const,
                     ["acquaintance", "Acquaintance"] as const,
                   ].map(([category, label]) => (
                     <button

@@ -76,6 +76,7 @@ def get_user_tribe(user_id: str) -> dict:
         return {
             "friends": friends,
             "count": len(friends),
+            "family_count": sum(1 for f in friends if f["category"] == "family"),
             "inner_circle_count": sum(1 for f in friends if f["category"] == "inner_circle"),
             "village_count": sum(1 for f in friends if f["category"] == "village"),
             "acquaintance_count": sum(1 for f in friends if f["category"] == "acquaintance"),
@@ -114,16 +115,20 @@ def get_recent_user_activity(user_id: str, days: int = 7) -> dict:
         activity = scenario["recent_activity"]
 
         voice_notes = activity["voice_notes_sent"]
+        family_friend_ids = {
+            fid for fid, f in scenario["friends"].items() if f["category"] == "family"
+        }
         inner_circle_friend_ids = {
             fid for fid, f in scenario["friends"].items() if f["category"] == "inner_circle"
         }
-        voice_notes_to_inner_circle = [
-            vn for vn in voice_notes if vn["friend_id"] in inner_circle_friend_ids
+        voice_notes_to_family_or_inner = [
+            vn for vn in voice_notes 
+            if vn["friend_id"] in family_friend_ids or vn["friend_id"] in inner_circle_friend_ids
         ]
 
         return {
             "voice_notes_sent": voice_notes,
-            "voice_notes_to_inner_circle_count": len(voice_notes_to_inner_circle),
+            "voice_notes_to_family_or_inner_count": len(voice_notes_to_family_or_inner),
             "external_touchpoints": activity["external_touchpoints"],
             "ritual_completions": activity["ritual_completions"],
             "total_outreach_count": len(voice_notes)
@@ -220,7 +225,7 @@ def check_nudge_eligibility(user_id: str) -> dict:
     Rules:
     - Max 2 nudges per week
     - At least 4 days between nudges
-    - If user sent 2+ voice notes to inner_circle this week, NOT eligible
+    - If user sent 2+ voice notes to family or inner_circle this week, NOT eligible
     """
     print(f"  [tool] check_nudge_eligibility(user_id={user_id})")
 
@@ -251,10 +256,10 @@ def check_nudge_eligibility(user_id: str) -> dict:
 
     # Rule 3: user already connecting on their own
     activity = get_recent_user_activity(user_id, days=7)
-    if activity.get("voice_notes_to_inner_circle_count", 0) >= 2:
+    if activity.get("voice_notes_to_family_or_inner_count", 0) >= 2:
         return {
             "eligible": False,
-            "reason": f"User has sent {activity['voice_notes_to_inner_circle_count']} voice notes to inner_circle friends this week. They are already connecting.",
+            "reason": f"User has sent {activity['voice_notes_to_family_or_inner_count']} voice notes to family or inner_circle friends this week. They are already connecting.",
             "rule_violated": "user_already_active",
         }
 
@@ -325,7 +330,12 @@ def compose_nudge_message(
     sensitive_keywords = ["sick", "cancer", "death", "divorce", "loss", "struggling", "carrying a lot", "health"]
     is_sensitive = any(kw in note.lower() for kw in sensitive_keywords)
 
-    if friend_category == "inner_circle":
+    if friend_category == "family":
+        if is_sensitive:
+            message = f"{first_name} — {friend_name}'s been quiet a while. A short voice note today might land just right."
+        else:
+            message = f"{first_name} — {friend_name}'s been on your mind. A 30-second voice note might be just enough today."
+    elif friend_category == "inner_circle":
         if is_sensitive:
             message = f"{first_name} — {friend_name}'s been quiet a while. A short voice note today might land just right."
         else:

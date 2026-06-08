@@ -1,6 +1,6 @@
 "use client";
 
-import { Archive, Circle, CircleDot, RotateCcw, Trash2, Users } from "lucide-react";
+import { Archive, Circle, CircleDot, Heart, RotateCcw, Trash2, Users } from "lucide-react";
 import type { FriendCategory, FriendProfile } from "@/lib/api/types";
 import {
   categoryActionLabel,
@@ -24,6 +24,7 @@ type FriendManagementSheetProps = {
 const CATEGORY_ICONS: Record<FriendCategory, typeof Circle> = {
   inner_circle: CircleDot,
   village: Users,
+  family: Heart,
   acquaintance: Circle,
 };
 

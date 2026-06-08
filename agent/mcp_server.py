@@ -60,7 +60,7 @@ def compose_nudge_message(
         friend_name: The name of the friend the user is being nudged about
         user_first_name: The user's first name (for personalized greeting)
         days_quiet: How many days since the user last reached out to this friend
-        friend_category: One of 'inner_circle', 'village', or 'acquaintance'
+        friend_category: One of 'family', 'inner_circle', 'village', or 'acquaintance'
         emotional_context: Optional notes the user has captured about the friend.
             If this contains sensitive keywords (sick, struggling, carrying a lot,
             loss, divorce, health, etc.), the tone will soften automatically.
@@ -94,7 +94,22 @@ def compose_nudge_message(
     is_sensitive = any(kw in emotional_context.lower() for kw in sensitive_keywords)
 
     # Compose based on category and tone
-    if friend_category == "inner_circle":
+    if friend_category == "family":
+        if is_sensitive:
+            message = (
+                f"{user_first_name} — {friend_name}'s been quiet a while. "
+                f"A short voice note today might land just right."
+            )
+            tone = "soft"
+            reasoning = "Sensitive keyword detected in context. Used softer tone for family member."
+        else:
+            message = (
+                f"{user_first_name} — {friend_name}'s been on your mind. "
+                f"A 30-second voice note might be just enough today."
+            )
+            tone = "warm"
+            reasoning = "Family member with no sensitive context. Used warm, personal tone."
+    elif friend_category == "inner_circle":
         if is_sensitive:
             message = (
                 f"{user_first_name} — {friend_name}'s been quiet a while. "

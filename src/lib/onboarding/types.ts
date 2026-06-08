@@ -17,7 +17,7 @@ export type BarrierId =
   | "unsure_how"
   | "one_sided";
 
-export type CircleId = "inner" | "village" | "acquaintance";
+export type CircleId = "inner" | "village" | "family" | "acquaintance";
 
 export type OnboardingState = {
   userName: string;

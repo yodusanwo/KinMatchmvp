@@ -54,6 +54,12 @@ export async function POST(request: Request) {
   const villagePeople = circleAssignments
     ? q1People.filter((person) => circleAssignments[person.id] === "village")
     : q2People;
+  const familyPeople = circleAssignments
+    ? q1People.filter((person) => circleAssignments[person.id] === "family")
+    : [];
+  const acquaintancePeople = circleAssignments
+    ? q1People.filter((person) => circleAssignments[person.id] === "acquaintance")
+    : [];
   const q3Barriers = body.q3Barriers;
   const watchers = Array.isArray(body.watchers) ? body.watchers : [];
 
@@ -113,6 +119,12 @@ export async function POST(request: Request) {
     const innerNameSet = new Set(
       innerCirclePeople.map((p) => normalizeName(p.name))
     );
+    const villageNameSet = new Set(
+      villagePeople.map((p) => normalizeName(p.name))
+    );
+    const familyNameSet = new Set(
+      familyPeople.map((p) => normalizeName(p.name))
+    );
 
     for (const person of innerCirclePeople) {
       const { data: friend, error: friendError } = await supabase
@@ -140,8 +152,67 @@ export async function POST(request: Request) {
       chipIdToFriendId.set(person.id, friend.id);
     }
 
-    for (const person of villagePeople) {
+    for (const person of familyPeople) {
       if (innerNameSet.has(normalizeName(person.name))) continue;
+
+      const { data: friend, error: friendError } = await supabase
+        .from("friends")
+        .insert({
+          user_id: user.id,
+          name: formatPersonName(person.name),
+          phone_number: person.phone_number
+            ? normalizePhone(person.phone_number)
+            : null,
+          avatar_color: person.avatarColor,
+          vibe: "potential_close",
+          category: "family",
+          cadence_days: 21,
+          is_wished_closer: false,
+          in_tribe: true,
+        })
+        .select("id")
+        .single();
+
+      if (friendError || !friend) {
+        throw new Error(friendError?.message ?? "Failed to save connection");
+      }
+
+      chipIdToFriendId.set(person.id, friend.id);
+    }
+
+    for (const person of acquaintancePeople) {
+      if (innerNameSet.has(normalizeName(person.name)) || 
+          villageNameSet.has(normalizeName(person.name)) ||
+          familyNameSet.has(normalizeName(person.name))) continue;
+
+      const { data: friend, error: friendError } = await supabase
+        .from("friends")
+        .insert({
+          user_id: user.id,
+          name: formatPersonName(person.name),
+          phone_number: person.phone_number
+            ? normalizePhone(person.phone_number)
+            : null,
+          avatar_color: person.avatarColor,
+          vibe: "potential_close",
+          category: "acquaintance",
+          cadence_days: 60,
+          is_wished_closer: false,
+          in_tribe: true,
+        })
+        .select("id")
+        .single();
+
+      if (friendError || !friend) {
+        throw new Error(friendError?.message ?? "Failed to save connection");
+      }
+
+      chipIdToFriendId.set(person.id, friend.id);
+    }
+
+    for (const person of villagePeople) {
+      if (innerNameSet.has(normalizeName(person.name)) ||
+          familyNameSet.has(normalizeName(person.name))) continue;
 
       const { data: friend, error: friendError } = await supabase
         .from("friends")
