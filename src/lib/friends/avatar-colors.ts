@@ -1,37 +1,37 @@
 import type { FriendCategory } from "@/lib/api/types";
 
-// All categories use the same diverse 30-color palette for maximum distinction
+// All categories use the same vibrant, highly distinct 30-color palette
 const SHARED_COLOR_PALETTE = [
   "#B65232",  // Terracotta red
-  "#6B7A5C",  // Sage olive
-  "#C68F3E",  // Mustard gold
+  "#D4A356",  // Bright gold
+  "#2F4032",  // Deep forest green
+  "#E67D64",  // Coral salmon
+  "#C68F3E",  // Mustard yellow
+  "#6B7A5C",  // Sage green
+  "#8E3D22",  // Deep burgundy
   "#E8D494",  // Honey yellow
-  "#8E3D22",  // Deep terracotta
-  "#2F4032",  // Forest green
-  "#D4A356",  // Gold
-  "#7B8A6C",  // Light sage
-  "#B07D4E",  // Bronze
-  "#9DB58A",  // Soft green
-  "#A67C52",  // Tan
-  "#E0B45A",  // Bright gold
-  "#5D6C4E",  // Deep olive
-  "#D8B896",  // Light tan
-  "#738269",  // Muted olive
-  "#C89058",  // Amber
-  "#8A7859",  // Khaki
-  "#E8BA6F",  // Pale gold
+  "#5D6C4E",  // Olive green
+  "#D97B4F",  // Burnt orange
+  "#A89668",  // Golden tan
+  "#3F4F42",  // Dark pine
+  "#C85A3E",  // Bright terracotta
+  "#DCA850",  // Warm gold
+  "#788870",  // Muted green
+  "#B84532",  // Rusty red
+  "#E0B45A",  // Pale gold
+  "#556B4F",  // Deep sage
+  "#D4704A",  // Coral orange
+  "#C09864",  // Amber
   "#6A7959",  // Moss green
-  "#BC9C70",  // Rustic tan
-  "#A89668",  // Caramel
-  "#788870",  // Sage gray
-  "#D4A67C",  // Warm beige
-  "#677656",  // Olive drab
-  "#C8A882",  // Sand
-  "#9B8965",  // Earth brown
-  "#E0C4A0",  // Cream tan
-  "#7C8B6D",  // Faded green
-  "#B8977A",  // Taupe
-  "#8E9B7A",  // Soft olive
+  "#A86342",  // Clay red
+  "#E8BA6F",  // Light gold
+  "#4A5C48",  // Forest olive
+  "#C66B4D",  // Warm coral
+  "#B89968",  // Bronze
+  "#677656",  // Faded green
+  "#D45B3E",  // Bright coral
+  "#CCA76D",  // Sand gold
+  "#5E6D50",  // Deep olive
 ];
 
 // All categories use the same color palette
