@@ -7,7 +7,7 @@ import { MiniAvatar } from "@/components/onboarding/MiniAvatar";
 import { primaryButtonClassName } from "@/components/brand/primary-button-styles";
 import type { TodayDailyState } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
-import { firstName } from "@/lib/memories/categories";
+import { formatDisplayName } from "@/lib/names/format";
 
 type SendSpotlightProps = {
   state: Extract<TodayDailyState, { kind: "send_discovery" | "send_algorithmic" }>;
@@ -48,7 +48,7 @@ function whyItWorks(state: SendSpotlightProps["state"]) {
 }
 
 export function SendSpotlight({ state, onRefresh }: SendSpotlightProps) {
-  const name = firstName(state.friend.name);
+  const name = formatDisplayName(state.friend.name);
   const question = sendQuestion(state);
   const [skipping, setSkipping] = useState(false);
   const voiceNoteHref =
@@ -137,7 +137,7 @@ export function SendSpotlight({ state, onRefresh }: SendSpotlightProps) {
 }
 
 export function CaptureSpotlight({ state, onRefresh }: CaptureSpotlightProps) {
-  const name = firstName(state.friend.name);
+  const name = formatDisplayName(state.friend.name);
   const sentDaysAgo = daysSince(state.voice_note.created_at);
   const [dismissing, setDismissing] = useState(false);
 

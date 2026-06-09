@@ -1,6 +1,6 @@
 "use client";
 
-import { firstName } from "@/lib/memories/categories";
+import { formatDisplayName } from "@/lib/names/format";
 import { cn } from "@/lib/cn";
 
 type OptionalPhoneFieldProps = {
@@ -18,7 +18,7 @@ export function OptionalPhoneField({
   className,
   id = "friend-phone",
 }: OptionalPhoneFieldProps) {
-  const name = firstName(friendName) || "them";
+  const name = formatDisplayName(friendName) || "them";
 
   return (
     <div className={cn("space-y-1.5", className)}>

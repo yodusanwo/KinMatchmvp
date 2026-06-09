@@ -7,7 +7,7 @@ type GrowingCloserRowProps = {
   className?: string;
 };
 
-function firstName(name: string) {
+function formatDisplayName(name: string) {
   return name.trim().split(/\s+/)[0] ?? name;
 }
 
@@ -24,7 +24,7 @@ export function GrowingCloserRow({ faces, className }: GrowingCloserRowProps) {
             />
           </span>
           <span className="max-w-[80px] truncate font-sans text-xs text-ink">
-            {firstName(face.name)}
+            {formatDisplayName(face.name)}
           </span>
         </li>
       ))}

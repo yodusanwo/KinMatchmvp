@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Search, X } from "lucide-react";
 import { cn } from "@/lib/cn";
-import { firstName } from "@/lib/memories/categories";
+import { formatDisplayName } from "@/lib/names/format";
 
 type MemorySearchInputProps = {
   onSearchChange: (query: string) => void;
@@ -37,7 +37,7 @@ export function MemorySearchInput({
     setValue("");
   };
 
-  const name = firstName(friendName);
+  const name = formatDisplayName(friendName);
 
   return (
     <div className="relative">

@@ -6,7 +6,7 @@ import type { MicStatus } from "@/hooks/useVoiceRecorder";
 import type { MicAccessError } from "@/lib/audio/mic-permission";
 import { isIOS } from "@/lib/audio/mic-permission";
 import { isNativeApp } from "@/lib/audio/native-platform";
-import { firstName } from "@/lib/memories/categories";
+import { formatDisplayName } from "@/lib/names/format";
 
 // Backwards-compatible alias so existing callers using MicErrorInfo keep working
 export type MicErrorInfo = MicAccessError;
@@ -37,7 +37,7 @@ export function MicEnableFlow({
   onTextInstead,
   disabled,
 }: MicEnableFlowProps) {
-  const name = firstName(friendName);
+  const name = formatDisplayName(friendName);
 
   // Show the Path 5 fallback when the mic is blocked or otherwise can't be used.
   const isBlocked =

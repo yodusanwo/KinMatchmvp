@@ -3,9 +3,9 @@ import { ListenScreen } from "./listen-screen";
 import { getAppOrigin } from "@/lib/env";
 import {
   fetchPublicVoiceNote,
-  firstName,
 } from "@/lib/voice-notes/public-voice-note";
 import { normalizeShareToken } from "@/lib/voice-notes/blob-url";
+import { formatDisplayName } from "@/lib/names/format";
 
 type PageProps = {
   params: Promise<{ shareToken: string }>;
@@ -25,7 +25,7 @@ export async function generateMetadata({
   }
 
   const origin = getAppOrigin("https://kin-matchmvp.vercel.app");
-  const senderName = firstName(voiceNote.sender_name) || "a friend";
+  const senderName = formatDisplayName(voiceNote.sender_name) || "a friend";
   const title = `Voice note from ${senderName}`;
   const description = "Tap to listen — no app needed.";
   const url = `${origin}/v/${shareToken}`;

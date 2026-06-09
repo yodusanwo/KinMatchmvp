@@ -1,6 +1,6 @@
 import { Eyebrow } from "@/components/brand";
 import type { FriendSummary } from "@/lib/api/types";
-import { firstName } from "@/lib/memories/categories";
+import { formatDisplayName } from "@/lib/names/format";
 
 type CoreTribeSectionProps = {
   friends: FriendSummary[];
@@ -18,7 +18,7 @@ export function CoreTribeSection({ friends }: CoreTribeSectionProps) {
     );
   }
 
-  const names = friends.map((f) => firstName(f.name)).join(" • ");
+  const names = friends.map((f) => formatDisplayName(f.name)).join(" • ");
 
   return (
     <section>

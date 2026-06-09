@@ -1,4 +1,4 @@
-import { Headline, Subhead } from "@/components/brand";
+import { Headline } from "@/components/brand";
 
 type GreetingSectionProps = {
   firstName: string;
@@ -19,9 +19,6 @@ export function GreetingSection({ firstName }: GreetingSectionProps) {
       <Headline className="text-center">
         {greeting}, {firstName}.
       </Headline>
-      <Subhead className="mt-3 text-center text-sm">
-        How connected do you feel today?
-      </Subhead>
     </section>
   );
 }

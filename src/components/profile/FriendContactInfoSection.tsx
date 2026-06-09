@@ -5,7 +5,7 @@ import { Eyebrow, Subhead } from "@/components/brand";
 import { OptionalPhoneField } from "@/components/friends/OptionalPhoneField";
 import { fetchJson } from "@/lib/api/fetch-client";
 import type { FriendSummary } from "@/lib/api/types";
-import { firstName } from "@/lib/memories/categories";
+import { formatDisplayName } from "@/lib/names/format";
 
 type FriendContactInfoSectionProps = {
   onToast: (message: string) => void;
@@ -103,7 +103,7 @@ export function FriendContactInfoSection({
             className="rounded-2xl border border-ink/[0.12] bg-cream-deep/40 p-4"
           >
             <p className="font-sans text-sm font-semibold text-ink">
-              {firstName(friend.name)}
+              {formatDisplayName(friend.name)}
             </p>
             <OptionalPhoneField
               friendName={friend.name}

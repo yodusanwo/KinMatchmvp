@@ -4,7 +4,7 @@ import { MiniAvatar } from "@/components/onboarding/MiniAvatar";
 import { DriftIndicator } from "./DriftIndicator";
 import type { FriendSummary } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
-import { firstName } from "@/lib/memories/categories";
+import { formatDisplayName } from "@/lib/names/format";
 
 type TribeListProps = {
   tribe: FriendSummary[];
@@ -39,7 +39,7 @@ export function TribeList({ tribe, className }: TribeListProps) {
                 size="sm"
               />
               <span className="truncate font-sans text-sm font-medium text-ink group-hover:text-terracotta">
-                {firstName(friend.name)}
+                {formatDisplayName(friend.name)}
               </span>
             </div>
             <div className="flex shrink-0 items-center gap-2">

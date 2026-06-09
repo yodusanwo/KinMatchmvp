@@ -1,8 +1,8 @@
 import { ImageResponse } from "@vercel/og";
 import {
   fetchPublicVoiceNote,
-  firstName,
 } from "@/lib/voice-notes/public-voice-note";
+import { formatDisplayName } from "@/lib/names/format";
 import { normalizeShareToken } from "@/lib/voice-notes/blob-url";
 
 export const runtime = "edge";
@@ -14,7 +14,7 @@ export async function GET(_request: Request, context: RouteContext) {
   const shareToken = normalizeShareToken(rawShareToken);
   const { data: voiceNote } = await fetchPublicVoiceNote(shareToken);
 
-  const senderName = firstName(voiceNote?.sender_name) || "a friend";
+  const senderName = formatDisplayName(voiceNote?.sender_name ?? "") || "a friend";
   const senderInitial = senderName[0]?.toUpperCase() ?? "K";
 
   return new ImageResponse(

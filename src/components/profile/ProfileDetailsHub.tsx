@@ -10,7 +10,7 @@ import {
   Users,
 } from "lucide-react";
 import type { FriendProfile, MemoryCategory } from "@/lib/api/types";
-import { firstName } from "@/lib/memories/categories";
+import { formatDisplayName } from "@/lib/names/format";
 import { cn } from "@/lib/cn";
 
 type ProfileDetailsHubProps = {
@@ -63,7 +63,7 @@ export function ProfileDetailsHub({
   onAddMemory,
   onAddInterest,
 }: ProfileDetailsHubProps) {
-  const name = firstName(friend.name);
+  const name = formatDisplayName(friend.name);
 
   return (
     <section className="space-y-3">

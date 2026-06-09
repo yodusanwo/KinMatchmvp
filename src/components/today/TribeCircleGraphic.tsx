@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { FriendSummary } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
-import { firstName } from "@/lib/memories/categories";
+import { formatDisplayName } from "@/lib/names/format";
 import { getFriendColor, getInitials } from "@/lib/friends/avatar-colors";
 
 type TribeCircleGraphicProps = {
@@ -73,7 +73,7 @@ export function TribeCircleGraphic({
               {getInitials(friend.name)}
             </span>
             <span className="max-w-[64px] truncate font-sans text-[15px] font-medium leading-none text-ink">
-              {firstName(friend.name)}
+              {formatDisplayName(friend.name)}
             </span>
             <span className="font-sans text-[9px] leading-none text-ink-soft">
               {quietLabel(friend)}

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { PrimaryButton } from "@/components/brand";
 import { OptionalPhoneField } from "@/components/friends/OptionalPhoneField";
-import { firstName } from "@/lib/memories/categories";
+import { formatDisplayName } from "@/lib/names/format";
 
 type FriendPhoneSectionProps = {
   friendId: string;
@@ -20,7 +20,7 @@ export function FriendPhoneSection({
   onSaved,
   onToast,
 }: FriendPhoneSectionProps) {
-  const name = firstName(friendName);
+  const name = formatDisplayName(friendName);
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(phoneNumber ?? "");
   const [saving, setSaving] = useState(false);

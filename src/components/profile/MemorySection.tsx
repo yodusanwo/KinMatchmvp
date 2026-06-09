@@ -5,8 +5,8 @@ import type { MemoryCategory, MemoryNote } from "@/lib/api/types";
 import {
   MEMORY_CATEGORIES,
   MEMORY_CATEGORY_ORDER,
-  firstName,
 } from "@/lib/memories/categories";
+import { formatDisplayName } from "@/lib/names/format";
 import { cn } from "@/lib/cn";
 import { Plus } from "lucide-react";
 import { MemoryCategoryFilters } from "./MemoryCategoryFilters";
@@ -29,7 +29,7 @@ export function MemorySection({
   highlightId,
   showAddControls = true,
 }: MemorySectionProps) {
-  const name = firstName(friendName);
+  const name = formatDisplayName(friendName);
   const [expandedCategories, setExpandedCategories] = useState<Set<MemoryCategory>>(new Set());
   const [activeFilters, setActiveFilters] = useState<Set<MemoryCategory>>(new Set());
   const [searchQuery, setSearchQuery] = useState("");

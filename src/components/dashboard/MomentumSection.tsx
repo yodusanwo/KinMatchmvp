@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Eyebrow } from "@/components/brand";
 import type { FriendSummary } from "@/lib/api/types";
-import { firstName } from "@/lib/memories/categories";
+import { formatDisplayName } from "@/lib/names/format";
 
 type MomentumSectionProps = {
   growing: FriendSummary[];
@@ -39,7 +39,7 @@ function MomentumCategory({ label, friends, emptyMessage }: MomentumCategoryProp
               href={`/friends/${friend.id}`}
               className="text-terracotta underline decoration-terracotta/60 underline-offset-2 hover:text-terracotta-deep"
             >
-              {firstName(friend.name)}
+              {formatDisplayName(friend.name)}
             </Link>
             {index < friends.length - 1 && ", "}
           </span>

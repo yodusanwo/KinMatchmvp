@@ -1,10 +1,5 @@
-import Link from "next/link";
-import { BrandBar, Eyebrow, Headline, Subhead, TextLink } from "@/components/brand";
-import { AppShell } from "@/components/layout/AppShell";
-import { BottomNav } from "@/components/nav/BottomNav";
-import { formatDuration } from "@/components/voice-note/format-duration";
 import { requireOnboardedUser } from "@/lib/auth/require-user";
-import { getFriendColor, getInitials } from "@/lib/friends/avatar-colors";
+import { VoiceNotesScreen } from "./voice-notes-screen";
 import type { FriendCategory } from "@/lib/api/types";
 
 type VoiceNoteRow = {
@@ -30,46 +25,6 @@ type InteractionRow = {
   id: string;
   voice_note_id: string | null;
 };
-
-function relativeDate(iso: string): string {
-  const diffMs = Date.now() - new Date(iso).getTime();
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  const diffDays = Math.floor(diffHours / 24);
-  if (diffHours < 1) return "just now";
-  if (diffDays === 0) return "today";
-  if (diffDays === 1) return "yesterday";
-  return `${diffDays} days ago`;
-}
-
-function statusLabel(note: VoiceNoteRow): {
-  label: string;
-  className: string;
-} {
-  const diffHours =
-    (Date.now() - new Date(note.created_at).getTime()) / (1000 * 60 * 60);
-  if (note.listened_at) {
-    return {
-      label: "Listened ✓",
-      className: "bg-cream text-ink-soft",
-    };
-  }
-  if (diffHours < 1) {
-    return {
-      label: "Just sent",
-      className: "bg-terracotta/10 text-terracotta",
-    };
-  }
-  if (diffHours > 24) {
-    return {
-      label: "Sent — not yet listened",
-      className: "bg-terracotta/10 text-terracotta-deep",
-    };
-  }
-  return {
-    label: "Sent",
-    className: "bg-cream text-ink-soft",
-  };
-}
 
 export default async function VoiceNotesPage() {
   const { supabase, user } = await requireOnboardedUser("/voice-notes");
@@ -120,91 +75,10 @@ export default async function VoiceNotesPage() {
   );
 
   return (
-    <AppShell>
-      <BrandBar />
-      <div className="space-y-4 px-5 py-10 pb-28">
-        <Eyebrow>voice notes</Eyebrow>
-        <Headline>What you&apos;ve sent.</Headline>
-        <Subhead>Each voice note keeps the rhythm going.</Subhead>
-
-        {notes.length === 0 ? (
-          <div className="rounded-2xl border border-ink/[0.12] bg-cream-deep/60 p-5">
-            <p className="font-inter text-sm italic leading-relaxed text-ink-soft">
-              You haven&apos;t sent a voice note yet. Today&apos;s a good day to
-              start.
-            </p>
-            <p className="mt-4">
-              <TextLink href="/today">← Back to Today</TextLink>
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {notes.map((note) => {
-              const friendId = note.friend_id ?? note.recipient_friend_id;
-              const friend = friendId ? friendsById.get(friendId) : null;
-              const status = statusLabel(note);
-              const interaction = interactionByVoiceNoteId.get(note.id);
-
-              return (
-                <article
-                  key={note.id}
-                  className="rounded-2xl border border-ink/[0.12] bg-cream-deep/60 p-4"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex min-w-0 items-center gap-3">
-                      {friend && (
-                        <span
-                          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[12px] font-medium text-ink"
-                          style={{
-                            backgroundColor: getFriendColor(
-                              friend.id,
-                              friend.category ?? "inner_circle"
-                            ),
-                          }}
-                        >
-                          {getInitials(friend.name)}
-                        </span>
-                      )}
-                      <div className="min-w-0">
-                        <p className="truncate font-sans text-sm font-medium text-ink">
-                          {friend?.name ?? "Voice note"}
-                        </p>
-                        <p className="font-inter text-xs italic text-ink-soft">
-                          {relativeDate(note.created_at)} ·{" "}
-                          {formatDuration(note.duration_seconds)}
-                        </p>
-                      </div>
-                    </div>
-                    <span
-                      className={`shrink-0 rounded-full px-2 py-1 font-sans text-[12px] font-medium ${status.className}`}
-                    >
-                      {status.label}
-                    </span>
-                  </div>
-
-                  <div className="mt-3 flex items-center justify-between gap-3">
-                    <Link
-                      href={`/v/${note.share_token}`}
-                      className="font-inter text-xs text-terracotta underline decoration-terracotta/60 underline-offset-2"
-                    >
-                      open listen link
-                    </Link>
-                    {note.capture_pending && !note.captured_at && friendId && interaction && (
-                      <Link
-                        href={`/friends/${friendId}/details?capture=${interaction.id}`}
-                        className="font-inter text-xs text-terracotta underline decoration-terracotta/60 underline-offset-2"
-                      >
-                        + capture response →
-                      </Link>
-                    )}
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        )}
-      </div>
-      <BottomNav />
-    </AppShell>
+    <VoiceNotesScreen
+      notes={notes}
+      friendsById={friendsById}
+      interactionByVoiceNoteId={interactionByVoiceNoteId}
+    />
   );
 }

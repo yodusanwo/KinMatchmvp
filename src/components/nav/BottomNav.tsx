@@ -10,7 +10,7 @@ type BottomNavProps = {
 };
 
 const NAV_ITEMS = [
-  { href: "/dashboard", label: "Dashboard", icon: Home, match: /^\/(dashboard|today)/ },
+  { href: "/today", label: "Home", icon: Home, match: /^\/today/ },
   {
     href: "/tribe",
     label: "Tribe",

@@ -28,7 +28,7 @@ const CATEGORY_ICONS: Record<FriendCategory, typeof Circle> = {
   acquaintance: Circle,
 };
 
-function firstName(name: string) {
+function formatDisplayName(name: string) {
   return name.trim().split(/\s+/)[0] ?? name;
 }
 
@@ -47,7 +47,7 @@ export function FriendManagementSheet({
 }: FriendManagementSheetProps) {
   if (!open) return null;
 
-  const name = firstName(friend.name);
+  const name = formatDisplayName(friend.name);
   const availableCategories = FRIEND_CATEGORIES.filter(
     (category) => category !== friend.category
   );

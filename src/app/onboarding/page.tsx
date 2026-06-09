@@ -18,7 +18,7 @@ const REFLECTION_STEPS = [
   { number: 3, title: "What gets in the way?" },
 ];
 
-function firstName(name: string) {
+function formatDisplayName(name: string) {
   return name.trim().split(/\s+/)[0] ?? name;
 }
 
@@ -50,7 +50,7 @@ export default async function OnboardingIntroPage() {
       <div className="space-y-8 px-5 py-8">
         <div className="space-y-2">
           <Eyebrow>Before we begin</Eyebrow>
-          <Headline>A small reflection, {firstName(name)}.</Headline>
+          <Headline>A small reflection, {formatDisplayName(name)}.</Headline>
         </div>
 
         <Subhead>

@@ -7,7 +7,8 @@ import { Check, Plus } from "lucide-react";
 import { BrandBar, Eyebrow, Headline, PrimaryButton, Subhead } from "@/components/brand";
 import { AppShell } from "@/components/layout/AppShell";
 import { MiniAvatar } from "@/components/onboarding/MiniAvatar";
-import { MEMORY_CATEGORIES, MEMORY_MODAL_CATEGORIES, firstName } from "@/lib/memories/categories";
+import { MEMORY_CATEGORIES, MEMORY_MODAL_CATEGORIES } from "@/lib/memories/categories";
+import { formatDisplayName } from "@/lib/names/format";
 import type { MemoryCategory } from "@/lib/memories/types";
 import type { CaptureVoiceNoteContext } from "@/lib/capture/context";
 import type { ExtractedCaptureItem } from "@/lib/ai/extract-memories";
@@ -29,7 +30,7 @@ export function CaptureReviewScreen({
   initialItems,
 }: CaptureReviewScreenProps) {
   const router = useRouter();
-  const name = firstName(voiceNote.friend_name);
+  const name = formatDisplayName(voiceNote.friend_name);
   const [items, setItems] = useState<EditableItem[]>(
     initialItems.map((item) => ({
       ...item,
@@ -178,7 +179,7 @@ export function CaptureReviewScreen({
                         >
                           {MEMORY_MODAL_CATEGORIES.map((categoryId) => (
                             <option key={categoryId} value={categoryId}>
-                              {MEMORY_CATEGORIES[categoryId].title(firstName(voiceNote.friend_name)).toLowerCase()}
+                              {MEMORY_CATEGORIES[categoryId].title(formatDisplayName(voiceNote.friend_name)).toLowerCase()}
                             </option>
                           ))}
                           <option value="other">other</option>

@@ -63,7 +63,7 @@ export function Q1Screen() {
       <NameChipList people={q1People} onRemove={removeQ1Person} />
 
       <AddPersonInput
-        placeholder="Add a name…"
+        placeholder="Add a name (First Last)…"
         onAdd={(name, phone) => addQ1Person(name, phone)}
       />
 

@@ -11,7 +11,7 @@ import { BottomNav } from "@/components/nav/BottomNav";
 import { TodayPageSkeleton } from "@/components/ui/Skeleton";
 import { fetchJson } from "@/lib/api/fetch-client";
 import type { FriendCategory, FriendSummary } from "@/lib/api/types";
-import { firstName } from "@/lib/memories/categories";
+import { formatDisplayName } from "@/lib/names/format";
 import { getFriendColor, getInitials } from "@/lib/friends/avatar-colors";
 
 type FriendsResponse = {
@@ -445,7 +445,7 @@ function FriendGrid({
             )}
           </div>
           <span className="mt-2 truncate font-sans text-[12px] font-medium text-ink">
-            {firstName(friend.name)}
+            {formatDisplayName(friend.name)}
           </span>
           {isArchived && friend.archived_at ? (
             <span className="mt-0.5 font-inter text-[9px] text-ink-soft/70">

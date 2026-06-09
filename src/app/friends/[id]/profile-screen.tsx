@@ -24,7 +24,7 @@ import type {
   MemoryNote,
 } from "@/lib/api/types";
 import { trackEvent } from "@/lib/analytics/events";
-import { firstName } from "@/lib/memories/categories";
+import { formatDisplayName } from "@/lib/names/format";
 import {
   CATEGORY_CADENCE_DAYS,
   categoryRelationshipLabel,
@@ -117,7 +117,7 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
         throw new Error(data.error ?? "Couldn't update — try again");
       }
 
-      showToast(`${firstName(friend.name)} is now in ${categoryToastLabel(category)}.`);
+      showToast(`${formatDisplayName(friend.name)} is now in ${categoryToastLabel(category)}.`);
     } catch (err) {
       setFriend(previous);
       showToast(err instanceof Error ? err.message : "Couldn't update — try again");
@@ -145,7 +145,7 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
 
       sessionStorage.setItem(
         "kinmatch-toast",
-        `${firstName(friend.name)} archived.`
+        `${formatDisplayName(friend.name)} archived.`
       );
       router.replace("/today");
     } catch (err) {
@@ -175,7 +175,7 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
       const category = data.category ?? friend.category;
       sessionStorage.setItem(
         "kinmatch-toast",
-        `${firstName(friend.name)} restored to ${categoryToastLabel(category)}. Tap to change.`
+        `${formatDisplayName(friend.name)} restored to ${categoryToastLabel(category)}. Tap to change.`
       );
       sessionStorage.setItem("kinmatch-toast-action", "change-category");
       sessionStorage.setItem("kinmatch-toast-friend-id", friend.id);
@@ -204,7 +204,7 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
 
       sessionStorage.setItem(
         "kinmatch-toast",
-        `${firstName(friend.name)} permanently deleted.`
+        `${formatDisplayName(friend.name)} permanently deleted.`
       );
       router.replace("/tribe");
     } catch (err) {
@@ -224,7 +224,7 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
     );
   }
 
-  const name = firstName(friend.name);
+  const name = formatDisplayName(friend.name);
   const prompt = friend.profile_prompt;
 
   return (

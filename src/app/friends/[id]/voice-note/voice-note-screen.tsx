@@ -22,7 +22,7 @@ import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
 import { REACHABILITY_ERROR, fetchJson } from "@/lib/api/fetch-client";
 import { trackEvent } from "@/lib/analytics/events";
 import type { FriendCategory, FriendProfile } from "@/lib/api/types";
-import { firstName } from "@/lib/memories/categories";
+import { formatDisplayName } from "@/lib/names/format";
 import { buildSmsLink } from "@/lib/phones/sms-link";
 import { pickShareText } from "@/lib/share-text/voice-note-variants";
 import {
@@ -233,7 +233,7 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
     );
   }
 
-  const displayName = firstName(friend.name);
+  const displayName = formatDisplayName(friend.name);
   const hasPhone = Boolean(friend.phone_number?.trim());
   const micReady = recorder.micStatus === "ready";
   const showRecorder = micReady && !recorder.audioBlob;

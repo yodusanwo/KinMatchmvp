@@ -15,7 +15,7 @@ import type { AvatarColor } from "@/lib/onboarding/types";
 
 type SheetMode = "none" | "actions" | "remove" | "add" | "threshold";
 
-function firstName(name: string) {
+function formatDisplayName(name: string) {
   return name.trim().split(/\s+/)[0] ?? name;
 }
 
@@ -89,7 +89,7 @@ export function HeldScreen() {
       return;
     }
     setSheetMode("none");
-    showToast(`${firstName(selected.name)} removed from your circle`);
+    showToast(`${formatDisplayName(selected.name)} removed from your circle`);
     await load();
   }
 
@@ -105,7 +105,7 @@ export function HeldScreen() {
       return;
     }
     setSheetMode("none");
-    showToast(`Invitation resent to ${firstName(selected.name)}`);
+    showToast(`Invitation resent to ${formatDisplayName(selected.name)}`);
     await load();
   }
 
@@ -295,7 +295,7 @@ function WatcherRow({
       <MiniAvatar name={entry.name} avatarColor={entry.avatar_color} size="sm" />
       <Link href={`/friends/${entry.friend_id}`} className="min-w-0 flex-1">
         <p className="truncate font-sans text-[15px] font-medium text-ink">
-          {firstName(entry.name)}
+          {formatDisplayName(entry.name)}
         </p>
         <p className="font-inter text-[12px] text-ink-soft">
           {statusLine(entry)}
@@ -349,7 +349,7 @@ function HeldSheet({
   onSaveThreshold: () => void;
 }) {
   if (mode === "none") return null;
-  const name = selected ? firstName(selected.name) : "";
+  const name = selected ? formatDisplayName(selected.name) : "";
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/35 px-3 pb-3">
@@ -543,7 +543,7 @@ function FriendPill({
       }`}
     >
       <MiniAvatar name={friend.name} avatarColor={friend.avatar_color} size="sm" />
-      {firstName(friend.name)}
+      {formatDisplayName(friend.name)}
     </button>
   );
 }

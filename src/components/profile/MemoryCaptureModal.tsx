@@ -17,13 +17,13 @@ import type { MemoryCategory, MemoryNote } from "@/lib/api/types";
 import {
   MEMORY_CATEGORIES,
   MEMORY_MODAL_CATEGORIES,
-  firstName,
 } from "@/lib/memories/categories";
 import {
   buildDateNoteText,
   dateEventNeedsContext,
   type DateEventKind,
 } from "@/lib/memories/date-events";
+import { formatDisplayName } from "@/lib/names/format";
 import { cn } from "@/lib/cn";
 
 type MemoryCaptureModalProps = {
@@ -131,7 +131,7 @@ export function MemoryCaptureModal({
   }, [open, onClose]);
 
   async function handleSaveNote() {
-    const name = firstName(friendName);
+    const name = formatDisplayName(friendName);
     const trimmed = noteTextForSave(
       category,
       name,
@@ -180,7 +180,7 @@ export function MemoryCaptureModal({
 
   if (!open) return null;
 
-  const name = firstName(friendName);
+  const name = formatDisplayName(friendName);
   const placeholder =
     MEMORY_CATEGORIES[category].capturePlaceholder(name);
   const isDates = category === "dates";
