@@ -2,10 +2,10 @@ import Link from "next/link";
 import { BrandBar, Eyebrow, Headline, Subhead, TextLink } from "@/components/brand";
 import { AppShell } from "@/components/layout/AppShell";
 import { BottomNav } from "@/components/nav/BottomNav";
-import { MiniAvatar } from "@/components/onboarding/MiniAvatar";
 import { formatDuration } from "@/components/voice-note/format-duration";
 import { requireOnboardedUser } from "@/lib/auth/require-user";
-import type { AvatarColor } from "@/lib/onboarding/types";
+import { getFriendColor, getInitials } from "@/lib/friends/avatar-colors";
+import type { FriendCategory } from "@/lib/api/types";
 
 type VoiceNoteRow = {
   id: string;
@@ -23,7 +23,7 @@ type VoiceNoteRow = {
 type FriendRow = {
   id: string;
   name: string;
-  avatar_color: AvatarColor;
+  category: FriendCategory | null;
 };
 
 type InteractionRow = {
@@ -98,7 +98,7 @@ export default async function VoiceNotesPage() {
     friendIds.length > 0
       ? supabase
           .from("friends")
-          .select("id, name, avatar_color")
+          .select("id, name, category")
           .in("id", friendIds)
           .is("archived_at", null)
       : Promise.resolve({ data: [] }),
@@ -153,11 +153,17 @@ export default async function VoiceNotesPage() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex min-w-0 items-center gap-3">
                       {friend && (
-                        <MiniAvatar
-                          name={friend.name}
-                          avatarColor={friend.avatar_color}
-                          size="sm"
-                        />
+                        <span
+                          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[12px] font-medium text-ink"
+                          style={{
+                            backgroundColor: getFriendColor(
+                              friend.id,
+                              friend.category ?? "inner_circle"
+                            ),
+                          }}
+                        >
+                          {getInitials(friend.name)}
+                        </span>
                       )}
                       <div className="min-w-0">
                         <p className="truncate font-sans text-sm font-medium text-ink">

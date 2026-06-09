@@ -164,3 +164,19 @@ export type FriendProfilePrompt =
       cta_label: string;
       cta_href: string;
     };
+
+export type DashboardResponse = {
+  user: {
+    firstName: string;
+  };
+  coreTribe: FriendSummary[];
+  momentum: {
+    growing: FriendSummary[];
+    stable: FriendSummary[];
+    needsAttention: FriendSummary[];
+  };
+  insights: {
+    weeklyReachOuts: number;
+    weeklyVoiceNotes: number;
+  };
+};
