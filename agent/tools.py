@@ -98,12 +98,8 @@ def get_user_rituals(user_id: str) -> dict:
             "overdue_count": sum(1 for r in rituals if r["is_overdue"]),
         }
     else:
-        # Rituals endpoint not built yet — return empty for production
-        # TODO: Build /api/agent/user/rituals endpoint
-        return {
-            "rituals": [],
-            "overdue_count": 0,
-        }
+        client = _get_api_client()
+        return client.get("/api/agent/user/rituals")
 
 
 def get_recent_user_activity(user_id: str, days: int = 7) -> dict:

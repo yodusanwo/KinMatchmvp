@@ -93,7 +93,7 @@ A closer look inside the Cloud Run container:
 
 **ADK LlmAgent** is the orchestrator. It receives a user prompt, calls Gemini 2.5 Flash with the system prompt and tool schemas, and iteratively executes the tool calls Gemini requests until the agent reaches a `finish()` state.
 
-**Gemini 2.5 Flash** runs on Vertex AI in us-central1. The model receives the full reasoning context (system prompt + user request + tool results so far) and decides what to call next.
+**Gemini 2.5 Flash** runs on Vertex AI. The model receives the full reasoning context (system prompt + user request + tool results so far) and decides what to call next.
 
 **13 Python tools** form the agent's available actions. They split into three categories:
 
