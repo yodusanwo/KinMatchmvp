@@ -222,7 +222,7 @@ We initially built a hand-rolled agent (`agent.py`) using direct Gemini API call
 
 ### Why MCP for tool exposure
 
-Brand voice is a reusable capability — not just useful to this agent. By exposing `compose_nudge_message` via MCP, we make KinMatch's italic-soft tone available to any MCP-compatible client. This isn't just architectural elegance: Cursor (our development environment) now uses our own MCP server to draft brand-aligned content. The same pattern could extend to Claude Desktop, future internal agents, or third-party integrations.
+Context-aware tone composition tool is a reusable capability — not just useful to this agent. By exposing `compose_nudge_message` via MCP, we make KinMatch's italic-soft tone available to any MCP-compatible client. This isn't just architectural elegance: Cursor (our development environment) now uses our own MCP server to draft context-aligned content. The same pattern could extend to Claude Desktop, future internal agents, or third-party integrations.
 
 ### Why privacy-first (no voice note transcription)
 
