@@ -25,7 +25,7 @@ export async function GET(_request: Request, context: RouteContext) {
           flexDirection: "column",
           width: "100%",
           height: "100%",
-          backgroundColor: "#D5E0D5",
+          backgroundColor: "#2F4032",
           padding: "80px",
           fontFamily: "Georgia, serif",
         }}
@@ -42,14 +42,14 @@ export async function GET(_request: Request, context: RouteContext) {
             style={{
               fontSize: "28px",
               fontWeight: 500,
-              color: "#1F1A14",
+              color: "#E8F0E8",
             }}
           >
             Kin
             <span
               style={{
                 fontStyle: "italic",
-                color: "#B65232",
+                color: "#F5A582",
               }}
             >
               Match
@@ -63,7 +63,7 @@ export async function GET(_request: Request, context: RouteContext) {
               position: "relative",
             }}
           >
-            {/* Left silhouette (forest) */}
+            {/* Left silhouette (light sage) */}
             <div
               style={{
                 position: "absolute",
@@ -78,14 +78,14 @@ export async function GET(_request: Request, context: RouteContext) {
                   width: "14px",
                   height: "14px",
                   borderRadius: "50%",
-                  backgroundColor: "#2F4032",
+                  backgroundColor: "#B5C5B5",
                 }}
               />
               <div
                 style={{
                   width: "20px",
                   height: "14px",
-                  backgroundColor: "#2F4032",
+                  backgroundColor: "#B5C5B5",
                   borderRadius: "0 0 10px 10px",
                   marginTop: "1px",
                 }}
@@ -106,14 +106,14 @@ export async function GET(_request: Request, context: RouteContext) {
                   width: "14px",
                   height: "14px",
                   borderRadius: "50%",
-                  backgroundColor: "#B65232",
+                  backgroundColor: "#F5A582",
                 }}
               />
               <div
                 style={{
                   width: "20px",
                   height: "14px",
-                  backgroundColor: "#B65232",
+                  backgroundColor: "#F5A582",
                   borderRadius: "0 0 10px 10px",
                   marginTop: "1px",
                 }}
@@ -143,8 +143,8 @@ export async function GET(_request: Request, context: RouteContext) {
                 width: "96px",
                 height: "96px",
                 borderRadius: "50%",
-                backgroundColor: "#2F4032",
-                color: "#D5E0D5",
+                backgroundColor: "#B5C5B5",
+                color: "#2F4032",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -160,7 +160,7 @@ export async function GET(_request: Request, context: RouteContext) {
                   fontSize: "20px",
                   textTransform: "uppercase",
                   letterSpacing: "0.15em",
-                  color: "rgba(31, 26, 20, 0.55)",
+                  color: "rgba(232, 240, 232, 0.7)",
                   fontWeight: 500,
                 }}
               >
@@ -170,7 +170,7 @@ export async function GET(_request: Request, context: RouteContext) {
                 style={{
                   fontSize: "80px",
                   fontWeight: 500,
-                  color: "#1F1A14",
+                  color: "#E8F0E8",
                   lineHeight: 1.1,
                   marginTop: "8px",
                 }}
@@ -184,7 +184,7 @@ export async function GET(_request: Request, context: RouteContext) {
             style={{
               fontSize: "32px",
               fontStyle: "italic",
-              color: "rgba(31, 26, 20, 0.7)",
+              color: "rgba(232, 240, 232, 0.8)",
               marginTop: "24px",
             }}
           >

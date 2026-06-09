@@ -61,7 +61,7 @@ export function WelcomeContent({ auth }: { auth: WelcomeAuthState }) {
             <>
               <PrimaryLink href="/signin?next=/onboarding/name">Get started</PrimaryLink>
               <p className="text-center">
-                <TextLink href="/signin?next=/today">
+                <TextLink href="/signin?next=/today" className="!text-ink hover:!text-ink">
                   Already have an account? Sign in
                 </TextLink>
               </p>

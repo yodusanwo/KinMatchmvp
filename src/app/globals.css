@@ -2,16 +2,16 @@
 @config "../../tailwind.config.ts";
 
 :root {
-  --cream: #d5e0d5;
-  --cream-deep: #c5d0c5;
-  --ink: #1f1a14;
-  --ink-soft: #463c2e;
-  --terracotta: #b65232;
-  --terracotta-deep: #8e3d22;
+  --cream: #2f4032;
+  --cream-deep: #253528;
+  --ink: #e8f0e8;
+  --ink-soft: #b5c5b5;
+  --terracotta: #f5a582;
+  --terracotta-deep: #e89470;
   --forest: #2f4032;
   --sage: #6b7a5c;
-  --mustard: #c68f3e;
-  --honey: #e8d494;
+  --mustard: #f5c56e;
+  --honey: #f5e5a0;
 }
 
 @theme inline {

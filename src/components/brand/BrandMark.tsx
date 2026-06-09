@@ -5,7 +5,7 @@ type BrandMarkProps = {
   className?: string;
 };
 
-/** Two intertwined head and shoulder silhouettes representing connection. */
+/** Two intertwined head and shoulder silhouettes representing connection (dark mode knockout). */
 export function BrandMark({ size = 28, className }: BrandMarkProps) {
   const clipId = `brandmark-intersect-${size}`;
 
@@ -26,12 +26,12 @@ export function BrandMark({ size = 28, className }: BrandMarkProps) {
         </clipPath>
       </defs>
       
-      {/* Left silhouette (forest green) */}
+      {/* Left silhouette (light sage) */}
       <g>
-        <circle cx="12" cy="12" r="4" className="fill-forest" />
+        <circle cx="12" cy="12" r="4" className="fill-[#b5c5b5]" />
         <path
           d="M6 20c0-2.2 2.7-4 6-4s6 1.8 6 4v6H6v-6z"
-          className="fill-forest"
+          className="fill-[#b5c5b5]"
         />
       </g>
       
