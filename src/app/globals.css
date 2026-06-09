@@ -25,7 +25,8 @@
   --color-sage: var(--sage);
   --color-mustard: var(--mustard);
   --color-honey: var(--honey);
-  --font-sans: var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-sans:
+    var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
   --font-inter: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
