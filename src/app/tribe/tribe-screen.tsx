@@ -236,7 +236,7 @@ export function TribeScreen() {
                       </button>
                     )}
                   </div>
-                  <p className="mt-1 font-inter text-[10px] italic text-[rgba(31,26,20,0.45)]">
+                  <p className="mt-1 font-inter text-[10px] italic text-ink-soft/70">
                     {acquaintances.length === 0
                       ? "Promote anyone here as friendships deepen."
                       : "Lighter ties. Hidden by default."}
@@ -263,7 +263,7 @@ export function TribeScreen() {
                         {showArchived ? "hide" : "show"}
                       </button>
                     </div>
-                    <p className="mt-1 font-inter text-[10px] italic text-[rgba(31,26,20,0.45)]">
+                    <p className="mt-1 font-inter text-[10px] italic text-ink-soft/70">
                       Hidden from active tribe. Tap to restore.
                     </p>
                     {showArchived && (
@@ -397,7 +397,7 @@ function CategorySection({
     <section>
       <Eyebrow>{title} · {friends.length}</Eyebrow>
       {friends.length === 0 ? (
-        <p className="mt-2 font-inter text-[10px] italic text-[rgba(31,26,20,0.45)]">
+        <p className="mt-2 font-inter text-[10px] italic text-ink-soft/70">
           {emptyCopy}
         </p>
       ) : (
@@ -445,7 +445,7 @@ function FriendGrid({
                 backgroundColor: categoryColor(friend),
                 fontSize: avatarTextSize,
                 boxShadow: halo
-                  ? "0 0 0 1.5px #F2EAD9, 0 0 0 3px rgba(31,26,20,0.18)"
+                  ? "0 0 0 1.5px rgba(232,240,232,0.3), 0 0 0 3px rgba(181,197,181,0.2)"
                   : undefined,
               }}
             >
@@ -461,12 +461,12 @@ function FriendGrid({
             {firstName(friend.name)}
           </span>
           {isArchived && friend.archived_at ? (
-            <span className="mt-0.5 font-inter text-[9px] text-[rgba(31,26,20,0.5)]">
+            <span className="mt-0.5 font-inter text-[9px] text-ink-soft/70">
               {archivedDaysAgo(friend.archived_at)}
             </span>
           ) : (
             quietLabel(friend) && (
-              <span className="mt-0.5 font-inter text-[9px] text-[rgba(31,26,20,0.5)]">
+              <span className="mt-0.5 font-inter text-[9px] text-ink-soft/70">
                 {quietLabel(friend)}
               </span>
             )

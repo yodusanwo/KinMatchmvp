@@ -30,11 +30,11 @@ export default function Icon() {
             fill="#B5C5B5"
           />
           
-          {/* Right silhouette (terracotta) */}
-          <circle cx="20" cy="12" r="4" fill="#F5A582" />
+          {/* Right silhouette (yellow/mustard) */}
+          <circle cx="20" cy="12" r="4" fill="#F5C56E" />
           <path
             d="M14 20c0-2.2 2.7-4 6-4s6 1.8 6 4v6h-12v-6z"
-            fill="#F5A582"
+            fill="#F5C56E"
           />
           
           {/* Overlap/intersection (mustard) */}

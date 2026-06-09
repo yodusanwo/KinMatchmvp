@@ -252,12 +252,12 @@ function MemoryPromptCard({
                     "rounded-xl bg-cream/70 px-3 py-2 font-inter text-xs italic leading-[1.5] transition-colors duration-500",
                     highlightId === note.id
                       ? "text-ink ring-1 ring-terracotta/40"
-                      : "text-[rgba(31,26,20,0.75)]"
+                      : "text-ink-soft/80"
                   )}
                 >
                   {note.text}
                   {note.event_date && categoryId === "dates" ? (
-                    <span className="not-italic text-[rgba(31,26,20,0.45)]">
+                    <span className="not-italic text-ink-soft/60">
                       {" "}
                       ({formatEventDate(note.event_date)})
                     </span>

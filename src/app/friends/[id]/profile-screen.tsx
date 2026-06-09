@@ -240,37 +240,8 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
       <div className="px-5 pb-24 pt-4">
         <ProfileHeader friend={friend} />
 
-        <SuggestedNextStepCard
-          href={prompt.cta_href}
-          quote={prompt.quote}
-          whyThisWorks={prompt.kind === "send" ? prompt.why_this_works : null}
-          capturePrompt={prompt.kind === "capture" ? prompt.prompt : undefined}
-          ctaLabel={prompt.cta_label}
-          sendMethodHint={
-            prompt.kind === "send" ? (
-              friend.phone_number ? (
-                "→ Opens in Messages"
-              ) : (
-                <Link
-                  href={`#friend-phone`}
-                  className="text-terracotta underline decoration-terracotta/60 underline-offset-2"
-                  onClick={(event) => {
-                    event.preventDefault();
-                    document
-                      .getElementById("friend-phone")
-                      ?.scrollIntoView({ behavior: "smooth" });
-                  }}
-                >
-                  Add {name}&apos;s number for one-tap sending →
-                </Link>
-              )
-            ) : undefined
-          }
-          className="mt-4"
-        />
-
         {prompt.kind === "send" && (
-          <div id="friend-phone">
+          <div id="friend-phone" className="mt-4">
             <FriendPhoneSection
               friendId={friend.id}
               friendName={friend.name}

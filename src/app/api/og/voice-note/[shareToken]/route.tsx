@@ -49,7 +49,7 @@ export async function GET(_request: Request, context: RouteContext) {
             <span
               style={{
                 fontStyle: "italic",
-                color: "#F5A582",
+                color: "#F5C56E",
               }}
             >
               Match
@@ -106,14 +106,14 @@ export async function GET(_request: Request, context: RouteContext) {
                   width: "14px",
                   height: "14px",
                   borderRadius: "50%",
-                  backgroundColor: "#F5A582",
+                  backgroundColor: "#F5C56E",
                 }}
               />
               <div
                 style={{
                   width: "20px",
                   height: "14px",
-                  backgroundColor: "#F5A582",
+                  backgroundColor: "#F5C56E",
                   borderRadius: "0 0 10px 10px",
                   marginTop: "1px",
                 }}

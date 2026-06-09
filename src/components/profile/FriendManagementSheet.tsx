@@ -143,7 +143,7 @@ export function FriendManagementSheet({
             <h2 className="font-sans text-xl font-medium text-ink">
               Delete {name} permanently?
             </h2>
-            <p className="font-inter text-xs italic leading-[1.5] text-[rgba(31,26,20,0.75)]">
+            <p className="font-inter text-xs italic leading-[1.5] text-ink-soft/85">
               This permanently deletes {name}&apos;s profile, all memory notes
               you&apos;ve saved about them, and their voice notes. This cannot
               be undone.
@@ -170,7 +170,7 @@ export function FriendManagementSheet({
             <h2 className="font-sans text-xl font-medium text-ink">
               Archive {name}?
             </h2>
-            <p className="font-inter text-xs italic leading-[1.5] text-[rgba(31,26,20,0.75)]">
+            <p className="font-inter text-xs italic leading-[1.5] text-ink-soft/85">
               Archiving hides {name}&apos;s profile and notes from your active
               tribe. You can restore them anytime from the archived section.
               Their voice notes and shared links remain unchanged.
