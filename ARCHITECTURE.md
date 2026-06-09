@@ -33,7 +33,7 @@ When a friend has been quiet, has shown engagement, and the user has not already
 |---|---|---|
 | **KinMatch App** | Consumer-facing voice note platform | Next.js 15 / Vercel |
 | **Relational Care Agent** | Autonomous reasoning about who needs outreach | Google ADK / Gemini 2.5 Flash |
-| **MCP Server** | Context-aware tone composition exposed via MCP protocol | FastMCP |
+| **MCP Server** | Context-aware tone composition tool exposed via MCP protocol | FastMCP |
 | **Data Layer** | Friends, notes, voice notes, engagement, agent decisions | Supabase (PostgreSQL) |
 
 ---
