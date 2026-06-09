@@ -1,23 +1,54 @@
 import type { FriendCategory } from "@/lib/api/types";
 
-// Consistent color palettes for each category
+// Expanded color palettes with more variety for each category
 const CATEGORY_COLOR_PALETTES: Record<FriendCategory, string[]> = {
   inner_circle: [
-    "#E89470", "#C68F3E", "#D4A67C", "#B8977A", "#E8A88C",
-    "#D4926A", "#B07D4E", "#E0A882", "#C89058", "#D89876"
+    "#FF9B82",  // Bright coral
+    "#E67D64",  // Deep coral
+    "#FFB399",  // Peachy coral
+    "#FF8C72",  // Warm coral  
+    "#F5A582",  // Soft coral
+    "#FF7F6E",  // Vivid coral
+    "#E8968A",  // Muted coral
+    "#FFA890",  // Light coral
+    "#E89470",  // Salmon coral
+    "#D4926A",  // Earthy coral
   ],
   village: [
-    "#9DB58A", "#D4A356", "#8BA878", "#C69546", "#AAC79A",
-    "#91AB7C", "#C8A04C", "#A5C28E", "#BA9842", "#98B384"
+    "#6B7A5C",  // Sage olive
+    "#7B8A6C",  // Light olive
+    "#5D6C4E",  // Deep olive
+    "#738269",  // Muted olive
+    "#677656",  // Earthy olive
+    "#8A9B7A",  // Soft olive
+    "#5E6D50",  // Dark olive
+    "#7C8B6D",  // Medium olive
+    "#6A7959",  // Warm olive
+    "#788870",  // Pale olive
   ],
   family: [
-    "#D4A67C", "#B8977A", "#C89668", "#A88665", "#E0B68A",
-    "#CC9E70", "#B48E72", "#D8AE84", "#C0926C", "#DCB08C"
+    "#D4A356",  // Gold
+    "#C68F3E",  // Deep gold
+    "#E8BA6F",  // Light gold
+    "#DCA850",  // Warm gold
+    "#CFAB5C",  // Soft gold
+    "#E0B45A",  // Bright gold
+    "#C9A248",  // Rich gold
+    "#DDAE62",  // Mellow gold
+    "#D4A67C",  // Tan gold
+    "#CC9E70",  // Bronze gold
   ],
   acquaintance: [
-    "#9DB58A", "#D4A356", "#B8977A", "#C89058",
-    "#A5C28E", "#C8A04C", "#B0927C", "#BC9848",
-    "#91AB7C", "#C69546"
+    "#C8A882",  // Warm beige
+    "#D4B896",  // Light tan
+    "#B89968",  // Bronze tan
+    "#E0C4A0",  // Pale beige
+    "#C09864",  // Golden tan
+    "#D8BC94",  // Soft tan
+    "#B8A078",  // Earthy beige
+    "#CCAC80",  // Warm sand
+    "#D0B488",  // Desert tan
+    "#BC9C70",  // Rustic tan
   ],
 };
 
