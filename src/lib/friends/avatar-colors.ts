@@ -1,22 +1,23 @@
 import type { FriendCategory } from "@/lib/api/types";
 
 // All categories use the same vibrant, highly distinct 15-color palette
+// Colors are saturated and maximally distinct for clear visual differentiation
 const SHARED_COLOR_PALETTE = [
-  "#B65232",  // Terracotta red
-  "#D4A356",  // Bright gold
-  "#2F4032",  // Deep forest green
-  "#E67D64",  // Coral salmon
-  "#C68F3E",  // Mustard yellow
-  "#6B7A5C",  // Sage green
+  "#FF9B82",  // Bright coral (matches button color)
+  "#F4C542",  // Bright golden yellow
+  "#2F4F32",  // Deep forest green
+  "#D65745",  // Vibrant red
+  "#E8A448",  // Bright amber
+  "#6B8E4E",  // Olive green
   "#8E3D22",  // Deep burgundy
-  "#E8D494",  // Honey yellow
-  "#5D6C4E",  // Olive green
-  "#D97B4F",  // Burnt orange
-  "#A89668",  // Golden tan
-  "#3F4F42",  // Dark pine
+  "#FFD670",  // Sunny yellow
+  "#A0522D",  // Sienna brown
   "#C85A3E",  // Bright terracotta
-  "#DCA850",  // Warm gold
-  "#788870",  // Muted green
+  "#B8860B",  // Dark golden rod
+  "#4A6741",  // Hunter green
+  "#E67D64",  // Warm salmon
+  "#D2691E",  // Chocolate
+  "#7A8B4F",  // Yellow green
 ];
 
 // All categories use the same color palette
