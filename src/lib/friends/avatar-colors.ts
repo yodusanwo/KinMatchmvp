@@ -15,16 +15,16 @@ const CATEGORY_COLOR_PALETTES: Record<FriendCategory, string[]> = {
     "#D4926A",  // Earthy coral
   ],
   village: [
+    "#B65232",  // Terracotta red
     "#6B7A5C",  // Sage olive
-    "#7B8A6C",  // Light olive
-    "#5D6C4E",  // Deep olive
-    "#738269",  // Muted olive
-    "#677656",  // Earthy olive
-    "#8A9B7A",  // Soft olive
-    "#5E6D50",  // Dark olive
-    "#7C8B6D",  // Medium olive
-    "#6A7959",  // Warm olive
-    "#788870",  // Pale olive
+    "#C68F3E",  // Mustard gold
+    "#E8D494",  // Honey yellow
+    "#8E3D22",  // Deep terracotta
+    "#2F4032",  // Forest green
+    "#D4A356",  // Gold
+    "#7B8A6C",  // Light sage
+    "#B07D4E",  // Bronze
+    "#9DB58A",  // Soft green
   ],
   family: [
     "#D4A356",  // Gold
