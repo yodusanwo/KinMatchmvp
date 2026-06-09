@@ -4,171 +4,238 @@ import {
 } from "@/lib/voice-notes/public-voice-note";
 import { formatDisplayName } from "@/lib/names/format";
 import { normalizeShareToken } from "@/lib/voice-notes/blob-url";
+import { getFriendshipTheme, type CardTheme } from "@/lib/voice-notes/card-themes";
+import { generateNoteTitle } from "@/lib/voice-notes/note-titles";
 
 export const runtime = "edge";
 
 type RouteContext = { params: Promise<{ shareToken: string }> };
 
-// Simple hash function to get consistent icon for each sender
-function hashString(str: string): number {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32-bit integer
-  }
-  return Math.abs(hash);
-}
-
-// Icon components - each returns JSX for the icon
-function getSenderIcon(senderName: string) {
-  const icons = [
-    // Sunflower
-    () => (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ position: "relative", width: "192px", height: "192px" }}>
-          {/* Petals */}
-          {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
-            <div
-              key={angle}
-              style={{
-                position: "absolute",
-                width: "60px",
-                height: "60px",
-                backgroundColor: "#f5c56e",
-                borderRadius: "50% 50% 0 50%",
-                top: "66px",
-                left: "66px",
-                transform: `rotate(${angle}deg) translateY(-64px)`,
-                transformOrigin: "center",
-              }}
-            />
-          ))}
-          {/* Center */}
-          <div
-            style={{
-              position: "absolute",
-              width: "80px",
-              height: "80px",
-              backgroundColor: "#8e3d22",
-              borderRadius: "50%",
-              top: "56px",
-              left: "56px",
-            }}
-          />
-        </div>
-      </div>
-    ),
-    // Smiley Face
-    () => (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "192px", height: "192px", backgroundColor: "#f5c56e", borderRadius: "50%" }}>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
-          {/* Eyes */}
-          <div style={{ display: "flex", gap: "48px", marginTop: "40px" }}>
-            <div style={{ width: "16px", height: "16px", backgroundColor: "#1f1a14", borderRadius: "50%" }} />
-            <div style={{ width: "16px", height: "16px", backgroundColor: "#1f1a14", borderRadius: "50%" }} />
-          </div>
-          {/* Smile */}
-          <div style={{ width: "64px", height: "32px", borderBottom: "8px solid #1f1a14", borderRadius: "0 0 100% 100%", marginTop: "8px" }} />
-        </div>
-      </div>
-    ),
-    // Leaf
-    () => (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "192px", height: "192px" }}>
-        <div
-          style={{
-            width: "120px",
-            height: "160px",
-            backgroundColor: "#6b7a5c",
-            borderRadius: "0 100% 100% 0",
-            transform: "rotate(-30deg)",
-            position: "relative",
-          }}
-        >
-          <div
-            style={{
-              position: "absolute",
-              width: "4px",
-              height: "140px",
-              backgroundColor: "#463c2e",
-              left: "0",
-              top: "10px",
-            }}
-          />
-        </div>
-      </div>
-    ),
-    // Heart
-    () => (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "192px", height: "192px" }}>
-        <div style={{ position: "relative", width: "128px", height: "128px" }}>
-          <div
-            style={{
-              position: "absolute",
-              width: "64px",
-              height: "96px",
-              backgroundColor: "#b65232",
-              borderRadius: "64px 64px 0 0",
-              left: "0",
-              top: "16px",
-              transform: "rotate(-45deg)",
-              transformOrigin: "100% 100%",
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              width: "64px",
-              height: "96px",
-              backgroundColor: "#b65232",
-              borderRadius: "64px 64px 0 0",
-              right: "0",
-              top: "16px",
-              transform: "rotate(45deg)",
-              transformOrigin: "0% 100%",
-            }}
-          />
-        </div>
-      </div>
-    ),
-    // Simple Circle with Wave pattern
-    () => (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "192px", height: "192px", backgroundColor: "#B5C5B5", borderRadius: "50%", position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", bottom: "0", left: "0", right: "0", height: "80px", backgroundColor: "#6b7a5c", borderRadius: "50% 50% 0 0" }} />
-        <div style={{ position: "absolute", bottom: "24px", left: "0", right: "0", height: "60px", backgroundColor: "#8e9b7d", borderRadius: "50% 50% 0 0" }} />
-      </div>
-    ),
-    // Star-like shape
-    () => (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "192px", height: "192px" }}>
-        <div style={{ position: "relative", width: "160px", height: "160px" }}>
-          {[0, 60, 120, 180, 240, 300].map((angle) => (
-            <div
-              key={angle}
-              style={{
-                position: "absolute",
-                width: "40px",
-                height: "40px",
-                backgroundColor: "#D4A356",
-                borderRadius: "50%",
-                top: "60px",
-                left: "60px",
-                transform: `rotate(${angle}deg) translateY(-60px)`,
-              }}
-            />
-          ))}
-          <div style={{ position: "absolute", width: "60px", height: "60px", backgroundColor: "#c68f3e", borderRadius: "50%", top: "50px", left: "50px" }} />
-        </div>
-      </div>
-    ),
-  ];
-
-  const hash = hashString(senderName);
-  const iconIndex = hash % icons.length;
-  const IconComponent = icons[iconIndex];
+// Render themed icon based on theme's icon type
+function renderThemedIcon(theme: CardTheme) {
+  const size = 192;
+  const colors = theme.colors;
   
-  return <IconComponent />;
+  switch (theme.iconType) {
+    case 'sunflower':
+      return (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ position: "relative", width: `${size}px`, height: `${size}px` }}>
+            {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
+              <div
+                key={angle}
+                style={{
+                  position: "absolute",
+                  width: `${size * 0.3125}px`,
+                  height: `${size * 0.3125}px`,
+                  backgroundColor: colors.accent,
+                  borderRadius: "50% 50% 0 50%",
+                  top: `${size * 0.34375}px`,
+                  left: `${size * 0.34375}px`,
+                  transform: `rotate(${angle}deg) translateY(-${size * 0.333}px)`,
+                  transformOrigin: "center",
+                }}
+              />
+            ))}
+            <div
+              style={{
+                position: "absolute",
+                width: `${size * 0.4167}px`,
+                height: `${size * 0.4167}px`,
+                backgroundColor: colors.accentDark,
+                borderRadius: "50%",
+                top: `${size * 0.292}px`,
+                left: `${size * 0.292}px`,
+              }}
+            />
+          </div>
+        </div>
+      );
+    
+    case 'heart':
+      return (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: `${size}px`, height: `${size}px` }}>
+          <div style={{ position: "relative", width: `${size * 0.667}px`, height: `${size * 0.667}px` }}>
+            <div
+              style={{
+                position: "absolute",
+                width: `${size * 0.333}px`,
+                height: `${size * 0.5}px`,
+                backgroundColor: colors.accent,
+                borderRadius: `${size * 0.333}px ${size * 0.333}px 0 0`,
+                left: "0",
+                top: `${size * 0.0833}px`,
+                transform: "rotate(-45deg)",
+                transformOrigin: "100% 100%",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                width: `${size * 0.333}px`,
+                height: `${size * 0.5}px`,
+                backgroundColor: colors.accent,
+                borderRadius: `${size * 0.333}px ${size * 0.333}px 0 0`,
+                right: "0",
+                top: `${size * 0.0833}px`,
+                transform: "rotate(45deg)",
+                transformOrigin: "0% 100%",
+              }}
+            />
+          </div>
+        </div>
+      );
+    
+    case 'leaf':
+      return (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: `${size}px`, height: `${size}px` }}>
+          <div
+            style={{
+              width: `${size * 0.625}px`,
+              height: `${size * 0.833}px`,
+              backgroundColor: colors.accent,
+              borderRadius: "0 100% 100% 0",
+              transform: "rotate(-30deg)",
+              position: "relative",
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                width: "4px",
+                height: `${size * 0.729}px`,
+                backgroundColor: colors.accentDark,
+                left: "0",
+                top: `${size * 0.052}px`,
+              }}
+            />
+          </div>
+        </div>
+      );
+    
+    case 'wave':
+      return (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: `${size}px`, height: `${size}px`, backgroundColor: colors.backgroundSecondary, borderRadius: "50%", position: "relative", overflow: "hidden" }}>
+          <div style={{ position: "absolute", bottom: "0", left: "0", right: "0", height: `${size * 0.4167}px`, backgroundColor: colors.accent, borderRadius: "50% 50% 0 0" }} />
+          <div style={{ position: "absolute", bottom: `${size * 0.125}px`, left: "0", right: "0", height: `${size * 0.3125}px`, backgroundColor: colors.accentDark, borderRadius: "50% 50% 0 0" }} />
+        </div>
+      );
+    
+    case 'star':
+      return (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: `${size}px`, height: `${size}px` }}>
+          <div style={{ position: "relative", width: `${size * 0.833}px`, height: `${size * 0.833}px` }}>
+            {[0, 60, 120, 180, 240, 300].map((angle) => (
+              <div
+                key={angle}
+                style={{
+                  position: "absolute",
+                  width: `${size * 0.2083}px`,
+                  height: `${size * 0.2083}px`,
+                  backgroundColor: colors.accent,
+                  borderRadius: "50%",
+                  top: `${size * 0.3125}px`,
+                  left: `${size * 0.3125}px`,
+                  transform: `rotate(${angle}deg) translateY(-${size * 0.3125}px)`,
+                }}
+              />
+            ))}
+            <div style={{ position: "absolute", width: `${size * 0.3125}px`, height: `${size * 0.3125}px`, backgroundColor: colors.accentDark, borderRadius: "50%", top: `${size * 0.260}px`, left: `${size * 0.260}px` }} />
+          </div>
+        </div>
+      );
+    
+    case 'sun':
+      return (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ position: "relative", width: `${size}px`, height: `${size}px` }}>
+            {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((angle) => (
+              <div
+                key={angle}
+                style={{
+                  position: "absolute",
+                  width: `${size * 0.15}px`,
+                  height: `${size * 0.25}px`,
+                  backgroundColor: colors.accent,
+                  borderRadius: `${size * 0.075}px`,
+                  top: `${size * 0.375}px`,
+                  left: `${size * 0.425}px`,
+                  transform: `rotate(${angle}deg) translateY(-${size * 0.35}px)`,
+                  transformOrigin: "50% 100%",
+                }}
+              />
+            ))}
+            <div
+              style={{
+                position: "absolute",
+                width: `${size * 0.5}px`,
+                height: `${size * 0.5}px`,
+                backgroundColor: colors.accentDark,
+                borderRadius: "50%",
+                top: `${size * 0.25}px`,
+                left: `${size * 0.25}px`,
+              }}
+            />
+          </div>
+        </div>
+      );
+    
+    case 'moon':
+      return (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: `${size}px`, height: `${size}px` }}>
+          <div style={{ position: "relative", width: `${size * 0.667}px`, height: `${size * 0.667}px` }}>
+            <div style={{ width: "100%", height: "100%", backgroundColor: colors.accent, borderRadius: "50%" }} />
+            <div
+              style={{
+                position: "absolute",
+                width: "100%",
+                height: "100%",
+                backgroundColor: colors.background,
+                borderRadius: "50%",
+                top: `${size * 0.0833}px`,
+                left: `${size * 0.0833}px`,
+              }}
+            />
+          </div>
+        </div>
+      );
+    
+    case 'flower':
+    default:
+      return (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ position: "relative", width: `${size}px`, height: `${size}px` }}>
+            {[0, 72, 144, 216, 288].map((angle) => (
+              <div
+                key={angle}
+                style={{
+                  position: "absolute",
+                  width: `${size * 0.375}px`,
+                  height: `${size * 0.375}px`,
+                  backgroundColor: colors.accent,
+                  borderRadius: "50%",
+                  top: `${size * 0.3125}px`,
+                  left: `${size * 0.3125}px`,
+                  transform: `rotate(${angle}deg) translateY(-${size * 0.28}px)`,
+                  transformOrigin: "center",
+                }}
+              />
+            ))}
+            <div
+              style={{
+                position: "absolute",
+                width: `${size * 0.35}px`,
+                height: `${size * 0.35}px`,
+                backgroundColor: colors.accentDark,
+                borderRadius: "50%",
+                top: `${size * 0.325}px`,
+                left: `${size * 0.325}px`,
+              }}
+            />
+          </div>
+        </div>
+      );
+  }
 }
 
 export async function GET(_request: Request, context: RouteContext) {
@@ -177,6 +244,17 @@ export async function GET(_request: Request, context: RouteContext) {
   const { data: voiceNote } = await fetchPublicVoiceNote(shareToken);
 
   const senderName = formatDisplayName(voiceNote?.sender_name ?? "") || "a friend";
+  
+  // Generate theme based on friendship (using placeholder IDs for now)
+  // In production, would use actual user_id and friend_id
+  const theme = getFriendshipTheme(voiceNote?.sender_name ?? "default", "recipient");
+  
+  // Generate contextual note title
+  const noteTitle = generateNoteTitle({
+    timeOfDay: new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening',
+    daysSinceLastContact: 5, // Would come from database
+    relationshipMomentum: 'stable',
+  });
 
   return new ImageResponse(
     (
@@ -186,155 +264,144 @@ export async function GET(_request: Request, context: RouteContext) {
           flexDirection: "column",
           width: "100%",
           height: "100%",
-          backgroundColor: "#f2ead9",
+          backgroundColor: theme.colors.background,
           padding: "80px",
-          fontFamily: "Georgia, serif",
+          fontFamily: "system-ui, -apple-system, sans-serif",
         }}
       >
+        {/* Subtle pattern overlay */}
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            opacity: 0.15,
+            backgroundImage: `radial-gradient(circle at 20px 20px, ${theme.colors.accentDark} 2px, transparent 0)`,
+            backgroundSize: "40px 40px",
+          }}
+        />
+
+        {/* Header with KinMatch branding */}
         <div
           style={{
             display: "flex",
             justifyContent: "flex-end",
             alignItems: "center",
             gap: "12px",
+            position: "relative",
+            zIndex: 1,
           }}
         >
           <span
             style={{
-              fontSize: "28px",
+              fontSize: "24px",
               fontWeight: 500,
-              color: "#1f1a14",
+              color: theme.colors.textPrimary,
             }}
           >
             Kin
             <span
               style={{
                 fontStyle: "italic",
-                color: "#b65232",
+                color: theme.colors.accent,
               }}
             >
               Match
             </span>
           </span>
-          <div
-            style={{
-              width: "48px",
-              height: "32px",
-              display: "flex",
-              position: "relative",
-            }}
-          >
-            {/* Left silhouette */}
-            <div
-              style={{
-                position: "absolute",
-                left: "0",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
-              <div
-                style={{
-                  width: "14px",
-                  height: "14px",
-                  borderRadius: "50%",
-                  backgroundColor: "#6b7a5c",
-                }}
-              />
-              <div
-                style={{
-                  width: "20px",
-                  height: "14px",
-                  backgroundColor: "#6b7a5c",
-                  borderRadius: "0 0 10px 10px",
-                  marginTop: "1px",
-                }}
-              />
-            </div>
-            {/* Right silhouette */}
-            <div
-              style={{
-                position: "absolute",
-                left: "16px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
-              <div
-                style={{
-                  width: "14px",
-                  height: "14px",
-                  borderRadius: "50%",
-                  backgroundColor: "#b65232",
-                }}
-              />
-              <div
-                style={{
-                  width: "20px",
-                  height: "14px",
-                  backgroundColor: "#b65232",
-                  borderRadius: "0 0 10px 10px",
-                  marginTop: "1px",
-                }}
-              />
-            </div>
-          </div>
         </div>
 
+        {/* Main Content */}
         <div
           style={{
             display: "flex",
             flexDirection: "column",
             flex: 1,
             justifyContent: "center",
-            gap: "24px",
+            gap: "32px",
+            position: "relative",
+            zIndex: 1,
           }}
         >
+          {/* Icon and Text */}
           <div
             style={{
               display: "flex",
+              flexDirection: "column",
               alignItems: "center",
-              gap: "24px",
+              gap: "32px",
+              textAlign: "center",
             }}
           >
-            {getSenderIcon(senderName)}
-            <div style={{ display: "flex", flexDirection: "column" }}>
+            {renderThemedIcon(theme)}
+            
+            {/* Note Title */}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "12px",
+                maxWidth: "800px",
+              }}
+            >
               <span
                 style={{
-                  fontSize: "20px",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.15em",
-                  color: "rgba(31, 26, 20, 0.6)",
-                  fontWeight: 500,
+                  fontSize: "48px",
+                  fontWeight: 600,
+                  color: theme.colors.textPrimary,
+                  lineHeight: 1.2,
                 }}
               >
-                a voice note from
+                {noteTitle}
               </span>
+              
               <span
                 style={{
-                  fontSize: "80px",
+                  fontSize: "28px",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.12em",
+                  color: theme.colors.textSecondary,
+                  fontWeight: 400,
+                }}
+              >
+                A voice note from
+              </span>
+              
+              <span
+                style={{
+                  fontSize: "72px",
                   fontWeight: 500,
-                  color: "#1f1a14",
+                  color: theme.colors.textPrimary,
                   lineHeight: 1.1,
-                  marginTop: "8px",
                 }}
               >
                 {senderName}
               </span>
             </div>
           </div>
+        </div>
 
+        {/* Footer */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "16px",
+            position: "relative",
+            zIndex: 1,
+          }}
+        >
           <span
             style={{
-              fontSize: "32px",
+              fontSize: "24px",
               fontStyle: "italic",
-              color: "rgba(31, 26, 20, 0.7)",
-              marginTop: "24px",
+              color: theme.colors.textSecondary,
             }}
           >
-            Tap to listen, no app needed.
+            Tap to listen · No app needed
           </span>
         </div>
       </div>
