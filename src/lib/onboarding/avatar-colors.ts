@@ -2,11 +2,11 @@ import type { AvatarColor } from "./types";
 import { AVATAR_COLORS } from "./types";
 
 export const avatarColorClasses: Record<AvatarColor, string> = {
-  t: "bg-terracotta text-cream",
-  t2: "bg-terracotta-deep text-cream",
-  f: "bg-forest text-cream",
-  m: "bg-mustard text-ink",
-  g: "bg-sage text-cream",
+  t: "bg-[#D4A67C] text-ink",
+  t2: "bg-[#D4A356] text-ink",
+  f: "bg-[#9DB58A] text-ink",
+  m: "bg-[#E89470] text-ink",
+  g: "bg-[#B8977A] text-ink",
 };
 
 export function randomAvatarColor(): AvatarColor {

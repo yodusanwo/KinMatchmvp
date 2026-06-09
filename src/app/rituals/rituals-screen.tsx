@@ -105,7 +105,7 @@ export function RitualsScreen() {
               No rituals yet. Standing dates with your people are the easiest
               way to keep a friendship in rhythm.
             </p>
-            <div className="rounded-2xl border border-ink/[0.12] bg-cream-deep/50 p-4">
+            <div className="rounded-2xl border border-ink-soft/30 bg-cream-deep/50 p-4">
               <p className="font-sans text-sm font-medium text-ink">
                 Want a suggestion? Try one of these:
               </p>
@@ -132,7 +132,7 @@ export function RitualsScreen() {
             <RitualSection title="ongoing" rituals={grouped.ongoing} />
             <Link
               href="/rituals/new"
-              className="flex w-full items-center justify-center rounded-2xl border border-dashed border-ink/[0.25] px-4 py-4 font-sans text-xs font-medium text-ink/65"
+              className="flex w-full items-center justify-center rounded-2xl border border-dashed border-ink-soft/40 px-4 py-4 font-sans text-xs font-medium text-ink-soft"
             >
               + Add a ritual
             </Link>
@@ -165,8 +165,8 @@ function RitualSection({
             href={`/rituals/${ritual.id}`}
             className={`block rounded-2xl border p-4 ${
               urgent
-                ? "border-terracotta/20 bg-terracotta/10"
-                : "border-ink/[0.08] bg-cream-deep"
+                ? "border-terracotta/40 bg-terracotta/20"
+                : "border-ink-soft/25 bg-cream-deep/60"
             }`}
           >
             <div className="flex items-start justify-between gap-3">
@@ -179,7 +179,7 @@ function RitualSection({
                 {relativeDate(ritual.next_date)}
               </p>
             </div>
-            <p className="mt-2 font-inter text-[11px] italic leading-relaxed text-[rgba(31,26,20,0.6)]">
+            <p className="mt-2 font-inter text-[11px] italic leading-relaxed text-ink-soft/80">
               {participantLine(ritual)}
             </p>
           </Link>

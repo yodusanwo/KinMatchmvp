@@ -18,10 +18,24 @@ type FriendsResponse = {
 };
 
 const CATEGORY_COLORS: Record<FriendCategory, string[]> = {
-  inner_circle: ["#E89470", "#C68F3E"],
-  village: ["#9DB58A", "#D4A356"],
-  family: ["#D4A67C", "#B8977A"],
-  acquaintance: ["rgba(157,181,138,0.85)", "rgba(212,163,86,0.85)"],
+  inner_circle: [
+    "#E89470", "#C68F3E", "#D4A67C", "#B8977A", "#E8A88C",
+    "#D4926A", "#B07D4E", "#E0A882", "#C89058", "#D89876"
+  ],
+  village: [
+    "#9DB58A", "#D4A356", "#8BA878", "#C69546", "#AAC79A",
+    "#91AB7C", "#C8A04C", "#A5C28E", "#BA9842", "#98B384"
+  ],
+  family: [
+    "#D4A67C", "#B8977A", "#C89668", "#A88665", "#E0B68A",
+    "#CC9E70", "#B48E72", "#D8AE84", "#C0926C", "#DCB08C"
+  ],
+  acquaintance: [
+    "rgba(157,181,138,0.85)", "rgba(212,163,86,0.85)", 
+    "rgba(184,151,122,0.85)", "rgba(200,150,104,0.85)",
+    "rgba(169,190,150,0.85)", "rgba(196,155,98,0.85)",
+    "rgba(176,161,132,0.85)", "rgba(188,148,110,0.85)"
+  ],
 };
 
 function initials(name: string) {
