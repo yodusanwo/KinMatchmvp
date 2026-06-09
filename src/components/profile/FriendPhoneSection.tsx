@@ -40,7 +40,7 @@ export function FriendPhoneSection({
         error?: string;
       };
       if (!response.ok) {
-        throw new Error(data.error ?? "Couldn't save — try again.");
+        throw new Error(data.error ?? "Couldn't save, try again.");
       }
       onSaved(data.phone_number ?? null);
       setValue(data.phone_number ?? "");
@@ -48,7 +48,7 @@ export function FriendPhoneSection({
       onToast(data.phone_number ? "Saved." : "Removed.");
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Couldn't save — try again."
+        err instanceof Error ? err.message : "Couldn't save, try again."
       );
     } finally {
       setSaving(false);
@@ -101,7 +101,7 @@ export function FriendPhoneSection({
       />
       <p className="font-inter text-xs italic leading-relaxed text-ink-soft">
         {name}&apos;s number stays on their KinMatch profile. KinMatch never
-        texts them — it just lets your phone auto-fill when you send.
+        texts them, it just lets your phone auto-fill when you send.
       </p>
       {error && (
         <p className="font-inter text-xs italic text-terracotta-deep" role="alert">

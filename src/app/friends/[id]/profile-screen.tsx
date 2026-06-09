@@ -114,13 +114,13 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
       };
 
       if (!response.ok) {
-        throw new Error(data.error ?? "Couldn't update — try again");
+        throw new Error(data.error ?? "Couldn't update, try again");
       }
 
       showToast(`${formatDisplayName(friend.name)} is now in ${categoryToastLabel(category)}.`);
     } catch (err) {
       setFriend(previous);
-      showToast(err instanceof Error ? err.message : "Couldn't update — try again");
+      showToast(err instanceof Error ? err.message : "Couldn't update, try again");
     } finally {
       setSavingAction(false);
       setSheetMode("actions");
@@ -140,7 +140,7 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
       };
 
       if (!response.ok) {
-        throw new Error(data.error ?? "Couldn't archive — try again");
+        throw new Error(data.error ?? "Couldn't archive, try again");
       }
 
       sessionStorage.setItem(
@@ -149,7 +149,7 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
       );
       router.replace("/today");
     } catch (err) {
-      showToast(err instanceof Error ? err.message : "Couldn't archive — try again");
+      showToast(err instanceof Error ? err.message : "Couldn't archive, try again");
       setSavingAction(false);
     }
   }
@@ -169,7 +169,7 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
       };
 
       if (!response.ok) {
-        throw new Error(data.error ?? "Couldn't restore — try again");
+        throw new Error(data.error ?? "Couldn't restore, try again");
       }
 
       const category = data.category ?? friend.category;
@@ -181,7 +181,7 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
       sessionStorage.setItem("kinmatch-toast-friend-id", friend.id);
       router.replace("/tribe");
     } catch (err) {
-      showToast(err instanceof Error ? err.message : "Couldn't restore — try again");
+      showToast(err instanceof Error ? err.message : "Couldn't restore, try again");
       setSavingAction(false);
     }
   }
@@ -199,7 +199,7 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
       };
 
       if (!response.ok) {
-        throw new Error(data.error ?? "Couldn't delete — try again");
+        throw new Error(data.error ?? "Couldn't delete, try again");
       }
 
       sessionStorage.setItem(
@@ -208,7 +208,7 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
       );
       router.replace("/tribe");
     } catch (err) {
-      showToast(err instanceof Error ? err.message : "Couldn't delete — try again");
+      showToast(err instanceof Error ? err.message : "Couldn't delete, try again");
       setSavingAction(false);
     }
   }
@@ -275,8 +275,8 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
             href={`/friends/${friend.id}/voice-note`}
             quote={
               friend.category === "family"
-                ? `"Hey ${name} — how are you doing these days?"`
-                : `"Hey ${name} — how's your ${friend.category === "inner_circle" ? "world" : "life"} doing these days?"`
+                ? `"Hey ${name}, how are you doing these days?"`
+                : `"Hey ${name}, how's your ${friend.category === "inner_circle" ? "world" : "life"} doing these days?"`
             }
             whyThisWorks={
               friend.category === "family"

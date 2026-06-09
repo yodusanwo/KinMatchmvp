@@ -79,7 +79,7 @@ Categorization heuristics:
 - trusted: vulnerable disclosures, fears, dreams, struggles
 - other: anything that doesn't fit cleanly
 
-Respond with JSON only — no markdown, no explanation.
+Respond with JSON only, no markdown, no explanation.
 
 Conversation:
 ${params.conversationText}`;

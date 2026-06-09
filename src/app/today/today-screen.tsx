@@ -36,9 +36,9 @@ function tomorrowHint(state: TodayDailyState | null | undefined) {
   const name = formatDisplayName(state.friend.name);
   if (state.kind === "capture") {
     const nextDepth = Math.min((state.cycle_number ?? 1) + 1, 5);
-    return `A new question for your tribe — depth ${nextDepth} of 5.`;
+    return `A new question for your tribe, depth ${nextDepth} of 5.`;
   }
-  return `Capture what ${name} says — and their profile starts filling in.`;
+  return `Capture what ${name} says, and their profile starts filling in.`;
 }
 
 export function TodayScreen() {

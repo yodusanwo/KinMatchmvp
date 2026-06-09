@@ -79,7 +79,7 @@ export function DatesCaptureFields({
   return (
     <div className="mt-6 space-y-3">
       <p className="font-inter text-xs text-ink-soft">
-        Pick what it is and the month/day — no year needed.
+        Pick what it is and the month/day, no year needed.
       </p>
 
       <div className="flex gap-2">

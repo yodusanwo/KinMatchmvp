@@ -202,7 +202,7 @@ export function CaptureInputScreen({
             onClick={() => void skip()}
             className="block w-full text-center font-inter text-sm text-ink-soft underline underline-offset-2"
           >
-            skip — they haven&apos;t responded yet
+            skip, they haven&apos;t responded yet
           </button>
         </div>
       </div>

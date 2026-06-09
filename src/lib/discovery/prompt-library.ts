@@ -12,7 +12,7 @@ export type DiscoveryPrompt = {
 export const MVP_DISCOVERY_PROMPTS: DiscoveryPrompt[] = [
   {
     cycle: 1,
-    question: "Hey [Name] — how's your family doing these days?",
+    question: "Hey [Name], how's your family doing these days?",
     category: "people",
     depth_tier: 1,
     why_it_works:
@@ -21,7 +21,7 @@ export const MVP_DISCOVERY_PROMPTS: DiscoveryPrompt[] = [
   {
     cycle: 2,
     question:
-      "Hey [Name] — what have you been reading or watching lately? Anything you've been loving?",
+      "Hey [Name], what have you been reading or watching lately? Anything you've been loving?",
     category: "loves",
     depth_tier: 1,
     why_it_works:
@@ -38,16 +38,16 @@ export const MVP_DISCOVERY_PROMPTS: DiscoveryPrompt[] = [
   {
     cycle: 4,
     question:
-      "Bigger question for you — what's been giving you energy lately, and what's been draining it?",
+      "Bigger question for you, what's been giving you energy lately, and what's been draining it?",
     category: "current",
     depth_tier: 3,
     why_it_works:
-      "Invites honest reflection — the good and the hard. Most people appreciate being asked.",
+      "Invites honest reflection, the good and the hard. Most people appreciate being asked.",
   },
   {
     cycle: 5,
     question:
-      "Reaching out with a softer question — is there anything you've been carrying that you haven't really talked to anyone about?",
+      "Reaching out with a softer question, is there anything you've been carrying that you haven't really talked to anyone about?",
     category: "trusted",
     depth_tier: 3,
     why_it_works:
@@ -76,7 +76,7 @@ export function renderDiscoveryQuestion(
   
   // Special handling for cycle 1 when friend is family
   if (prompt.cycle === 1 && friendCategory === "family") {
-    question = "Hey [Name] — how are you doing these days?";
+    question = "Hey [Name], how are you doing these days?";
   }
   
   return question.replace(/\[Name\]/g, firstName(friendName));

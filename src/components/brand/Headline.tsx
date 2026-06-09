@@ -6,7 +6,7 @@ type HeadlineProps = {
   className?: string;
 };
 
-/** 22px medium — Instrument Sans. */
+/** 22px medium, Instrument Sans. */
 export function Headline({ children, as: Tag = "h1", className }: HeadlineProps) {
   return (
     <Tag

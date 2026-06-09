@@ -93,7 +93,7 @@ export async function GET(req: NextRequest) {
       "[agent-user-tribe] Voice notes query failed:",
       voiceNotesError,
     );
-    // Don't fail the whole request — listen stats are enrichment
+    // Don't fail the whole request, listen stats are enrichment
   }
 
   // Group notes by friend_id

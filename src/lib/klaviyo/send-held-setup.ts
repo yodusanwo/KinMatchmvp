@@ -30,7 +30,7 @@ export async function sendHeldSetupEmail(
   }
 
   if (profile?.held_alerts_enabled === false) {
-    console.log(`Skipping held alert for ${params.holderUserId} — disabled`);
+    console.log(`Skipping held alert for ${params.holderUserId}, disabled`);
     return { sent: false, skipped: true };
   }
 

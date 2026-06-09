@@ -271,7 +271,7 @@ export function mapRecorderError(err: unknown): MicErrorInfo {
     return result.error;
   }
 
-  // Defensive fallback — shouldn't happen since classifyMicError always
+  // Defensive fallback, shouldn't happen since classifyMicError always
   // returns { ok: false } for error inputs.
   return {
     kind: "unknown",

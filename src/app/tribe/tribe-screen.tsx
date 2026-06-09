@@ -139,7 +139,7 @@ export function TribeScreen() {
       };
 
       if (!response.ok || !payload.friend) {
-        throw new Error(payload.error ?? "Couldn't add them — try again");
+        throw new Error(payload.error ?? "Couldn't add them, try again");
       }
 
       setFriends((current) => [...current, payload.friend!]);
@@ -149,7 +149,7 @@ export function TribeScreen() {
       setAddOpen(false);
     } catch (err) {
       setAddError(
-        err instanceof Error ? err.message : "Couldn't add them — try again"
+        err instanceof Error ? err.message : "Couldn't add them, try again"
       );
     } finally {
       setAdding(false);

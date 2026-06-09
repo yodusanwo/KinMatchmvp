@@ -24,7 +24,7 @@ import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 export async function GET(req: NextRequest) {
   // ─────────────────────────────────────────────────────────────
-  // Resolve authentication — bearer token (agent) or cookies (browser)
+  // Resolve authentication, bearer token (agent) or cookies (browser)
   // ─────────────────────────────────────────────────────────────
 
   const authHeader = req.headers.get("authorization");

@@ -60,7 +60,7 @@ export async function POST(_request: Request, context: RouteContext) {
     holderName: friend.name,
     userName: profile?.name?.trim() || profile?.email?.split("@")[0] || "Someone",
     thresholdDays: relationship.threshold_days,
-    setupMessage: `Hi ${friend.name} — I chose you as one of my holders in KinMatch. If I’m quiet for ${relationship.threshold_days} days, KinMatch will send you a gentle heads-up so you can nudge me to reconnect. You don’t need to do anything right now — this is just me inviting you into that little accountability loop.`,
+    setupMessage: `Hi ${friend.name}, I chose you as one of my holders in KinMatch. If I’m quiet for ${relationship.threshold_days} days, KinMatch will send you a gentle heads-up so you can nudge me to reconnect. You don’t need to do anything right now, this is just me inviting you into that little accountability loop.`,
   });
 
   await supabase

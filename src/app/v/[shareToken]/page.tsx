@@ -27,7 +27,7 @@ export async function generateMetadata({
   const origin = getAppOrigin("https://kin-matchmvp.vercel.app");
   const senderName = formatDisplayName(voiceNote.sender_name) || "a friend";
   const title = `Voice note from ${senderName}`;
-  const description = "Tap to listen — no app needed.";
+  const description = "Tap to listen, no app needed.";
   const url = `${origin}/v/${shareToken}`;
   const imageUrl = `${origin}/api/og/voice-note/${shareToken}`;
 
@@ -58,7 +58,7 @@ export async function generateMetadata({
   };
 }
 
-/** Public voice note listening page — no auth required (Day 10). */
+/** Public voice note listening page, no auth required (Day 10). */
 export default async function PublicVoiceNotePage({ params }: PageProps) {
   const { shareToken } = await params;
   return <ListenScreen shareToken={normalizeShareToken(shareToken)} />;

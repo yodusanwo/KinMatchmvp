@@ -226,7 +226,7 @@ export function scoreFriendForSpotlight(
 }
 
 // ─────────────────────────────────────────────────────────────
-// PRIMARY REASON — human-readable explanation of top score driver
+// PRIMARY REASON, human-readable explanation of top score driver
 // ─────────────────────────────────────────────────────────────
 export function derivePrimaryReason(
   components: SpotlightComponents,
@@ -244,7 +244,7 @@ export function derivePrimaryReason(
 
   switch (topComponent) {
     case "reciprocity":
-      return `${name} reached out — you haven't replied yet`;
+      return `${name} reached out, you haven't replied yet`;
     case "life_event":
       return `${name} has an important date coming up`;
     case "emotional_weight":

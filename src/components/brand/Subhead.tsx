@@ -5,7 +5,7 @@ type SubheadProps = {
   className?: string;
 };
 
-/** Italic emotional line — Inter, ink-soft. */
+/** Italic emotional line, Inter, ink-soft. */
 export function Subhead({ children, className }: SubheadProps) {
   return (
     <p

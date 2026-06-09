@@ -117,10 +117,10 @@ export function SignInForm({
         <Subhead>
           We emailed a sign-in link to <span className="text-ink">{email}</span>.
           {finishingOnboarding
-            ? " Click it to finish setup — this page will open when you do."
+            ? " Click it to finish setup, this page will open when you do."
             : gettingStarted
-              ? " Click it to begin — this page will open when you do."
-              : " Click it to continue — this page will open when you do."}
+              ? " Click it to begin, this page will open when you do."
+              : " Click it to continue, this page will open when you do."}
         </Subhead>
         <button
           type="button"

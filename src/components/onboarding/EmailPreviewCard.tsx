@@ -23,7 +23,7 @@ export function EmailPreviewCard({ className }: EmailPreviewCardProps) {
         Sarah&apos;s been quiet for 18 days
       </p>
       <p className="mt-1 font-inter text-sm italic text-ink-soft">
-        A gentle nudge — not an alarm. Tap when you have a moment.
+        A gentle nudge, not an alarm. Tap when you have a moment.
       </p>
     </div>
   );

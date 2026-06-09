@@ -176,7 +176,7 @@ export function ProfileScreen({
     if (prefErrorTimeoutRef.current) {
       clearTimeout(prefErrorTimeoutRef.current);
     }
-    setPrefError("Couldn't save — try again");
+    setPrefError("Couldn't save, try again");
     prefErrorTimeoutRef.current = setTimeout(() => setPrefError(null), 3000);
   }
 
@@ -202,7 +202,7 @@ export function ProfileScreen({
     if (!response.ok) {
       setLocalName(previousName);
       setEditingName(!previousName);
-      showNameMessage("error", "couldn't save — try again");
+      showNameMessage("error", "couldn't save, try again");
       return;
     }
 
@@ -421,7 +421,7 @@ export function ProfileScreen({
                             </p>
                           )}
                           <p className={`mt-2 ${mutedHelperClassName}`}>
-                            Or skip — you can text your people instead.
+                            Or skip, you can text your people instead.
                           </p>
                         </div>
                       )}
@@ -456,7 +456,7 @@ export function ProfileScreen({
         )}
 
         <p className="mt-6 font-inter text-sm text-ink-soft">
-          You sign in with a magic link — no password. Use the button below to
+          You sign in with a magic link, no password. Use the button below to
           switch accounts on this device.{" "}
           <TextLink href="/privacy">Privacy</TextLink>
         </p>

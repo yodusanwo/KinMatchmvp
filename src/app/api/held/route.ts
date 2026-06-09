@@ -336,7 +336,7 @@ export async function PUT(request: NextRequest) {
 
   const now = new Date().toISOString();
   const threshold = profile?.held_quiet_threshold_days ?? 14;
-  const setupMessage = `Hi ${friend.name} — I chose you as one of my holders in KinMatch. KinMatch helps me notice when I’ve gone quiet with people I care about. If I’m quiet for ${threshold} days, KinMatch will send you a gentle heads-up so you can nudge me to reconnect. You don’t need to do anything right now — this is just me inviting you into that little accountability loop.`;
+  const setupMessage = `Hi ${friend.name}, I chose you as one of my holders in KinMatch. KinMatch helps me notice when I’ve gone quiet with people I care about. If I’m quiet for ${threshold} days, KinMatch will send you a gentle heads-up so you can nudge me to reconnect. You don’t need to do anything right now, this is just me inviting you into that little accountability loop.`;
   const { data: relationship, error } = await supabase
     .from("held_relationships")
     .insert({

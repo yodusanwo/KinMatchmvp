@@ -225,7 +225,7 @@ export function CaptureReviewScreen({
             onClick={() => void skip()}
             className="block w-full text-center font-inter text-sm text-ink-soft underline underline-offset-2"
           >
-            skip — nothing to save
+            skip, nothing to save
           </button>
         </div>
       </div>

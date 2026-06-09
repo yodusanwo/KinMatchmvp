@@ -3,8 +3,8 @@ import { firstName } from "@/lib/voice-notes/public-voice-note";
 export function voiceNoteShareText(friendName: string | null | undefined) {
   const name = firstName(friendName);
   return name
-    ? `Hey ${name}, I left you a quick voice note —`
-    : "Hey — I left you a quick voice note —";
+    ? `Hey ${name}, I left you a quick voice note:`
+    : "Hey, I left you a quick voice note:";
 }
 
 export function voiceNoteShareTitle(senderName: string | null | undefined) {
@@ -42,7 +42,7 @@ export function buildVoiceNoteShareData(params: {
     };
   }
 
-  // macOS Messages often ignores `text` when `url` is also set — send one body.
+  // macOS Messages often ignores `text` when `url` is also set, send one body.
   return {
     title,
     text: messageBody,

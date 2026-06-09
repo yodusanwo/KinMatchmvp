@@ -1,7 +1,7 @@
 /**
  * GET /api/agent/user/activity?days=7
  *
- * Returns the user's recent outreach activity — voice notes sent and
+ * Returns the user's recent outreach activity, voice notes sent and
  * interactions logged within the time window.
  *
  * Used by the agent to determine if the user is "already connecting" with

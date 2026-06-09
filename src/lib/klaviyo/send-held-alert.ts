@@ -30,7 +30,7 @@ export async function sendHeldAlertEmail(
   }
 
   if (profile?.held_alerts_enabled === false) {
-    console.log(`Skipping held quiet-window alert for ${params.holderUserId} — disabled`);
+    console.log(`Skipping held quiet-window alert for ${params.holderUserId}, disabled`);
     return { sent: false, skipped: true };
   }
 

@@ -6,7 +6,7 @@ export const COPY_VARIANTS = {
     forget: "We'll be your rhythm so you don't have to remember.",
     distance: "Voice notes travel where calls can't.",
     busy: "60-second voice notes are enough. Really.",
-    awkward: "We'll help you break the silence — gently.",
+    awkward: "We'll help you break the silence, gently.",
     unsure: "We'll help you ask the next question.",
     one_sided: "Held keeps you from being the only one reaching out.",
   },
@@ -32,7 +32,7 @@ export const COPY_VARIANTS = {
     busy: "60 seconds for [name]?",
     awkward: "A gentle way back to [name]",
     unsure: "Something to follow up on with [name]",
-    one_sided: "[name] is on your tribe — your move when you're ready",
+    one_sided: "[name] is on your tribe, your move when you're ready",
   },
 } as const satisfies Record<string, Record<BarrierKey, string>>;
 

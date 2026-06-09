@@ -61,7 +61,7 @@ export function formatRevealSubhead(
       villageCount === 1
         ? "one person in your village"
         : `${villageCount} people in your village`;
-    return `${close} — and ${village}.`;
+    return `${close}, and ${village}.`;
   }
   if (villageCount > 0) {
     return villageCount === 1

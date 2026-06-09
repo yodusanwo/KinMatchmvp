@@ -70,7 +70,7 @@ function statusLabel(note: VoiceNoteRow): {
   }
   if (diffHours > 24) {
     return {
-      label: "Sent — not yet listened",
+      label: "Sent, not yet listened",
       className: "bg-terracotta/10 text-terracotta-deep",
     };
   }

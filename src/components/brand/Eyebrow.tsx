@@ -5,7 +5,7 @@ type EyebrowProps = {
   className?: string;
 };
 
-/** 11px uppercase label — Instrument Sans, 0.12em tracking. */
+/** 11px uppercase label, Instrument Sans, 0.12em tracking. */
 export function Eyebrow({ children, className }: EyebrowProps) {
   return (
     <p

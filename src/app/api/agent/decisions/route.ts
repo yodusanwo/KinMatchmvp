@@ -38,7 +38,7 @@ interface DecisionBody {
 
 export async function POST(req: NextRequest) {
   // ─────────────────────────────────────────────────────────────
-  // Resolve authentication — either bearer token or cookie session
+  // Resolve authentication, either bearer token or cookie session
   // ─────────────────────────────────────────────────────────────
 
   const authHeader = req.headers.get("authorization");

@@ -50,7 +50,7 @@ export function FriendContactInfoSection({
         error?: string;
       };
       if (!response.ok) {
-        throw new Error(data.error ?? "Couldn't save — try again.");
+        throw new Error(data.error ?? "Couldn't save, try again.");
       }
       setFriends((current) =>
         current.map((friend) =>
@@ -66,7 +66,7 @@ export function FriendContactInfoSection({
       onToast("Saved.");
     } catch (err) {
       onToast(
-        err instanceof Error ? err.message : "Couldn't save — try again."
+        err instanceof Error ? err.message : "Couldn't save, try again."
       );
     } finally {
       setSavingId(null);

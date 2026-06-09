@@ -188,7 +188,7 @@ export async function GET(_request: Request, context: RouteContext) {
               marginTop: "24px",
             }}
           >
-            Tap to listen — no app needed.
+            Tap to listen, no app needed.
           </span>
         </div>
       </div>

@@ -76,7 +76,7 @@ export function SendSpotlight({ state, onRefresh }: SendSpotlightProps) {
     return (
       <article className="rounded-3xl bg-cream-deep/80 p-4">
         <p className="font-inter text-sm italic text-ink-soft">
-          Got it — next friend.
+          Got it, next friend.
         </p>
       </article>
     );

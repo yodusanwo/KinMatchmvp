@@ -56,7 +56,7 @@ function voiceNoteFilename(mimeType: string) {
 
 async function parseSendError(res: Response) {
   const data = (await res.json().catch(() => ({}))) as { error?: string };
-  return data.error ?? "Couldn't send that note — try again.";
+  return data.error ?? "Couldn't send that note, try again.";
 }
 
 async function markVoiceNoteSent(voiceNoteId: string) {
@@ -65,7 +65,7 @@ async function markVoiceNoteSent(voiceNoteId: string) {
   });
   if (!res.ok) {
     const data = (await res.json().catch(() => ({}))) as { error?: string };
-    throw new Error(data.error ?? "Couldn't mark as sent — try again.");
+    throw new Error(data.error ?? "Couldn't mark as sent, try again.");
   }
 }
 
@@ -189,7 +189,7 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
           trackEvent("voice_note_sent", { method: "share_sheet" });
           if (!isMobileShareTarget()) {
             setSendNotice(
-              "Message copied — paste into Messages if you only see the link",
+              "Message copied, paste into Messages if you only see the link",
             );
           }
         } catch (err) {
@@ -198,7 +198,7 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
             return;
           }
           setSendStatus("error");
-          setSendError("Couldn't open sharing — try again.");
+          setSendError("Couldn't open sharing, try again.");
           console.error("Share failed", err);
           return;
         }
@@ -206,12 +206,12 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
         await navigator.clipboard.writeText(fullBody);
         trackEvent("voice_note_sent", { method: "clipboard" });
         setSendStatus("idle");
-        setSendNotice("Message copied — paste in your texts app");
+        setSendNotice("Message copied, paste in your texts app");
         router.push("/today");
         return;
       } else {
         setSendStatus("error");
-        setSendError("Couldn't copy the link — try again.");
+        setSendError("Couldn't copy the link, try again.");
         return;
       }
 

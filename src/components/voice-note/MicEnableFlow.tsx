@@ -67,9 +67,9 @@ export function MicEnableFlow({
       {!isBlocked && (
         <Subhead className="text-sm">
           {isNativeApp()
-            ? "KinMatch will ask for your microphone — tap Allow."
+            ? "KinMatch will ask for your microphone, tap Allow."
             : isIOS()
-              ? "Safari will ask for your microphone — tap Allow when you see the prompt."
+              ? "Safari will ask for your microphone, tap Allow when you see the prompt."
               : "Your browser will ask before anything is recorded."}
         </Subhead>
       )}
@@ -77,7 +77,7 @@ export function MicEnableFlow({
       {isBlocked && (
         <div className="space-y-3 text-left">
           <p className="font-inter text-sm italic leading-relaxed text-ink">
-            The microphone&apos;s blocked right now — but {name} is still right
+            The microphone&apos;s blocked right now, but {name} is still right
             there.
           </p>
           {onTextInstead && (

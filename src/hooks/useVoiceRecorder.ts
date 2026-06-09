@@ -130,7 +130,7 @@ export function useVoiceRecorder() {
 
       // 'prompt' or 'unknown' (iOS Safari case): stay in 'idle' until
       // the user explicitly taps to set up the microphone.
-      // Do NOT call getUserMedia here — that would silently fail on iOS Safari.
+      // Do NOT call getUserMedia here, that would silently fail on iOS Safari.
       setState((current) => ({
         ...current,
         micStatus: "idle",
@@ -193,7 +193,7 @@ export function useVoiceRecorder() {
 
     if (result.ok) {
       console.log("[useVoiceRecorder] requestMicAccess: granted");
-      // Stop the stream — we just wanted the permission grant.
+      // Stop the stream, we just wanted the permission grant.
       // The actual recording stream is created later in startRecording.
       result.stream.getTracks().forEach((track) => track.stop());
 
@@ -301,7 +301,7 @@ export function useVoiceRecorder() {
       setState((current) => ({
         ...current,
         isRecording: false,
-        error: "Couldn't finish recording — try again.",
+        error: "Couldn't finish recording, try again.",
       }));
     }
   }, [applyRecordingResult]);
@@ -328,7 +328,7 @@ export function useVoiceRecorder() {
       setState((current) => ({
         ...current,
         error:
-          micError.message || "Couldn't use your phone's recorder — try again.",
+          micError.message || "Couldn't use your phone's recorder, try again.",
         micError,
       }));
     }

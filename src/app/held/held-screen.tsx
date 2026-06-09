@@ -35,7 +35,7 @@ function statusLine(entry: HeldFriendEntry) {
 }
 
 function defaultInvitationMessage(name: string, thresholdDays: string) {
-  return `Hi ${name} — I chose you as one of my holders in KinMatch. KinMatch helps me notice when I’ve gone quiet with people I care about. If I’m quiet for ${thresholdDays} days, KinMatch will send you a gentle heads-up so you can nudge me to reconnect. You don’t need to do anything right now — this is just me inviting you into that little accountability loop.`;
+  return `Hi ${name}, I chose you as one of my holders in KinMatch. KinMatch helps me notice when I’ve gone quiet with people I care about. If I’m quiet for ${thresholdDays} days, KinMatch will send you a gentle heads-up so you can nudge me to reconnect. You don’t need to do anything right now, this is just me inviting you into that little accountability loop.`;
 }
 
 export function HeldScreen() {
@@ -85,7 +85,7 @@ export function HeldScreen() {
     });
     setSaving(false);
     if (!response.ok) {
-      showToast("Couldn't remove — try again");
+      showToast("Couldn't remove, try again");
       return;
     }
     setSheetMode("none");
@@ -101,7 +101,7 @@ export function HeldScreen() {
     });
     setSaving(false);
     if (!response.ok) {
-      showToast("Couldn't resend — try again");
+      showToast("Couldn't resend, try again");
       return;
     }
     setSheetMode("none");
@@ -122,7 +122,7 @@ export function HeldScreen() {
     });
     setSaving(false);
     if (!response.ok) {
-      showToast("Couldn't add them — try again");
+      showToast("Couldn't add them, try again");
       return;
     }
     setSelectedFriendId(null);
@@ -141,7 +141,7 @@ export function HeldScreen() {
     });
     setSaving(false);
     if (!response.ok) {
-      showToast("Couldn't update — try again");
+      showToast("Couldn't update, try again");
       return;
     }
     setSheetMode("none");
@@ -404,7 +404,7 @@ function HeldSheet({
             </h2>
             <p className="font-inter text-xs italic leading-[1.5] text-[rgba(31,26,20,0.75)]">
               KinMatch will no longer notify them if you go quiet. They won&apos;t
-              be told you removed them — it&apos;ll just stop.
+              be told you removed them, it&apos;ll just stop.
             </p>
             <button
               type="button"

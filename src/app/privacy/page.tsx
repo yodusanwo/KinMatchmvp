@@ -18,7 +18,7 @@ export default function PrivacyPage() {
             <p className="mt-2">
               Phone numbers you save for friends are stored on KinMatch&apos;s
               servers to enable the one-tap send feature. KinMatch never sends
-              SMS, calls, or any communication to these numbers — they are only
+              SMS, calls, or any communication to these numbers, they are only
               used to pre-fill your phone&apos;s Messages app when you send a
               voice note.
             </p>
@@ -30,7 +30,7 @@ export default function PrivacyPage() {
             </h2>
             <p className="mt-2">
               When you tap send, your device opens Messages with the recipient
-              and message ready. You choose whether to actually send — KinMatch
+              and message ready. You choose whether to actually send, KinMatch
               does not send texts on your behalf.
             </p>
           </section>

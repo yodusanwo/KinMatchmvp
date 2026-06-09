@@ -48,7 +48,7 @@ export const MEMORY_CATEGORIES: Record<MemoryCategory, MemoryCategoryConfig> =
       title: () => "Important dates",
       chipLabel: "Dates",
       icon: Calendar,
-      capturePlaceholder: (name) => `${name}'s birthday — October 12…`,
+      capturePlaceholder: (name) => `${name}'s birthday, October 12…`,
       emptyPrompt: (name) => ({
         before: "Add ",
         link: `${name}'s birthday`,
@@ -87,7 +87,7 @@ export const MEMORY_CATEGORIES: Record<MemoryCategory, MemoryCategoryConfig> =
       chipLabel: "Shared",
       icon: MessageCircle,
       capturePlaceholder: () =>
-        "That time we got lost in Austin — we still quote it…",
+        "That time we got lost in Austin, we still quote it…",
       emptyPrompt: () => ({
         before: "",
         link: "Inside jokes, history, 'remember when'…",
@@ -100,7 +100,7 @@ export const MEMORY_CATEGORIES: Record<MemoryCategory, MemoryCategoryConfig> =
       chipLabel: "Trusted",
       icon: Lock,
       capturePlaceholder: () =>
-        "Worried about her mom's health — shared in confidence…",
+        "Worried about her mom's health, shared in confidence…",
       emptyPrompt: (name) => ({
         before: "Things ",
         link: name,

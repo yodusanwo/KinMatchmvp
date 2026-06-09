@@ -6,7 +6,7 @@ export type WelcomeEmailContent = {
   previewText: string;
   /** Full body for in-app / debugging. */
   body: string;
-  /** Personalized line only — maps to Klaviyo {{ event.welcome_body }}. */
+  /** Personalized line only, maps to Klaviyo {{ event.welcome_body }}. */
   welcomeBody: string;
 };
 
@@ -20,9 +20,9 @@ export function buildWelcomeEmailContent(
   const welcomeBody = `${greeting} welcome to KinMatch.\n\n${personalizedBody}`;
 
   return {
-    subject: "Your tribe is ready — KinMatch",
+    subject: "Your tribe is ready, KinMatch",
     previewText: welcomeBody.slice(0, 120),
     welcomeBody,
-    body: `${welcomeBody}\n\nOpen Today when you're ready — we'll suggest one person to reach out to, not a whole inbox of guilt.\n\n— KinMatch`,
+    body: `${welcomeBody}\n\nOpen Today when you're ready, we'll suggest one person to reach out to, not a whole inbox of guilt.\n\n- KinMatch`,
   };
 }

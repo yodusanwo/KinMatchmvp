@@ -4,10 +4,10 @@
  * IMPORTANT ARCHITECTURE NOTE:
  * This file separates two concerns:
  *
- * 1. checkMicPermissionState() — Safe to call anywhere (including useEffect).
+ * 1. checkMicPermissionState(), Safe to call anywhere (including useEffect).
  *    Uses navigator.permissions.query() only, NEVER triggers a permission prompt.
  *
- * 2. requestMicAccess() — MUST only be called synchronously inside an onClick handler.
+ * 2. requestMicAccess(), MUST only be called synchronously inside an onClick handler.
  *    Calls getUserMedia(). On iOS Safari, calling this from useEffect or after
  *    awaits will silently fail and permanently deny permission for the site.
  *
@@ -93,7 +93,7 @@ export function hasGetUserMedia(): boolean {
  *
  * Returns 'unknown' on iOS Safari (which doesn't support permissions API for microphone)
  * or when the Permissions API isn't available. The caller should treat 'unknown' as
- * "we don't know — show the setup intro and let the user opt in."
+ * "we don't know, show the setup intro and let the user opt in."
  */
 export async function checkMicPermissionState(): Promise<MicPermissionState> {
   if (typeof navigator === "undefined") {

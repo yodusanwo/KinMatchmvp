@@ -153,7 +153,7 @@ export async function PATCH(request: Request, context: RouteContext) {
       thresholdDays: quietWindow,
       setupMessage:
         setupMessage ??
-        `Hi ${friend.name} — I chose you as one of my holders in KinMatch. KinMatch helps me notice when I’ve gone quiet with people I care about. If I’m quiet for ${quietWindow} days, KinMatch will send you a gentle heads-up so you can nudge me to reconnect. You don’t need to do anything right now — this is just me inviting you into that little accountability loop.`,
+        `Hi ${friend.name}, I chose you as one of my holders in KinMatch. KinMatch helps me notice when I’ve gone quiet with people I care about. If I’m quiet for ${quietWindow} days, KinMatch will send you a gentle heads-up so you can nudge me to reconnect. You don’t need to do anything right now, this is just me inviting you into that little accountability loop.`,
     });
 
     await supabase

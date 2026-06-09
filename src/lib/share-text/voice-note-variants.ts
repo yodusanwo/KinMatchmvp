@@ -24,22 +24,22 @@ function buildVariant(
 ): string {
   switch (index) {
     case 0:
-      return `Hey ${name}, I left you a quick voice note —`;
+      return `Hey ${name}, I left you a quick voice note:`;
     case 1:
       if (daysQuiet >= 14) {
-        return `Hey ${name} — it's been a minute. Left you a voice note —`;
+        return `Hey ${name}, it's been a minute. Left you a voice note:`;
       }
       if (daysQuiet >= 7) {
-        return `Hey ${name}, been thinking about you — left a voice note —`;
+        return `Hey ${name}, been thinking about you, left a voice note:`;
       }
-      return `Hey ${name}, wanted to say hi — left you a voice note —`;
+      return `Hey ${name}, wanted to say hi, left you a voice note:`;
     case 2:
       return isInnerCircle
-        ? `${name} — something I wanted to say out loud —`
-        : `Hey ${name}, left you something to listen to —`;
+        ? `${name}, something I wanted to say out loud:`
+        : `Hey ${name}, left you something to listen to:`;
     case 3:
     default:
-      return `Hey ${name} — tap when you have a sec. Left a voice note —`;
+      return `Hey ${name}, tap when you have a sec. Left a voice note:`;
   }
 }
 

@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
   if (typeof body.phone_number === "string" && body.phone_number.trim()) {
     if (isLikelyInvalidPhone(body.phone_number)) {
       return NextResponse.json(
-        { error: "That doesn't look like a phone number — try with area code." },
+        { error: "That doesn't look like a phone number, try with area code." },
         { status: 400 }
       );
     }

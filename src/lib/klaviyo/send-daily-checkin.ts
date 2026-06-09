@@ -33,7 +33,7 @@ export async function sendDailyCheckinEmail(
   }
 
   if (profile?.daily_checkin_enabled === false) {
-    console.log(`Skipping daily check-in for ${params.userId} — disabled`);
+    console.log(`Skipping daily check-in for ${params.userId}, disabled`);
     return { sent: false, skipped: true };
   }
 

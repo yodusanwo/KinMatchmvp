@@ -12,7 +12,7 @@ type HeldFriendRowProps = {
 };
 
 function defaultSetupMessage(name: string, thresholdDays: string) {
-  return `Hi ${name} — I chose you as one of my holders in KinMatch. KinMatch helps me notice when I’ve gone quiet with people I care about. If I’m quiet for ${thresholdDays} days, KinMatch will send you a gentle heads-up so you can nudge me to reconnect. You don’t need to do anything right now — this is just me inviting you into that little accountability loop.`;
+  return `Hi ${name}, I chose you as one of my holders in KinMatch. KinMatch helps me notice when I’ve gone quiet with people I care about. If I’m quiet for ${thresholdDays} days, KinMatch will send you a gentle heads-up so you can nudge me to reconnect. You don’t need to do anything right now, this is just me inviting you into that little accountability loop.`;
 }
 
 export function HeldFriendRow({ entry }: HeldFriendRowProps) {

@@ -78,7 +78,7 @@ function profilePromptForFriend(params: {
 
   return {
     kind: "send",
-    quote: `KinMatch learns about ${name} from the conversations we capture. Send them a voice note — their profile will fill in as you go.`,
+    quote: `KinMatch learns about ${name} from the conversations we capture. Send them a voice note, their profile will fill in as you go.`,
     why_this_works: null,
     cta_label: "Send a voice note",
     cta_href: `/friends/${friend.id}/voice-note`,
@@ -224,7 +224,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     }
     if (isLikelyInvalidPhone(raw)) {
       return NextResponse.json(
-        { error: "That doesn't look like a phone number — try with area code." },
+        { error: "That doesn't look like a phone number, try with area code." },
         { status: 400 }
       );
     }

@@ -33,7 +33,7 @@ const HOW_IT_WORKS_STEPS = [
     number: 1,
     title: "Thoughtful emails, about 3 a week.",
     description:
-      "Each one is a small nudge — a name from your inner circle or village and a reason to reach out.",
+      "Each one is a small nudge, a name from your inner circle or village and a reason to reach out.",
   },
   {
     number: 2,
@@ -241,7 +241,7 @@ export function EmailPrefsScreen() {
                   </p>
                 )}
                 <p className="font-inter text-xs italic text-ink-soft">
-                  Or skip this step — you can text your people directly and
+                  Or skip this step, you can text your people directly and
                   KinMatch will still keep the rhythm.
                 </p>
               </div>
