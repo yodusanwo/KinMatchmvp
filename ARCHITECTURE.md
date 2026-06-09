@@ -125,6 +125,10 @@ The agent enforces a strict frequency cap: maximum 2 nudges per week, minimum 4-
 
 This third layer is what makes the agent feel humane rather than mechanical — it knows when *not* to act.
 
+### Beyond the layers: tools, not framework
+
+Reasoning quality came from layered tooling, not the framework. ADK gave us session management, deployment, and observability — important infrastructure wins. But the agent's nuance emerged as we added engagement signals (was this voice note listened to?), tone calibration (sensitive keywords in memory notes trigger softer messaging), and frequency discipline (the agent reads the user's own activity, not just friend activity). In a production verification run, the agent observed the user had sent 10 voice notes to inner-circle friends in the past week and concluded *"she is already maintaining her rhythm"* — declining to nudge. That restraint isn't a framework feature; it's a reasoning feature built from layered tools and a system prompt that rewards observing context.
+
 ---
 
 ## 7. Data Flow
