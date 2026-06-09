@@ -77,7 +77,7 @@ Three horizontal layers, each with a distinct responsibility:
 ![System Architecture](./assets/kinmatch_system.png)
 
 - **User-facing layer (Vercel)** — The Next.js app at `app.kinmatch.co` is the consumer product. Agent API routes expose authenticated endpoints the agent can call. Voice notes are stored in Vercel Blob with shareable links.
-- **Agent layer (Google Cloud Run)** — The contest deliverable. The ADK agent reasons; the MCP server exposes brand-voice composition as a callable tool; Secret Manager holds the service-to-service auth token.
+- **Agent layer (Google Cloud Run)** — The ADK agent reasons; the MCP server exposes brand-voice composition as a callable tool; Secret Manager holds the service-to-service auth token.
 - **Data layer (Supabase)** — Source of truth for users, friends, notes, voice notes, engagement signals, and the agent's own decision audit log.
 
 The agent **does not write directly to Supabase**. All data flows through the user-facing API at `app.kinmatch.co`, which authenticates the agent via a JWT-scoped request and enforces the same authorization rules as a logged-in user. This means the agent operates with the same boundaries as the user — no special database privileges.
