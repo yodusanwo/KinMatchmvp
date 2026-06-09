@@ -1,23 +1,23 @@
 import type { FriendCategory } from "@/lib/api/types";
 
-// All categories use the same maximally distinct 15-color palette
-// ONE color per color family - no similar shades that could be confused
+// Maximally distinct warm earth tones - matching the app's aesthetic
+// Highly saturated colors spanning red/orange/yellow/green/brown families
 const SHARED_COLOR_PALETTE = [
-  "#D65745",  // 1. Vibrant red
-  "#FF9B82",  // 2. Bright coral
-  "#FF8C42",  // 3. Bright orange
-  "#F4C542",  // 4. Golden yellow
-  "#A8B560",  // 5. Lime green
-  "#4A8B57",  // 6. Emerald green
-  "#2F4F32",  // 7. Deep forest
-  "#5B9AA0",  // 8. Teal
-  "#6B7FA8",  // 9. Slate blue
-  "#8B6BA8",  // 10. Purple
-  "#A85B7F",  // 11. Mauve
-  "#8E3D22",  // 12. Deep burgundy
-  "#A0522D",  // 13. Sienna brown
-  "#B8860B",  // 14. Dark gold
-  "#6B5D4F",  // 15. Warm taupe
+  "#D65745",  // Vibrant red
+  "#FF9B82",  // Bright coral (button color)
+  "#FF8C42",  // Bright orange
+  "#F4C542",  // Golden yellow
+  "#C68F3E",  // Mustard
+  "#B8860B",  // Dark gold
+  "#D4A356",  // Amber
+  "#A8B560",  // Lime green
+  "#6B8E4E",  // Olive green
+  "#4A8B57",  // Emerald green
+  "#2F4F32",  // Deep forest
+  "#8E3D22",  // Deep burgundy
+  "#A0522D",  // Sienna brown
+  "#B65232",  // Terracotta
+  "#8B7355",  // Warm brown
 ];
 
 // All categories use the same color palette
