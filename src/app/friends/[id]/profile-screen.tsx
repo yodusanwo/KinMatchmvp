@@ -302,8 +302,16 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
         <div className="mt-8">
           <SuggestedNextStepCard
             href={`/friends/${friend.id}/voice-note`}
-            quote={`"Hey ${name} — how's your ${friend.category === "family" ? "family" : friend.category === "inner_circle" ? "world" : "life"} doing these days?"`}
-            whyThisWorks="An easy way in. Most people love being asked about their people."
+            quote={
+              friend.category === "family"
+                ? `"Hey ${name} — how are you doing these days?"`
+                : `"Hey ${name} — how's your ${friend.category === "inner_circle" ? "world" : "life"} doing these days?"`
+            }
+            whyThisWorks={
+              friend.category === "family"
+                ? "Simple and caring. Family always appreciates being checked on."
+                : "An easy way in. Most people love being asked about their people."
+            }
             ctaLabel="Send a voice note"
             sendMethodHint={
               friend.phone_number ? (

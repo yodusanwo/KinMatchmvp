@@ -295,10 +295,12 @@ export async function getDailyState(params: {
           cycle_number: cycleNumber,
           prompt: {
             cycle: prompt.cycle,
-            question: renderDiscoveryQuestion(prompt, friend.name),
+            question: renderDiscoveryQuestion(prompt, friend.name, friend.category),
             category: prompt.category,
             depth_tier: prompt.depth_tier,
-            why_it_works: prompt.why_it_works,
+            why_it_works: prompt.cycle === 1 && friend.category === "family"
+              ? "Simple and caring. Family always appreciates being checked on."
+              : prompt.why_it_works,
           },
         };
       }

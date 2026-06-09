@@ -17,9 +17,14 @@ export function buildDiscoveryPromptEmailProperties(params: {
   prompt: DiscoveryPrompt;
   friendId: string;
   friendName: string;
+  friendCategory?: "family" | "inner_circle" | "village" | "acquaintance";
 }) {
   return {
-    discovery_question: renderDiscoveryQuestion(params.prompt, params.friendName),
+    discovery_question: renderDiscoveryQuestion(
+      params.prompt,
+      params.friendName,
+      params.friendCategory
+    ),
     discovery_category: params.prompt.category,
     discovery_depth_tier: params.prompt.depth_tier,
     primary_cta_label: discoveryPrimaryCtaLabel(),

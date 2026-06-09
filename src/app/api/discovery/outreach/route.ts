@@ -28,7 +28,7 @@ export async function GET(request: Request) {
 
   const { data: friend } = await supabase
     .from("friends")
-    .select("id, name")
+    .select("id, name, category")
     .eq("id", friendId)
     .eq("user_id", user.id)
     .is("archived_at", null)
@@ -43,7 +43,7 @@ export async function GET(request: Request) {
     friend_id: friendId,
     prompt_day: day,
     prompt_cycle: prompt.cycle,
-    question: renderDiscoveryQuestion(prompt, friend.name),
+    question: renderDiscoveryQuestion(prompt, friend.name, friend.category),
     category: prompt.category,
     outreach_mode: "voice_note",
   });

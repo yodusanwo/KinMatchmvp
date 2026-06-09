@@ -25,7 +25,7 @@ export async function GET(_request: Request, context: RouteContext) {
           flexDirection: "column",
           width: "100%",
           height: "100%",
-          backgroundColor: "#F2EAD9",
+          backgroundColor: "#D5E0D5",
           padding: "80px",
           fontFamily: "Georgia, serif",
         }}
@@ -57,32 +57,68 @@ export async function GET(_request: Request, context: RouteContext) {
           </span>
           <div
             style={{
-              width: "32px",
-              height: "24px",
+              width: "48px",
+              height: "32px",
               display: "flex",
               position: "relative",
             }}
           >
+            {/* Left silhouette (forest) */}
             <div
               style={{
-                width: "24px",
-                height: "24px",
-                borderRadius: "50%",
-                backgroundColor: "#B65232",
                 position: "absolute",
-                left: 0,
+                left: "0",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
               }}
-            />
+            >
+              <div
+                style={{
+                  width: "14px",
+                  height: "14px",
+                  borderRadius: "50%",
+                  backgroundColor: "#2F4032",
+                }}
+              />
+              <div
+                style={{
+                  width: "20px",
+                  height: "14px",
+                  backgroundColor: "#2F4032",
+                  borderRadius: "0 0 10px 10px",
+                  marginTop: "1px",
+                }}
+              />
+            </div>
+            {/* Right silhouette (terracotta) */}
             <div
               style={{
-                width: "24px",
-                height: "24px",
-                borderRadius: "50%",
-                backgroundColor: "#2F4032",
                 position: "absolute",
-                left: "8px",
+                left: "16px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
               }}
-            />
+            >
+              <div
+                style={{
+                  width: "14px",
+                  height: "14px",
+                  borderRadius: "50%",
+                  backgroundColor: "#B65232",
+                }}
+              />
+              <div
+                style={{
+                  width: "20px",
+                  height: "14px",
+                  backgroundColor: "#B65232",
+                  borderRadius: "0 0 10px 10px",
+                  marginTop: "1px",
+                }}
+              />
+            </div>
           </div>
         </div>
 
@@ -108,7 +144,7 @@ export async function GET(_request: Request, context: RouteContext) {
                 height: "96px",
                 borderRadius: "50%",
                 backgroundColor: "#2F4032",
-                color: "#F2EAD9",
+                color: "#D5E0D5",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",

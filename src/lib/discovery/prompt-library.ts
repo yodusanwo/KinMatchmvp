@@ -69,9 +69,17 @@ export function dayNumberForDiscoveryCycle(cycle: number): number {
 
 export function renderDiscoveryQuestion(
   prompt: DiscoveryPrompt,
-  friendName: string
+  friendName: string,
+  friendCategory?: "family" | "inner_circle" | "village" | "acquaintance"
 ): string {
-  return prompt.question.replace(/\[Name\]/g, firstName(friendName));
+  let question = prompt.question;
+  
+  // Special handling for cycle 1 when friend is family
+  if (prompt.cycle === 1 && friendCategory === "family") {
+    question = "Hey [Name] — how are you doing these days?";
+  }
+  
+  return question.replace(/\[Name\]/g, firstName(friendName));
 }
 
 export function discoveryPrimaryCtaLabel(): string {

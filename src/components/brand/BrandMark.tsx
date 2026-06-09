@@ -5,7 +5,7 @@ type BrandMarkProps = {
   className?: string;
 };
 
-/** Overlap mark: forest + terracotta circles with a mustard intersection. */
+/** Two intertwined head and shoulder silhouettes representing connection. */
 export function BrandMark({ size = 28, className }: BrandMarkProps) {
   const clipId = `brandmark-intersect-${size}`;
 
@@ -21,18 +21,37 @@ export function BrandMark({ size = 28, className }: BrandMarkProps) {
     >
       <defs>
         <clipPath id={clipId}>
-          <circle cx="12" cy="16" r="10" />
+          {/* Left silhouette clip path */}
+          <path d="M8 12c0-2.2 1.8-4 4-4s4 1.8 4 4-1.8 4-4 4-4-1.8-4-4zm-2 8c0-2.2 2.7-4 6-4s6 1.8 6 4v6H6v-6z" />
         </clipPath>
       </defs>
-      <circle cx="12" cy="16" r="10" className="fill-forest" />
-      <circle cx="20" cy="16" r="10" className="fill-terracotta" />
-      <circle
-        cx="20"
-        cy="16"
-        r="10"
-        className="fill-mustard"
-        clipPath={`url(#${clipId})`}
-      />
+      
+      {/* Left silhouette (forest green) */}
+      <g>
+        <circle cx="12" cy="12" r="4" className="fill-forest" />
+        <path
+          d="M6 20c0-2.2 2.7-4 6-4s6 1.8 6 4v6H6v-6z"
+          className="fill-forest"
+        />
+      </g>
+      
+      {/* Right silhouette (terracotta) */}
+      <g>
+        <circle cx="20" cy="12" r="4" className="fill-terracotta" />
+        <path
+          d="M14 20c0-2.2 2.7-4 6-4s6 1.8 6 4v6h-12v-6z"
+          className="fill-terracotta"
+        />
+      </g>
+      
+      {/* Overlap/intersection (mustard) */}
+      <g clipPath={`url(#${clipId})`}>
+        <circle cx="20" cy="12" r="4" className="fill-mustard" />
+        <path
+          d="M14 20c0-2.2 2.7-4 6-4s6 1.8 6 4v6h-12v-6z"
+          className="fill-mustard"
+        />
+      </g>
     </svg>
   );
 }
