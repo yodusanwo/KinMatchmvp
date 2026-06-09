@@ -68,6 +68,8 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for technical details.
 
 **ADK saves real time.** Standardized session management, auto-generated tool schemas, native Cloud Run deployment, built-in tracing. The defaults are good defaults.
 
+**Infrastructure from the framework, nuance from the tools** The framework gave us infrastructure; the tooling gave us nuance. ADK saved us real engineering time — session management, deployment, observability all came for free. But the agent's nuanced reasoning came from elsewhere: layered tools (engagement signals, tone calibration, frequency discipline) and a system prompt that rewards observing context. In one production run today, the agent saw the user had sent 10 voice notes this week and decided "she is already maintaining her rhythm" — declining to act. That restraint is a reasoning feature, not a framework feature.
+
 ---
 
 ## What's Next for KinMatch

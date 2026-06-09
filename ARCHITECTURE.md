@@ -27,13 +27,13 @@ But an app alone isn't enough. People still forget. Life still gets busy. The ha
 
 The **KinMatch Relational Care Agent** is an autonomous AI built on Google's Agent Development Kit (ADK). It observes a user's tribe through structured engagement data, unstructured memory notes the user has written about each friend, and the user's own recent reaching out activity. It reasons across all three layers to make contextual judgments about which friend most needs care today, what tone fits their current life context, and whether action is needed at all.
 
-When a friend has been quiet, has shown engagement, and the user has not already been reaching out, the agent drafts a short voice note suggestion in the user's brand voice. When the user is already connecting, the agent stays silent. The agent never sends anything without user review. It drafts, and the user decides.
+When a friend has been quiet, has shown engagement, and the user has not already been reaching out, the agent drafts a short voice note suggestion in KinMatch's signature tone — present-tense, gentle, calibrated to emotional cues in the user's notes. When the user is already connecting, the agent stays silent. The agent never sends anything without user review. It drafts, and the user decides.
 
 | Component | Responsibility | Primary Technology |
 |---|---|---|
 | **KinMatch App** | Consumer-facing voice note platform | Next.js 15 / Vercel |
 | **Relational Care Agent** | Autonomous reasoning about who needs outreach | Google ADK / Gemini 2.5 Flash |
-| **MCP Server** | Brand-voice composition exposed via MCP protocol | FastMCP |
+| **MCP Server** | Context-aware tone composition exposed via MCP protocol | FastMCP |
 | **Data Layer** | Friends, notes, voice notes, engagement, agent decisions | Supabase (PostgreSQL) |
 
 ---
