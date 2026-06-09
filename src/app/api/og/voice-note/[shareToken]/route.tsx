@@ -26,20 +26,20 @@ function getSenderIcon(senderName: string) {
     // Sunflower
     () => (
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ position: "relative", width: "96px", height: "96px" }}>
+        <div style={{ position: "relative", width: "192px", height: "192px" }}>
           {/* Petals */}
           {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
             <div
               key={angle}
               style={{
                 position: "absolute",
-                width: "30px",
-                height: "30px",
+                width: "60px",
+                height: "60px",
                 backgroundColor: "#f5c56e",
                 borderRadius: "50% 50% 0 50%",
-                top: "33px",
-                left: "33px",
-                transform: `rotate(${angle}deg) translateY(-32px)`,
+                top: "66px",
+                left: "66px",
+                transform: `rotate(${angle}deg) translateY(-64px)`,
                 transformOrigin: "center",
               }}
             />
@@ -48,12 +48,12 @@ function getSenderIcon(senderName: string) {
           <div
             style={{
               position: "absolute",
-              width: "40px",
-              height: "40px",
+              width: "80px",
+              height: "80px",
               backgroundColor: "#8e3d22",
               borderRadius: "50%",
-              top: "28px",
-              left: "28px",
+              top: "56px",
+              left: "56px",
             }}
           />
         </div>
@@ -61,25 +61,25 @@ function getSenderIcon(senderName: string) {
     ),
     // Smiley Face
     () => (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "96px", height: "96px", backgroundColor: "#f5c56e", borderRadius: "50%" }}>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "192px", height: "192px", backgroundColor: "#f5c56e", borderRadius: "50%" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
           {/* Eyes */}
-          <div style={{ display: "flex", gap: "24px", marginTop: "20px" }}>
-            <div style={{ width: "8px", height: "8px", backgroundColor: "#1f1a14", borderRadius: "50%" }} />
-            <div style={{ width: "8px", height: "8px", backgroundColor: "#1f1a14", borderRadius: "50%" }} />
+          <div style={{ display: "flex", gap: "48px", marginTop: "40px" }}>
+            <div style={{ width: "16px", height: "16px", backgroundColor: "#1f1a14", borderRadius: "50%" }} />
+            <div style={{ width: "16px", height: "16px", backgroundColor: "#1f1a14", borderRadius: "50%" }} />
           </div>
           {/* Smile */}
-          <div style={{ width: "32px", height: "16px", borderBottom: "4px solid #1f1a14", borderRadius: "0 0 100% 100%", marginTop: "4px" }} />
+          <div style={{ width: "64px", height: "32px", borderBottom: "8px solid #1f1a14", borderRadius: "0 0 100% 100%", marginTop: "8px" }} />
         </div>
       </div>
     ),
     // Leaf
     () => (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "96px", height: "96px" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "192px", height: "192px" }}>
         <div
           style={{
-            width: "60px",
-            height: "80px",
+            width: "120px",
+            height: "160px",
             backgroundColor: "#6b7a5c",
             borderRadius: "0 100% 100% 0",
             transform: "rotate(-30deg)",
@@ -89,11 +89,11 @@ function getSenderIcon(senderName: string) {
           <div
             style={{
               position: "absolute",
-              width: "2px",
-              height: "70px",
+              width: "4px",
+              height: "140px",
               backgroundColor: "#463c2e",
               left: "0",
-              top: "5px",
+              top: "10px",
             }}
           />
         </div>
@@ -101,17 +101,17 @@ function getSenderIcon(senderName: string) {
     ),
     // Heart
     () => (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "96px", height: "96px" }}>
-        <div style={{ position: "relative", width: "64px", height: "64px" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "192px", height: "192px" }}>
+        <div style={{ position: "relative", width: "128px", height: "128px" }}>
           <div
             style={{
               position: "absolute",
-              width: "32px",
-              height: "48px",
+              width: "64px",
+              height: "96px",
               backgroundColor: "#b65232",
-              borderRadius: "32px 32px 0 0",
+              borderRadius: "64px 64px 0 0",
               left: "0",
-              top: "8px",
+              top: "16px",
               transform: "rotate(-45deg)",
               transformOrigin: "100% 100%",
             }}
@@ -119,12 +119,12 @@ function getSenderIcon(senderName: string) {
           <div
             style={{
               position: "absolute",
-              width: "32px",
-              height: "48px",
+              width: "64px",
+              height: "96px",
               backgroundColor: "#b65232",
-              borderRadius: "32px 32px 0 0",
+              borderRadius: "64px 64px 0 0",
               right: "0",
-              top: "8px",
+              top: "16px",
               transform: "rotate(45deg)",
               transformOrigin: "0% 100%",
             }}
@@ -134,31 +134,31 @@ function getSenderIcon(senderName: string) {
     ),
     // Simple Circle with Wave pattern
     () => (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "96px", height: "96px", backgroundColor: "#B5C5B5", borderRadius: "50%", position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", bottom: "0", left: "0", right: "0", height: "40px", backgroundColor: "#6b7a5c", borderRadius: "50% 50% 0 0" }} />
-        <div style={{ position: "absolute", bottom: "12px", left: "0", right: "0", height: "30px", backgroundColor: "#8e9b7d", borderRadius: "50% 50% 0 0" }} />
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "192px", height: "192px", backgroundColor: "#B5C5B5", borderRadius: "50%", position: "relative", overflow: "hidden" }}>
+        <div style={{ position: "absolute", bottom: "0", left: "0", right: "0", height: "80px", backgroundColor: "#6b7a5c", borderRadius: "50% 50% 0 0" }} />
+        <div style={{ position: "absolute", bottom: "24px", left: "0", right: "0", height: "60px", backgroundColor: "#8e9b7d", borderRadius: "50% 50% 0 0" }} />
       </div>
     ),
     // Star-like shape
     () => (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "96px", height: "96px" }}>
-        <div style={{ position: "relative", width: "80px", height: "80px" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "192px", height: "192px" }}>
+        <div style={{ position: "relative", width: "160px", height: "160px" }}>
           {[0, 60, 120, 180, 240, 300].map((angle) => (
             <div
               key={angle}
               style={{
                 position: "absolute",
-                width: "20px",
-                height: "20px",
+                width: "40px",
+                height: "40px",
                 backgroundColor: "#D4A356",
                 borderRadius: "50%",
-                top: "30px",
-                left: "30px",
-                transform: `rotate(${angle}deg) translateY(-30px)`,
+                top: "60px",
+                left: "60px",
+                transform: `rotate(${angle}deg) translateY(-60px)`,
               }}
             />
           ))}
-          <div style={{ position: "absolute", width: "30px", height: "30px", backgroundColor: "#c68f3e", borderRadius: "50%", top: "25px", left: "25px" }} />
+          <div style={{ position: "absolute", width: "60px", height: "60px", backgroundColor: "#c68f3e", borderRadius: "50%", top: "50px", left: "50px" }} />
         </div>
       </div>
     ),
