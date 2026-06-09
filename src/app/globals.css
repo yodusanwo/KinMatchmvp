@@ -2,13 +2,13 @@
 @config "../../tailwind.config.ts";
 
 :root {
-  --cream: #2f4032;
-  --cream-deep: #253528;
+  --cream: #1E1E24;
+  --cream-deep: #2A2E37;
   --ink: #e8f0e8;
   --ink-soft: #b5c5b5;
-  --terracotta: #d4a356;
-  --terracotta-deep: #c68f3e;
-  --forest: #2f4032;
+  --terracotta: #DCEE0A;
+  --terracotta-deep: #c5d909;
+  --forest: #1E1E24;
   --sage: #6b7a5c;
   --mustard: #c68f3e;
   --honey: #e8d494;
