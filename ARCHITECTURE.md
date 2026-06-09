@@ -25,7 +25,7 @@ KinMatch is a voice-first friendship app for working adults — people between 3
 
 But an app alone isn't enough. People still forget. Life still gets busy. The hardest part of friendship in adulthood isn't making the connection. It's remembering to reach out before too much time has passed.
 
-The **KinMatch Relational Care Agent** is an autonomous AI built on Google's Agent Development Kit (ADK) that watches a user's tribe, reads engagement signals, and quietly proposes outreach when it matters. The agent never sends without user review — it drafts, the user decides.
+The **KinMatch Relational Care Agent** is an autonomous AI built on Google's Agent Development Kit (ADK). It observes a user's tribe — structured engagement data, unstructured memory notes the user has written about each friend, and the user's own recent reaching-out activity — and reasons across all three layers to make contextual judgments: which friend most needs care today, what tone fits their current life context, and whether action is needed at all. When a friend has been quiet AND has shown engagement AND the user hasn't already been reaching out, the agent drafts a short voice note suggestion in the user's brand voice. When the user is already connecting, the agent stays silent. The agent never sends without user review — it drafts, the user decides.
 
 | Component | Responsibility | Primary Technology |
 |---|---|---|
