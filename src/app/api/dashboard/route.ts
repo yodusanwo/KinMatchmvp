@@ -75,10 +75,10 @@ export async function GET() {
 
   // Calculate friendship momentum
   const growing = friends.filter(
-    (f) => daysQuiet(f) < 7 && daysQuiet(f) < f.cadence_days * 0.5
+    (f) => f.days_quiet < 7 && f.days_quiet < f.cadence_days * 0.5
   );
-  const stable = friends.filter((f) => !isDrifting(f) && daysQuiet(f) >= 7);
-  const needsAttention = friends.filter((f) => isDrifting(f));
+  const stable = friends.filter((f) => !f.is_drifting && f.days_quiet >= 7);
+  const needsAttention = friends.filter((f) => f.is_drifting);
 
   // Calculate insights - last 7 days
   const sevenDaysAgo = new Date();
