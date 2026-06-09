@@ -1,55 +1,45 @@
 import type { FriendCategory } from "@/lib/api/types";
 
-// Expanded color palettes with more variety for each category
+// All categories use the same diverse 30-color palette for maximum distinction
+const SHARED_COLOR_PALETTE = [
+  "#B65232",  // Terracotta red
+  "#6B7A5C",  // Sage olive
+  "#C68F3E",  // Mustard gold
+  "#E8D494",  // Honey yellow
+  "#8E3D22",  // Deep terracotta
+  "#2F4032",  // Forest green
+  "#D4A356",  // Gold
+  "#7B8A6C",  // Light sage
+  "#B07D4E",  // Bronze
+  "#9DB58A",  // Soft green
+  "#A67C52",  // Tan
+  "#E0B45A",  // Bright gold
+  "#5D6C4E",  // Deep olive
+  "#D8B896",  // Light tan
+  "#738269",  // Muted olive
+  "#C89058",  // Amber
+  "#8A7859",  // Khaki
+  "#E8BA6F",  // Pale gold
+  "#6A7959",  // Moss green
+  "#BC9C70",  // Rustic tan
+  "#A89668",  // Caramel
+  "#788870",  // Sage gray
+  "#D4A67C",  // Warm beige
+  "#677656",  // Olive drab
+  "#C8A882",  // Sand
+  "#9B8965",  // Earth brown
+  "#E0C4A0",  // Cream tan
+  "#7C8B6D",  // Faded green
+  "#B8977A",  // Taupe
+  "#8E9B7A",  // Soft olive
+];
+
+// All categories use the same color palette
 const CATEGORY_COLOR_PALETTES: Record<FriendCategory, string[]> = {
-  inner_circle: [
-    "#FF9B82",  // Bright coral
-    "#E67D64",  // Deep coral
-    "#FFB399",  // Peachy coral
-    "#FF8C72",  // Warm coral  
-    "#F5A582",  // Soft coral
-    "#FF7F6E",  // Vivid coral
-    "#E8968A",  // Muted coral
-    "#FFA890",  // Light coral
-    "#E89470",  // Salmon coral
-    "#D4926A",  // Earthy coral
-  ],
-  village: [
-    "#B65232",  // Terracotta red
-    "#6B7A5C",  // Sage olive
-    "#C68F3E",  // Mustard gold
-    "#E8D494",  // Honey yellow
-    "#8E3D22",  // Deep terracotta
-    "#2F4032",  // Forest green
-    "#D4A356",  // Gold
-    "#7B8A6C",  // Light sage
-    "#B07D4E",  // Bronze
-    "#9DB58A",  // Soft green
-  ],
-  family: [
-    "#D4A356",  // Gold
-    "#C68F3E",  // Deep gold
-    "#E8BA6F",  // Light gold
-    "#DCA850",  // Warm gold
-    "#CFAB5C",  // Soft gold
-    "#E0B45A",  // Bright gold
-    "#C9A248",  // Rich gold
-    "#DDAE62",  // Mellow gold
-    "#D4A67C",  // Tan gold
-    "#CC9E70",  // Bronze gold
-  ],
-  acquaintance: [
-    "#C8A882",  // Warm beige
-    "#D4B896",  // Light tan
-    "#B89968",  // Bronze tan
-    "#E0C4A0",  // Pale beige
-    "#C09864",  // Golden tan
-    "#D8BC94",  // Soft tan
-    "#B8A078",  // Earthy beige
-    "#CCAC80",  // Warm sand
-    "#D0B488",  // Desert tan
-    "#BC9C70",  // Rustic tan
-  ],
+  inner_circle: SHARED_COLOR_PALETTE,
+  village: SHARED_COLOR_PALETTE,
+  family: SHARED_COLOR_PALETTE,
+  acquaintance: SHARED_COLOR_PALETTE,
 };
 
 /**
