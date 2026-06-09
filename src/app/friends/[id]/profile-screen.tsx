@@ -299,6 +299,33 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
           </div>
         )}
 
+        <div className="mt-8">
+          <SuggestedNextStepCard
+            href={`/friends/${friend.id}/voice-note`}
+            quote={`"Hey ${name} — how's your ${friend.category === "family" ? "family" : friend.category === "inner_circle" ? "world" : "life"} doing these days?"`}
+            whyThisWorks="An easy way in. Most people love being asked about their people."
+            ctaLabel="Send a voice note"
+            sendMethodHint={
+              friend.phone_number ? (
+                "→ Opens in Messages"
+              ) : (
+                <Link
+                  href={`#friend-phone`}
+                  className="text-terracotta underline decoration-terracotta/60 underline-offset-2"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    document
+                      .getElementById("friend-phone")
+                      ?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                >
+                  Add {name}&apos;s number for one-tap sending →
+                </Link>
+              )
+            }
+          />
+        </div>
+
         <p className="mt-8 text-center">
           <button
             type="button"

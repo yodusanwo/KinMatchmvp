@@ -11,6 +11,7 @@ import {
   Subhead,
 } from "@/components/brand";
 import { AppShell } from "@/components/layout/AppShell";
+import { BottomNav } from "@/components/nav/BottomNav";
 import { MiniAvatar } from "@/components/onboarding/MiniAvatar";
 import { LiveWaveform } from "@/components/voice-note/LiveWaveform";
 import { MicEnableFlow } from "@/components/voice-note/MicEnableFlow";
@@ -270,7 +271,7 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
         </Link>
       </div>
 
-      <div className="flex min-h-[calc(100vh-120px)] flex-col px-5 pb-10 pt-8">
+      <div className="flex min-h-[calc(100vh-120px)] flex-col px-5 pb-24 pt-8">
         <div className="flex items-center gap-3">
           <MiniAvatar
             name={friend.name}
@@ -413,6 +414,7 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
           )}
         </div>
       </div>
+      <BottomNav />
     </AppShell>
   );
 }
