@@ -1,6 +1,6 @@
 import type { FriendCategory } from "@/lib/api/types";
 
-// All categories use the same vibrant, highly distinct 30-color palette
+// All categories use the same vibrant, highly distinct 15-color palette
 const SHARED_COLOR_PALETTE = [
   "#B65232",  // Terracotta red
   "#D4A356",  // Bright gold
@@ -17,21 +17,6 @@ const SHARED_COLOR_PALETTE = [
   "#C85A3E",  // Bright terracotta
   "#DCA850",  // Warm gold
   "#788870",  // Muted green
-  "#B84532",  // Rusty red
-  "#E0B45A",  // Pale gold
-  "#556B4F",  // Deep sage
-  "#D4704A",  // Coral orange
-  "#C09864",  // Amber
-  "#6A7959",  // Moss green
-  "#A86342",  // Clay red
-  "#E8BA6F",  // Light gold
-  "#4A5C48",  // Forest olive
-  "#C66B4D",  // Warm coral
-  "#B89968",  // Bronze
-  "#677656",  // Faded green
-  "#D45B3E",  // Bright coral
-  "#CCA76D",  // Sand gold
-  "#5E6D50",  // Deep olive
 ];
 
 // All categories use the same color palette
