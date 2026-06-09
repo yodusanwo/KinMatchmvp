@@ -12,45 +12,18 @@ import { TodayPageSkeleton } from "@/components/ui/Skeleton";
 import { fetchJson } from "@/lib/api/fetch-client";
 import type { FriendCategory, FriendSummary } from "@/lib/api/types";
 import { firstName } from "@/lib/memories/categories";
+import { getFriendColor, getInitials } from "@/lib/friends/avatar-colors";
 
 type FriendsResponse = {
   friends: FriendSummary[];
 };
 
-const CATEGORY_COLORS: Record<FriendCategory, string[]> = {
-  inner_circle: [
-    "#E89470", "#C68F3E", "#D4A67C", "#B8977A", "#E8A88C",
-    "#D4926A", "#B07D4E", "#E0A882", "#C89058", "#D89876"
-  ],
-  village: [
-    "#9DB58A", "#D4A356", "#8BA878", "#C69546", "#AAC79A",
-    "#91AB7C", "#C8A04C", "#A5C28E", "#BA9842", "#98B384"
-  ],
-  family: [
-    "#D4A67C", "#B8977A", "#C89668", "#A88665", "#E0B68A",
-    "#CC9E70", "#B48E72", "#D8AE84", "#C0926C", "#DCB08C"
-  ],
-  acquaintance: [
-    "rgba(157,181,138,0.85)", "rgba(212,163,86,0.85)", 
-    "rgba(184,151,122,0.85)", "rgba(200,150,104,0.85)",
-    "rgba(169,190,150,0.85)", "rgba(196,155,98,0.85)",
-    "rgba(176,161,132,0.85)", "rgba(188,148,110,0.85)"
-  ],
-};
-
 function initials(name: string) {
-  const parts = name.trim().split(/\s+/);
-  if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-  return name.trim().slice(0, 2).toUpperCase();
-}
-
-function hashId(id: string) {
-  return [...id].reduce((sum, char) => sum + char.charCodeAt(0), 0);
+  return getInitials(name);
 }
 
 function categoryColor(friend: FriendSummary) {
-  const palette = CATEGORY_COLORS[friend.category];
-  return palette[hashId(friend.id) % palette.length];
+  return getFriendColor(friend.id, friend.category);
 }
 
 function quietLabel(friend: FriendSummary) {

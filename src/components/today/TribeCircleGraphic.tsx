@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { MiniAvatar } from "@/components/onboarding/MiniAvatar";
 import type { FriendSummary } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 import { firstName } from "@/lib/memories/categories";
+import { getFriendColor, getInitials } from "@/lib/friends/avatar-colors";
 
 type TribeCircleGraphicProps = {
   tribe: FriendSummary[];
@@ -60,17 +60,18 @@ export function TribeCircleGraphic({
             style={{ top: slot.top, left: slot.left }}
             aria-label={`Open ${friend.name}'s profile`}
           >
-            <MiniAvatar
-              name={friend.name}
-              avatarColor={friend.avatar_color}
-              size="lg"
+            <span
               className={cn(
-                "h-10 w-10 ring-2 ring-cream",
+                "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-sans text-sm font-medium text-ink ring-2 ring-cream",
                 friend.is_drifting && "ring-terracotta/60",
                 friend.id === highlightFriendId &&
                   "shadow-[0_0_0_2px_rgba(182,82,50,0.3)]"
               )}
-            />
+              style={{ backgroundColor: getFriendColor(friend.id, friend.category) }}
+              aria-hidden
+            >
+              {getInitials(friend.name)}
+            </span>
             <span className="max-w-[64px] truncate font-sans text-[11px] font-medium leading-none text-ink">
               {firstName(friend.name)}
             </span>
