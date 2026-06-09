@@ -47,7 +47,7 @@ The Rapid Agent Challenge requires four mandatory Google technologies. Each is s
 | **Intelligence** (LLM) | Gemini 2.5 Flash via Vertex AI | `gemini-2.5-flash` returned in every Cloud Run response |
 | **Orchestration** | Google ADK 2.2.0 LlmAgent | 13 tools registered, Runner + InMemorySessionService, end-to-end reasoning loop verified |
 | **Infrastructure** | Google Cloud Run (us-central1) | Service live at `https://kinmatch-agent-46939916931.us-central1.run.app` |
-| **MCP Integration** | FastMCP server + agent acts as MCP client | Brand-voice tool exposed via MCP; Cursor can connect as an external MCP client |
+| **MCP Integration** | FastMCP server + agent acts as MCP client | Context-aware tone compositiontool exposed via MCP; Cursor can connect as an external MCP client |
 
 **Production-grade extras** (beyond mandatory requirements):
 
@@ -77,7 +77,7 @@ Three horizontal layers, each with a distinct responsibility:
 ![System Architecture](./assets/kinmatch_system.png)
 
 - **User-facing layer (Vercel)** — The Next.js app at `app.kinmatch.co` is the consumer product. Agent API routes expose authenticated endpoints the agent can call. Voice notes are stored in Vercel Blob with shareable links.
-- **Agent layer (Google Cloud Run)** — The ADK agent reasons; the MCP server exposes brand-voice composition as a callable tool; Secret Manager holds the service-to-service auth token.
+- **Agent layer (Google Cloud Run)** — The ADK agent reasons; the MCP server exposes context-aware tone composition as a callable tool; Secret Manager holds the service-to-service auth token.
 - **Data layer (Supabase)** — Source of truth for users, friends, notes, voice notes, engagement signals, and the agent's own decision audit log.
 
 The agent **does not write directly to Supabase**. All data flows through the user-facing API at `app.kinmatch.co`, which authenticates the agent via a JWT-scoped request and enforces the same authorization rules as a logged-in user. This means the agent operates with the same boundaries as the user — no special database privileges.
@@ -101,7 +101,7 @@ A closer look inside the Cloud Run container:
 - **Reasoning tools** (3): `identify_quiet_friends`, `check_nudge_eligibility`, `suggest_ritual_time`
 - **Action tools** (4): `compose_nudge_message`, `send_nudge`, `log_decision`, `finish`
 
-**FastMCP server** exposes `compose_nudge_message` and `list_kinmatch_capabilities` over the Model Context Protocol. This means **any MCP-compatible client** (Cursor, Claude Desktop, future agents) can use KinMatch's brand-voice composition without integrating directly with the agent. The agent itself acts as an MCP client when configured to route nudge composition through the MCP server (`USE_MCP_FOR_NUDGES=true`).
+**FastMCP server** exposes `compose_nudge_message` and `list_kinmatch_capabilities` over the Model Context Protocol. This means **any MCP-compatible client** (Cursor, Claude Desktop, future agents) can use KinMatch's context-aware composition without integrating directly with the agent. The agent itself acts as an MCP client when configured to route nudge composition through the MCP server (`USE_MCP_FOR_NUDGES=true`).
 
 **Secret Manager** stores `KINMATCH_AGENT_SECRET` — a 64-character shared secret used by the agent to authenticate to the KinMatch API on every tool call.
 
