@@ -18,10 +18,10 @@ type FriendsResponse = {
 };
 
 const CATEGORY_COLORS: Record<FriendCategory, string[]> = {
-  inner_circle: ["#B65232", "#2F4032"],
-  village: ["#6B7A5C", "#C68F3E"],
-  family: ["#8E3D22", "#463C2E"],
-  acquaintance: ["rgba(107,122,92,0.85)", "rgba(198,143,62,0.85)"],
+  inner_circle: ["#E89470", "#C68F3E"],
+  village: ["#9DB58A", "#D4A356"],
+  family: ["#D4A67C", "#B8977A"],
+  acquaintance: ["rgba(157,181,138,0.85)", "rgba(212,163,86,0.85)"],
 };
 
 function initials(name: string) {
