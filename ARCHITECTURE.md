@@ -23,7 +23,7 @@
 
 KinMatch is a voice-first friendship app for working adults — people between 30s to 50s who deeply care about their close friends but lose touch as work, family, and life crowd the calendar. The KinMatch app helps them stay connected through short voice notes to a curated "tribe" of friends.
 
-But an app alone isn't enough. People still forget. Life still gets busy. The hardest part of friendship in adulthood isn't the connection itself — it's remembering to reach out before too much time has passed.
+But an app alone isn't enough. People still forget. Life still gets busy. The hardest part of friendship in adulthood isn't making the connection. It's remembering to reach out before too much time has passed.
 
 The **KinMatch Relational Care Agent** is an autonomous AI built on Google's Agent Development Kit (ADK) that watches a user's tribe, reads engagement signals, and quietly proposes outreach when it matters. The agent never sends without user review — it drafts, the user decides.
 
