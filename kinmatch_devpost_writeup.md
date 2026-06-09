@@ -34,7 +34,7 @@ The agent runs on **Google Cloud Run**, orchestrated by **Google ADK 2.2.0**, re
 
 **Data access:** The agent never touches Supabase directly. It exchanges a shared secret (stored in **Google Secret Manager**) for a user-scoped JWT, then calls the KinMatch API — operating under the same Row-Level Security policies as the user.
 
-**MCP integration:** Brand-voice composition is exposed as a callable tool via the **Model Context Protocol** using FastMCP. Cursor (our dev environment) connects to the same MCP server, proving the tool is genuinely reusable beyond our agent.
+**MCP integration:** Context-aware composition is exposed as a callable tool via the **Model Context Protocol** using FastMCP. Cursor (our dev environment) connects to the same MCP server, proving the tool is genuinely reusable beyond our agent.
 
 **Privacy by design:** The agent reads structured engagement signals (was the voice note listened to?) and unstructured memory notes the user writes. It does **not** transcribe voice content. That's a product decision, not a limitation.
 
@@ -78,7 +78,7 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for technical details.
 
 **Voice note transcription with per-note consent.** Richer reasoning is possible if the agent can read voice content. We're waiting until the consent UX is right — granular, explicit, user-controlled.
 
-**Open the MCP surface.** We've proven the brand-voice MCP server works with Cursor. Exploring whether to publish it publicly so other developers can add KinMatch-style relational care capabilities to their own products.
+**Open the MCP surface.** We've proven the context-aware MCP server works with Cursor. Exploring whether to publish it publicly so other developers can add KinMatch-style relational care capabilities to their own products.
 
 ---
 
