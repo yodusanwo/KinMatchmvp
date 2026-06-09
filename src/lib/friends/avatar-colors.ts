@@ -1,31 +1,24 @@
 import type { FriendCategory } from "@/lib/api/types";
 
-// Maximally distinct warm earth tones - matching the app's aesthetic
-// Highly saturated colors spanning red/orange/yellow/green/brown families
-const SHARED_COLOR_PALETTE = [
-  "#D65745",  // Vibrant red
-  "#FF9B82",  // Bright coral (button color)
-  "#FF8C42",  // Bright orange
-  "#F4C542",  // Golden yellow
-  "#C68F3E",  // Mustard
-  "#B8860B",  // Dark gold
-  "#D4A356",  // Amber
-  "#A8B560",  // Lime green
-  "#6B8E4E",  // Olive green
-  "#4A8B57",  // Emerald green
-  "#2F4F32",  // Deep forest
-  "#8E3D22",  // Deep burgundy
-  "#A0522D",  // Sienna brown
-  "#B65232",  // Terracotta
-  "#8B7355",  // Warm brown
-];
-
-// All categories use the same color palette
+// Consistent color palettes for each category
 const CATEGORY_COLOR_PALETTES: Record<FriendCategory, string[]> = {
-  inner_circle: SHARED_COLOR_PALETTE,
-  village: SHARED_COLOR_PALETTE,
-  family: SHARED_COLOR_PALETTE,
-  acquaintance: SHARED_COLOR_PALETTE,
+  inner_circle: [
+    "#E89470", "#C68F3E", "#D4A67C", "#B8977A", "#E8A88C",
+    "#D4926A", "#B07D4E", "#E0A882", "#C89058", "#D89876"
+  ],
+  village: [
+    "#9DB58A", "#D4A356", "#8BA878", "#C69546", "#AAC79A",
+    "#91AB7C", "#C8A04C", "#A5C28E", "#BA9842", "#98B384"
+  ],
+  family: [
+    "#D4A67C", "#B8977A", "#C89668", "#A88665", "#E0B68A",
+    "#CC9E70", "#B48E72", "#D8AE84", "#C0926C", "#DCB08C"
+  ],
+  acquaintance: [
+    "#9DB58A", "#D4A356", "#B8977A", "#C89058",
+    "#A5C28E", "#C8A04C", "#B0927C", "#BC9848",
+    "#91AB7C", "#C69546"
+  ],
 };
 
 /**
