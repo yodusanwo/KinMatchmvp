@@ -53,7 +53,7 @@ export function MemoryCategoryFilters({
             )}
           >
             <span>All</span>
-            <span className="text-[10px] opacity-70">({totalCount})</span>
+            <span className="text-[12px] opacity-70">({totalCount})</span>
           </button>
 
           {categories.map((categoryId) => {
@@ -80,7 +80,7 @@ export function MemoryCategoryFilters({
                   aria-hidden
                 />
                 <span>{config.chipLabel}</span>
-                <span className="text-[10px] opacity-70">({count})</span>
+                <span className="text-[12px] opacity-70">({count})</span>
               </button>
             );
           })}

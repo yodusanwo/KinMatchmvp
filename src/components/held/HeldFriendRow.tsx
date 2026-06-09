@@ -95,7 +95,7 @@ export function HeldFriendRow({ entry }: HeldFriendRowProps) {
       </div>
       {expanded && (
         <div className="mt-3 space-y-2 rounded-2xl border border-ink/[0.1] bg-cream-deep/35 p-3">
-        <label className="block font-sans text-[11px] font-medium uppercase tracking-[0.12em] text-ink-soft">
+        <label className="block font-sans text-[15px] font-medium uppercase tracking-[0.12em] text-ink-soft">
           Quiet window
           <select
             value={threshold}
@@ -109,7 +109,7 @@ export function HeldFriendRow({ entry }: HeldFriendRowProps) {
             ))}
           </select>
         </label>
-        <label className="block font-sans text-[11px] font-medium uppercase tracking-[0.12em] text-ink-soft">
+        <label className="block font-sans text-[15px] font-medium uppercase tracking-[0.12em] text-ink-soft">
           Accountability partner email
           <input
             type="email"
@@ -119,7 +119,7 @@ export function HeldFriendRow({ entry }: HeldFriendRowProps) {
             className="mt-1 w-full rounded-xl border border-ink/[0.2] bg-cream px-3 py-2 font-inter text-sm normal-case tracking-normal text-ink placeholder:text-ink-soft/50"
           />
         </label>
-        <label className="block font-sans text-[11px] font-medium uppercase tracking-[0.12em] text-ink-soft">
+        <label className="block font-sans text-[15px] font-medium uppercase tracking-[0.12em] text-ink-soft">
           Note they&apos;ll receive
           <textarea
             value={setupMessage}

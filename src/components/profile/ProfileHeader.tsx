@@ -29,7 +29,7 @@ export function ProfileHeader({ friend }: ProfileHeaderProps) {
       <p className="mt-0.5 font-inter text-xs italic text-terracotta">
         {friend.vibe_label}
       </p>
-      <p className="mt-1 flex flex-wrap items-center justify-center gap-x-1 font-sans text-[11px] text-ink-soft">
+      <p className="mt-1 flex flex-wrap items-center justify-center gap-x-1 font-sans text-[15px] text-ink-soft">
         <span>{friend.cadence_label} ·</span>
         <DriftIndicator
           daysQuiet={friend.days_quiet}

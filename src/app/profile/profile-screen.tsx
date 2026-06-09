@@ -68,7 +68,7 @@ const PREFERENCES: {
 ];
 
 const mutedHelperClassName =
-  "font-inter text-[11px] italic leading-relaxed text-[rgba(31,26,20,0.5)]";
+  "font-inter text-[15px] italic leading-relaxed text-[rgba(31,26,20,0.5)]";
 
 function ToggleSwitch({ checked }: { checked: boolean }) {
   return (
@@ -289,7 +289,7 @@ export function ProfileScreen({
               editingName && "border-b border-ink/[0.2]"
             )}
           >
-            <dt className="font-sans text-[11px] font-medium uppercase tracking-[0.12em] text-ink-soft">
+            <dt className="font-sans text-[15px] font-medium uppercase tracking-[0.12em] text-ink-soft">
               Name
             </dt>
             <dd className="min-w-0 flex-1 text-right">
@@ -316,7 +316,7 @@ export function ProfileScreen({
               {nameMessage && (
                 <p
                   className={cn(
-                    "mt-1 font-inter text-[11px] italic",
+                    "mt-1 font-inter text-[15px] italic",
                     nameMessage.kind === "saved"
                       ? "text-[rgba(31,26,20,0.5)]"
                       : "text-terracotta"
@@ -328,7 +328,7 @@ export function ProfileScreen({
             </dd>
           </div>
           <div className="flex justify-between gap-4">
-            <dt className="font-sans text-[11px] font-medium uppercase tracking-[0.12em] text-ink-soft">
+            <dt className="font-sans text-[15px] font-medium uppercase tracking-[0.12em] text-ink-soft">
               Email
             </dt>
             <dd className="text-right">
@@ -341,11 +341,11 @@ export function ProfileScreen({
           {onboardingComplete && (
             <>
               <div className="border-t border-ink/[0.08] pt-4">
-                <p className="font-sans text-[11px] font-medium uppercase tracking-[0.12em] text-ink-soft">
+                <p className="font-sans text-[15px] font-medium uppercase tracking-[0.12em] text-ink-soft">
                   email preferences
                 </p>
                 {prefError && (
-                  <p className="mt-1 font-inter text-[11px] italic text-terracotta">
+                  <p className="mt-1 font-inter text-[15px] italic text-terracotta">
                     {prefError}
                   </p>
                 )}
@@ -374,7 +374,7 @@ export function ProfileScreen({
               })}
 
               <div className="border-t border-ink/[0.08] pt-4">
-                <p className="font-sans text-[11px] font-medium uppercase tracking-[0.12em] text-ink-soft">
+                <p className="font-sans text-[15px] font-medium uppercase tracking-[0.12em] text-ink-soft">
                   voice notes
                 </p>
               </div>
@@ -403,19 +403,19 @@ export function ProfileScreen({
                       </p>
                       {micStatus === "blocked" && (
                         <div className="space-y-2 rounded-xl bg-cream p-4">
-                          <p className="font-inter text-[13px] font-medium text-ink">
+                          <p className="font-inter text-[15px] font-medium text-ink">
                             {isIOS()
                               ? "To enable the mic:"
                               : "To fix this:"}
                           </p>
                           {isIOS() ? (
-                            <ol className="ml-4 list-decimal space-y-1 font-inter text-[13px] text-ink">
+                            <ol className="ml-4 list-decimal space-y-1 font-inter text-[15px] text-ink">
                               {iosSafariUnlockSteps().map((step, i) => (
                                 <li key={i}>{step}</li>
                               ))}
                             </ol>
                           ) : (
-                            <p className="font-inter text-[13px] text-ink">
+                            <p className="font-inter text-[15px] text-ink">
                               Open your browser&apos;s site settings and allow
                               microphone access for this site.
                             </p>

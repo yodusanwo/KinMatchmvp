@@ -17,16 +17,16 @@ export function SafariPermissionMock({
           &ldquo;kin-matchmvp.vercel.app&rdquo; Would Like to Access the
           Microphone
         </p>
-        <p className="mt-2 font-sans text-[13px] leading-snug text-[#3c3c43]/80">
+        <p className="mt-2 font-sans text-[15px] leading-snug text-[#3c3c43]/80">
           KinMatch only uses your microphone when you record a voice note.
         </p>
       </div>
       <div className="grid grid-cols-2 border-t border-[#c6c6c8]">
-        <div className="border-r border-[#c6c6c8] py-3 font-sans text-[17px] text-[#007aff]">
+        <div className="border-r border-[#c6c6c8] py-3 font-sans text-[19px] text-[#007aff]">
           Don&apos;t Allow
         </div>
         <div
-          className={`py-3 font-sans text-[17px] font-semibold text-[#007aff] ${
+          className={`py-3 font-sans text-[19px] font-semibold text-[#007aff] ${
             highlightAllow ? "bg-[#007aff]/10" : ""
           }`}
         >

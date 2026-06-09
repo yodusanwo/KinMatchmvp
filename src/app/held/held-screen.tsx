@@ -171,7 +171,7 @@ export function HeldScreen() {
 
         {data && !loading && (
           <div className="mt-5 space-y-7">
-            <p className="font-inter text-sm italic leading-relaxed text-ink-soft">
+            <p className="font-inter text-sm italic leading-relaxed text-ink">
               If you go quiet for about <strong>{data.quiet_threshold_days} days</strong>, KinMatch will let your circle know.{" "}
               <button
                 type="button"
@@ -210,7 +210,7 @@ export function HeldScreen() {
                   type="button"
                   disabled={isFull}
                   onClick={() => setSheetMode("add")}
-                  className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-ink/[0.25] px-4 py-4 font-sans text-xs font-medium text-ink/65 disabled:opacity-60"
+                  className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-ink/[0.25] px-4 py-4 font-sans text-xs font-medium text-ink-soft disabled:opacity-60"
                 >
                   <Plus className="h-4 w-4" aria-hidden />
                   {isFull
@@ -218,7 +218,7 @@ export function HeldScreen() {
                     : "Add someone to your circle"}
                 </button>
 
-                <p className="mt-6 text-center font-inter text-xs italic text-ink-soft/70">
+                <p className="mt-6 text-center font-inter text-xs italic text-ink-soft">
                   {data.recent_events[0]
                     ? `Last triggered: ${timeAgo(data.recent_events[0].occurred_at)}.`
                     : "Last triggered: never. You've stayed in rhythm."}
@@ -294,10 +294,10 @@ function WatcherRow({
     <div className="flex items-center gap-3 py-3.5">
       <MiniAvatar name={entry.name} avatarColor={entry.avatar_color} size="sm" />
       <Link href={`/friends/${entry.friend_id}`} className="min-w-0 flex-1">
-        <p className="truncate font-sans text-[13px] font-medium text-ink">
+        <p className="truncate font-sans text-[15px] font-medium text-ink">
           {firstName(entry.name)}
         </p>
-        <p className="font-inter text-[10px] text-[rgba(31,26,20,0.55)]">
+        <p className="font-inter text-[12px] text-ink-soft">
           {statusLine(entry)}
         </p>
       </Link>
@@ -356,7 +356,7 @@ function HeldSheet({
       <div className="w-full max-w-[456px] rounded-[28px] bg-cream p-5 shadow-2xl">
         {mode === "actions" && selected && (
           <>
-            <p className="mb-5 text-center font-sans text-[11px] font-medium uppercase tracking-[0.16em] text-ink-soft">
+            <p className="mb-5 text-center font-sans text-[15px] font-medium uppercase tracking-[0.16em] text-ink-soft">
               about {name}
             </p>
             <Link
@@ -451,7 +451,7 @@ function HeldSheet({
               )}
             </div>
             <label className="block space-y-2">
-              <span className="font-sans text-[11px] font-medium uppercase tracking-[0.12em] text-ink-soft">
+              <span className="font-sans text-[15px] font-medium uppercase tracking-[0.12em] text-ink-soft">
                 Note they&apos;ll receive
               </span>
               <textarea

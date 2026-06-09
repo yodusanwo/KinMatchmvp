@@ -128,7 +128,7 @@ export function NewRitualScreen({ template }: { template?: string }) {
 
         <div className="mt-8 space-y-6">
           <label className="block space-y-2">
-            <span className="font-sans text-[11px] font-medium uppercase tracking-[0.12em] text-ink-soft">
+            <span className="font-sans text-[15px] font-medium uppercase tracking-[0.12em] text-ink-soft">
               Ritual name
             </span>
             <input
@@ -173,7 +173,7 @@ export function NewRitualScreen({ template }: { template?: string }) {
           </section>
 
           <label className="block space-y-2">
-            <span className="font-sans text-[11px] font-medium uppercase tracking-[0.12em] text-ink-soft">
+            <span className="font-sans text-[15px] font-medium uppercase tracking-[0.12em] text-ink-soft">
               How often
             </span>
             <select
@@ -203,7 +203,7 @@ export function NewRitualScreen({ template }: { template?: string }) {
           )}
 
           <label className="block space-y-2">
-            <span className="font-sans text-[11px] font-medium uppercase tracking-[0.12em] text-ink-soft">
+            <span className="font-sans text-[15px] font-medium uppercase tracking-[0.12em] text-ink-soft">
               When&apos;s the next one
             </span>
             <input

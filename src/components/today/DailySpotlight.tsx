@@ -11,6 +11,7 @@ import { firstName } from "@/lib/memories/categories";
 
 type SendSpotlightProps = {
   state: Extract<TodayDailyState, { kind: "send_discovery" | "send_algorithmic" }>;
+  onRefresh: () => void;
 };
 
 type CaptureSpotlightProps = {
@@ -46,13 +47,40 @@ function whyItWorks(state: SendSpotlightProps["state"]) {
     : state.primary_reason;
 }
 
-export function SendSpotlight({ state }: SendSpotlightProps) {
+export function SendSpotlight({ state, onRefresh }: SendSpotlightProps) {
   const name = firstName(state.friend.name);
   const question = sendQuestion(state);
+  const [skipping, setSkipping] = useState(false);
   const voiceNoteHref =
     state.kind === "send_discovery"
       ? `/api/discovery/outreach?friend_id=${state.friend.id}&day=${state.day_number}`
       : `/friends/${state.friend.id}/voice-note`;
+
+  async function skipPrompt() {
+    setSkipping(true);
+    // Call defer endpoint which handles both discovery and algorithmic modes
+    await fetch(`/api/discovery/defer`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        friend_id: state.friend.id,
+        day_number: state.kind === "send_discovery" ? state.day_number : undefined,
+      }),
+    });
+    // Small delay to ensure database write completes
+    await new Promise(resolve => setTimeout(resolve, 500));
+    onRefresh();
+  }
+
+  if (skipping) {
+    return (
+      <article className="rounded-3xl bg-cream-deep/80 p-4">
+        <p className="font-inter text-sm italic text-ink-soft">
+          Got it — next friend.
+        </p>
+      </article>
+    );
+  }
 
   return (
     <article className="rounded-3xl bg-cream-deep/80 p-4">
@@ -80,13 +108,22 @@ export function SendSpotlight({ state }: SendSpotlightProps) {
         {whyItWorks(state)}
       </p>
 
-      <Link
-        href={voiceNoteHref}
-        className={cn(primaryButtonClassName, "mt-5 gap-2")}
-      >
-        <Mic className="h-4 w-4" strokeWidth={1.75} aria-hidden />
-        Send a voice note
-      </Link>
+      <div className="mt-4 flex items-center gap-2">
+        <Link
+          href={voiceNoteHref}
+          className={cn(primaryButtonClassName, "flex-1 gap-2 py-2.5 text-xs")}
+        >
+          <Mic className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
+          Send voice note
+        </Link>
+        <button
+          type="button"
+          onClick={() => void skipPrompt()}
+          className="flex-1 rounded-full border border-ink/[0.2] px-3 py-2.5 font-sans text-xs font-medium text-ink"
+        >
+          Not now
+        </button>
+      </div>
       <p className="mt-3 text-center">
         <Link
           href={`/friends/${state.friend.id}`}
@@ -109,6 +146,8 @@ export function CaptureSpotlight({ state, onRefresh }: CaptureSpotlightProps) {
     await fetch(`/api/capture/${state.voice_note.id}/defer`, {
       method: "POST",
     });
+    // Small delay to ensure database write completes before refresh
+    await new Promise(resolve => setTimeout(resolve, 500));
     onRefresh();
   }
 

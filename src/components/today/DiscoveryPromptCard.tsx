@@ -10,7 +10,7 @@ export function DiscoveryPromptCard({ prompt }: DiscoveryPromptCardProps) {
     <section className="rounded-2xl border border-ink/[0.12] bg-cream-deep/55 p-3">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="font-sans text-[10px] font-medium uppercase tracking-[0.12em] text-terracotta">
+          <p className="font-sans text-[12px] font-medium uppercase tracking-[0.12em] text-terracotta">
             Discovery · Day {prompt.day}
           </p>
           <p className="mt-1 line-clamp-2 font-inter text-sm italic leading-relaxed text-ink">

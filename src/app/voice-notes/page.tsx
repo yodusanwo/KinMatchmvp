@@ -170,7 +170,7 @@ export default async function VoiceNotesPage() {
                       </div>
                     </div>
                     <span
-                      className={`shrink-0 rounded-full px-2 py-1 font-sans text-[10px] font-medium ${status.className}`}
+                      className={`shrink-0 rounded-full px-2 py-1 font-sans text-[12px] font-medium ${status.className}`}
                     >
                       {status.label}
                     </span>

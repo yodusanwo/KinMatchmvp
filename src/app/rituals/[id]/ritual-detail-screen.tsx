@@ -112,7 +112,7 @@ export function RitualDetailScreen({ ritual }: { ritual: DetailRitual }) {
             {frequencyLabel(ritual.frequency, ritual.recurrence_pattern)} ·{" "}
             {participantText}
           </p>
-          <span className="inline-flex rounded-full bg-terracotta/10 px-3 py-1 font-sans text-[11px] font-medium text-terracotta">
+          <span className="inline-flex rounded-full bg-terracotta/10 px-3 py-1 font-sans text-[15px] font-medium text-terracotta">
             Next: {formatDate(ritual.next_date)}
           </span>
         </div>
@@ -173,7 +173,7 @@ export function RitualDetailScreen({ ritual }: { ritual: DetailRitual }) {
           )}
         </section>
 
-        <p className="mt-8 font-inter text-[11px] italic leading-relaxed text-ink-soft">
+        <p className="mt-8 font-inter text-[15px] italic leading-relaxed text-ink-soft">
           TODO v1.1: bring ritual reminders into Today, add post-ritual capture,
           account for upcoming rituals in Spotlight, export calendars, celebrate
           streaks, and add notification support.

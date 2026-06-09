@@ -217,13 +217,13 @@ export function TribeScreen() {
                       <button
                         type="button"
                         onClick={() => setShowAcquaintances((value) => !value)}
-                        className="font-inter text-[11px] text-terracotta underline decoration-terracotta/60 underline-offset-2"
+                        className="font-inter text-[15px] text-terracotta underline decoration-terracotta/60 underline-offset-2"
                       >
                         {showAcquaintances ? "hide" : "show"}
                       </button>
                     )}
                   </div>
-                  <p className="mt-1 font-inter text-[10px] italic text-ink-soft/70">
+                  <p className="mt-1 font-inter text-[12px] italic text-ink-soft/70">
                     {acquaintances.length === 0
                       ? "Promote anyone here as friendships deepen."
                       : "Lighter ties. Hidden by default."}
@@ -245,12 +245,12 @@ export function TribeScreen() {
                       <button
                         type="button"
                         onClick={() => setShowArchived((value) => !value)}
-                        className="font-inter text-[11px] text-terracotta underline decoration-terracotta/60 underline-offset-2"
+                        className="font-inter text-[15px] text-terracotta underline decoration-terracotta/60 underline-offset-2"
                       >
                         {showArchived ? "hide" : "show"}
                       </button>
                     </div>
-                    <p className="mt-1 font-inter text-[10px] italic text-ink-soft/70">
+                    <p className="mt-1 font-inter text-[12px] italic text-ink-soft/70">
                       Hidden from active tribe. Tap to restore.
                     </p>
                     {showArchived && (
@@ -282,7 +282,7 @@ export function TribeScreen() {
                 <button
                   type="button"
                   onClick={() => setAddOpen(true)}
-                  className="font-inter text-[11px] text-terracotta underline decoration-terracotta/60 underline-offset-2"
+                  className="font-inter text-[15px] text-terracotta underline decoration-terracotta/60 underline-offset-2"
                 >
                   + add someone to your tribe
                 </button>
@@ -330,7 +330,7 @@ export function TribeScreen() {
                       key={category}
                       type="button"
                       onClick={() => setNewCategory(category)}
-                      className={`rounded-full border px-3 py-2 font-sans text-[11px] font-semibold ${
+                      className={`rounded-full border px-3 py-2 font-sans text-[15px] font-semibold ${
                         newCategory === category
                           ? "border-terracotta bg-terracotta/10 text-ink"
                           : "border-ink/[0.16] text-ink-soft"
@@ -384,7 +384,7 @@ function CategorySection({
     <section>
       <Eyebrow>{title} · {friends.length}</Eyebrow>
       {friends.length === 0 ? (
-        <p className="mt-2 font-inter text-[10px] italic text-ink-soft/70">
+        <p className="mt-2 font-inter text-[12px] italic text-ink-soft/70">
           {emptyCopy}
         </p>
       ) : (
@@ -444,7 +444,7 @@ function FriendGrid({
               </span>
             )}
           </div>
-          <span className="mt-2 truncate font-sans text-[10px] font-medium text-ink">
+          <span className="mt-2 truncate font-sans text-[12px] font-medium text-ink">
             {firstName(friend.name)}
           </span>
           {isArchived && friend.archived_at ? (

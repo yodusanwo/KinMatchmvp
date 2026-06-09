@@ -58,7 +58,7 @@ export function FriendManagementSheet({
       <div className="w-full max-w-[456px] rounded-[28px] bg-cream p-5 shadow-2xl">
         {mode === "actions" ? (
           <>
-            <p className="mb-5 text-center font-sans text-[11px] font-medium uppercase tracking-[0.16em] text-ink-soft">
+            <p className="mb-5 text-center font-sans text-[15px] font-medium uppercase tracking-[0.16em] text-ink-soft">
               about {name}
             </p>
 

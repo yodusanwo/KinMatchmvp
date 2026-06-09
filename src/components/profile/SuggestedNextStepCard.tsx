@@ -54,7 +54,7 @@ export function SuggestedNextStepCard({
         {ctaLabel}
       </Link>
       {sendMethodHint && (
-        <p className="mt-2 text-center font-inter text-[11px] italic text-ink-soft">
+        <p className="mt-2 text-center font-inter text-[15px] italic text-ink-soft">
           {sendMethodHint}
         </p>
       )}

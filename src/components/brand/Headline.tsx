@@ -11,7 +11,7 @@ export function Headline({ children, as: Tag = "h1", className }: HeadlineProps)
   return (
     <Tag
       className={cn(
-        "font-sans text-[22px] font-medium leading-snug text-ink",
+        "font-sans text-[24px] font-medium leading-snug text-ink",
         className
       )}
     >

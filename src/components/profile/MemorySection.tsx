@@ -89,7 +89,7 @@ export function MemorySection({
   return (
     <section className="space-y-4">
       <div className="space-y-1.5">
-        <p className="font-sans text-[11px] font-medium uppercase tracking-[0.12em] text-terracotta">
+        <p className="font-sans text-[15px] font-medium uppercase tracking-[0.12em] text-terracotta">
           Things to remember
         </p>
         <h2 className="font-serif text-2xl leading-tight text-ink">
@@ -271,7 +271,7 @@ function MemoryPromptCard({
             <button
               type="button"
               onClick={() => onToggleExpand(categoryId)}
-              className="mt-1.5 font-inter text-[11px] italic text-ink-soft hover:text-terracotta transition-colors"
+              className="mt-1.5 font-inter text-[15px] italic text-ink-soft hover:text-terracotta transition-colors"
             >
               +{notes.length - visibleNotes.length} more saved
             </button>
@@ -281,7 +281,7 @@ function MemoryPromptCard({
             <button
               type="button"
               onClick={() => onToggleExpand(categoryId)}
-              className="mt-1.5 font-inter text-[11px] italic text-ink-soft hover:text-terracotta transition-colors"
+              className="mt-1.5 font-inter text-[15px] italic text-ink-soft hover:text-terracotta transition-colors"
             >
               Show less
             </button>

@@ -54,7 +54,7 @@ export function BottomNav({ heldBadge = false }: BottomNavProps) {
                 aria-current={active ? "page" : undefined}
               >
                 <Icon className="h-3.5 w-3.5 min-[360px]:h-5 min-[360px]:w-5" strokeWidth={1.75} aria-hidden />
-                <span className="font-sans text-[10px] font-medium">{label}</span>
+                <span className="font-sans text-[12px] font-medium">{label}</span>
                 {label === "Held" && heldBadge && (
                   <span
                     className="absolute right-0 top-0 h-2 w-2 rounded-full bg-terracotta"

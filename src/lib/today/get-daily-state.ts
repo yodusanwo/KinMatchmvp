@@ -285,7 +285,25 @@ export async function getDailyState(params: {
       const ordered = ranked
         .map((score) => summaries.get(score.friend_id))
         .filter((summary): summary is FriendSummary => Boolean(summary));
-      const friend = ordered[(cycleNumber - 1) % Math.max(ordered.length, 1)];
+
+      // Get friends who already have a prompt for this day number (sent or skipped)
+      const { data: existingPrompts } = await params.supabase
+        .from("discovery_prompts")
+        .select("friend_id")
+        .eq("user_id", user.id)
+        .eq("prompt_day", dayNumber);
+
+      const promptedFriendIds = new Set(
+        (existingPrompts ?? []).map((p) => p.friend_id)
+      );
+
+      // Filter out friends who already have prompts for today
+      const availableFriends = ordered.filter(
+        (friend) => !promptedFriendIds.has(friend.id)
+      );
+
+      // Pick the first available friend
+      const friend = availableFriends[0] ?? null;
 
       if (prompt && friend) {
         return {
@@ -313,15 +331,51 @@ export async function getDailyState(params: {
   const friend = friends.find((item) => item.id === spotlight.friend_id);
   if (!summary || !friend) return null;
 
+  // Check if this friend was shown as algorithmic spotlight today already
+  // to avoid re-showing immediately after skip
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const { data: todaysSpotlights } = await params.supabase
+    .from("friends")
+    .select("id, last_spotlight_at")
+    .eq("user_id", user.id)
+    .eq("in_tribe", true)
+    .gte("last_spotlight_at", today.toISOString());
+
+  const shownTodayIds = new Set(
+    (todaysSpotlights ?? []).map((f) => f.id)
+  );
+
+  // If top friend was already shown today, try the next one
+  let selectedSpotlight = spotlight;
+  let selectedSummary = summary;
+  let selectedFriend = friend;
+  
+  if (shownTodayIds.has(spotlight.friend_id)) {
+    // Find first friend in ranked list not shown today
+    for (const score of ranked) {
+      if (!shownTodayIds.has(score.friend_id)) {
+        const altSummary = summaries.get(score.friend_id);
+        const altFriend = friends.find((item) => item.id === score.friend_id);
+        if (altSummary && altFriend) {
+          selectedSpotlight = score;
+          selectedSummary = altSummary;
+          selectedFriend = altFriend;
+          break;
+        }
+      }
+    }
+  }
+
   return {
     kind: "send_algorithmic",
-    friend: summary,
+    friend: selectedSummary,
     personalized_prompt: formatPersonalizedSpotlightPrompt(
       { barriers },
-      summary.name,
-      summary.days_quiet
+      selectedSummary.name,
+      selectedSummary.days_quiet
     ),
-    primary_reason: spotlight.primary_reason,
+    primary_reason: selectedSpotlight.primary_reason,
   };
 }
 

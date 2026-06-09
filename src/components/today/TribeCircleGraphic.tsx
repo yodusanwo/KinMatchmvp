@@ -72,7 +72,7 @@ export function TribeCircleGraphic({
             >
               {getInitials(friend.name)}
             </span>
-            <span className="max-w-[64px] truncate font-sans text-[11px] font-medium leading-none text-ink">
+            <span className="max-w-[64px] truncate font-sans text-[15px] font-medium leading-none text-ink">
               {firstName(friend.name)}
             </span>
             <span className="font-sans text-[9px] leading-none text-ink-soft">
@@ -85,7 +85,7 @@ export function TribeCircleGraphic({
       {overflow > 0 && (
         <Link
           href="/tribe"
-          className="absolute bottom-2 right-3 rounded-full bg-cream px-2 py-1 font-sans text-[10px] text-ink-soft"
+          className="absolute bottom-2 right-3 rounded-full bg-cream px-2 py-1 font-sans text-[12px] text-ink-soft"
         >
           +{overflow} more
         </Link>

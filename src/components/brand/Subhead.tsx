@@ -10,7 +10,7 @@ export function Subhead({ children, className }: SubheadProps) {
   return (
     <p
       className={cn(
-        "font-inter text-base italic leading-relaxed text-ink-soft",
+        "font-inter text-base italic leading-relaxed text-ink",
         className
       )}
     >

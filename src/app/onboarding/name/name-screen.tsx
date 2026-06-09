@@ -64,7 +64,7 @@ export function NameScreen({ initialName, placeholderName }: NameScreenProps) {
             <Headline className="max-w-[320px] text-[34px] leading-[1.08]">
               What should we call you?
             </Headline>
-            <p className="max-w-[330px] font-inter text-[13px] italic leading-[1.55] text-[rgba(31,26,20,0.65)]">
+            <p className="max-w-[330px] font-inter text-[15px] italic leading-[1.55] text-[rgba(31,26,20,0.65)]">
               Your name, as your people would say it. Just a first name is fine.
             </p>
           </div>

@@ -29,7 +29,7 @@ export function ReflectionStepShell({
       <BrandBar />
       <div className={cn("flex min-h-[calc(100vh-65px)] flex-col px-5 py-6", className)}>
         <div className="mb-8 space-y-2">
-          <p className="font-sans text-[11px] font-medium uppercase tracking-[0.12em] text-terracotta">
+          <p className="font-sans text-[15px] font-medium uppercase tracking-[0.12em] text-terracotta">
             {STEP_LABELS[step]}
           </p>
           <ProgressDots filled={step} total={3} />

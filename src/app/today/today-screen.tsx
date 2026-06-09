@@ -87,7 +87,7 @@ export function TodayScreen() {
       <BrandBar className="py-2" />
       <div className="flex min-h-[calc(100dvh-49px)] flex-col px-5 pb-28 pt-3">
         <Eyebrow>{dayLabel(state)}</Eyebrow>
-        <Headline className="mt-1 text-[23px] leading-tight">
+        <Headline className="mt-1 text-[25px] leading-tight">
           {headlineForState(state)}
         </Headline>
 
@@ -108,7 +108,10 @@ export function TodayScreen() {
                   onRefresh={() => void load()}
                 />
               ) : (
-                <SendSpotlight state={state} />
+                <SendSpotlight 
+                  state={state}
+                  onRefresh={() => void load()}
+                />
               )
             ) : (
               <div className="rounded-2xl border border-ink/[0.12] bg-cream-deep/60 p-5">

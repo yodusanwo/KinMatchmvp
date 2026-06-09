@@ -160,7 +160,7 @@ export function SignInForm({
       )}
 
       <div className="space-y-2">
-        <label htmlFor="email" className="font-sans text-[11px] font-medium uppercase tracking-[0.12em] text-ink-soft">
+        <label htmlFor="email" className="font-sans text-[15px] font-medium uppercase tracking-[0.12em] text-ink-soft">
           Email
         </label>
         <input

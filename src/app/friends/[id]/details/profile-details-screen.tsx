@@ -122,7 +122,7 @@ export function ProfileDetailsScreen({
 
       <div className="px-5 pb-24 pt-4">
         <div className="space-y-1">
-          <p className="font-sans text-[11px] font-medium uppercase tracking-[0.12em] text-terracotta">
+          <p className="font-sans text-[15px] font-medium uppercase tracking-[0.12em] text-terracotta">
             Friend details
           </p>
           <h1 className="font-serif text-2xl leading-tight text-ink">

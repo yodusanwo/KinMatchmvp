@@ -170,16 +170,16 @@ function RitualSection({
             }`}
           >
             <div className="flex items-start justify-between gap-3">
-              <p className="font-sans text-[13px] font-medium text-ink">
+              <p className="font-sans text-[15px] font-medium text-ink">
                 {ritual.name}
               </p>
-              <p className={`shrink-0 font-sans text-[10px] font-medium ${
+              <p className={`shrink-0 font-sans text-[12px] font-medium ${
                 urgent ? "text-terracotta" : "text-ink-soft"
               }`}>
                 {relativeDate(ritual.next_date)}
               </p>
             </div>
-            <p className="mt-2 font-inter text-[11px] italic leading-relaxed text-ink-soft/80">
+            <p className="mt-2 font-inter text-[15px] italic leading-relaxed text-ink-soft/80">
               {participantLine(ritual)}
             </p>
           </Link>

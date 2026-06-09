@@ -15,7 +15,7 @@ export function ProfileTopBar({ friendName, onMore }: ProfileTopBarProps) {
       >
         ← Today
       </Link>
-      <span className="font-sans text-[13px] font-medium text-ink">
+      <span className="font-sans text-[15px] font-medium text-ink">
         {friendName}
       </span>
       <button

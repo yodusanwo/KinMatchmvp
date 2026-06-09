@@ -104,7 +104,7 @@ export function ListenScreen({ shareToken }: ListenScreenProps) {
 
         {note.transcript && (
           <article className="mt-6 rounded-2xl border border-ink/[0.12] bg-cream-deep/40 p-5">
-            <p className="font-sans text-[11px] font-medium uppercase tracking-[0.12em] text-ink-soft">
+            <p className="font-sans text-[15px] font-medium uppercase tracking-[0.12em] text-ink-soft">
               Transcript
             </p>
             <p className="mt-3 font-inter text-sm leading-relaxed text-ink-soft">

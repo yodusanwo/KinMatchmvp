@@ -56,7 +56,7 @@ export function HeldScreen() {
           <div className="space-y-2">
             <Eyebrow>One last thing</Eyebrow>
             <Headline>Choose who holds you.</Headline>
-            <p className="font-inter text-[13px] italic leading-[1.55] text-[rgba(31,26,20,0.85)]">
+            <p className="font-inter text-[15px] italic leading-[1.55] text-[rgba(31,26,20,0.85)]">
               Modern life has more people in it than ever, and fewer who&apos;d
               actually notice if you went quiet. Held is the small circle who
               would. Tap the people you want in that circle.

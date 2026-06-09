@@ -388,13 +388,13 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
 
               <p className="text-center">
                 {hasPhone ? (
-                  <span className="font-inter text-[11px] italic text-ink-soft">
+                  <span className="font-inter text-[15px] italic text-ink-soft">
                     {sendMethodHint}
                   </span>
                 ) : (
                   <Link
                     href={`/friends/${friend.id}`}
-                    className="font-inter text-[11px] italic text-terracotta underline decoration-terracotta/60 underline-offset-2"
+                    className="font-inter text-[15px] italic text-terracotta underline decoration-terracotta/60 underline-offset-2"
                   >
                     {sendMethodHint}
                   </Link>
