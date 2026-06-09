@@ -9,13 +9,174 @@ export const runtime = "edge";
 
 type RouteContext = { params: Promise<{ shareToken: string }> };
 
+// Simple hash function to get consistent icon for each sender
+function hashString(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  return Math.abs(hash);
+}
+
+// Icon components - each returns JSX for the icon
+function getSenderIcon(senderName: string) {
+  const icons = [
+    // Sunflower
+    () => (
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ position: "relative", width: "96px", height: "96px" }}>
+          {/* Petals */}
+          {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
+            <div
+              key={angle}
+              style={{
+                position: "absolute",
+                width: "30px",
+                height: "30px",
+                backgroundColor: "#f5c56e",
+                borderRadius: "50% 50% 0 50%",
+                top: "33px",
+                left: "33px",
+                transform: `rotate(${angle}deg) translateY(-32px)`,
+                transformOrigin: "center",
+              }}
+            />
+          ))}
+          {/* Center */}
+          <div
+            style={{
+              position: "absolute",
+              width: "40px",
+              height: "40px",
+              backgroundColor: "#8e3d22",
+              borderRadius: "50%",
+              top: "28px",
+              left: "28px",
+            }}
+          />
+        </div>
+      </div>
+    ),
+    // Smiley Face
+    () => (
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "96px", height: "96px", backgroundColor: "#f5c56e", borderRadius: "50%" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+          {/* Eyes */}
+          <div style={{ display: "flex", gap: "24px", marginTop: "20px" }}>
+            <div style={{ width: "8px", height: "8px", backgroundColor: "#1f1a14", borderRadius: "50%" }} />
+            <div style={{ width: "8px", height: "8px", backgroundColor: "#1f1a14", borderRadius: "50%" }} />
+          </div>
+          {/* Smile */}
+          <div style={{ width: "32px", height: "16px", borderBottom: "4px solid #1f1a14", borderRadius: "0 0 100% 100%", marginTop: "4px" }} />
+        </div>
+      </div>
+    ),
+    // Leaf
+    () => (
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "96px", height: "96px" }}>
+        <div
+          style={{
+            width: "60px",
+            height: "80px",
+            backgroundColor: "#6b7a5c",
+            borderRadius: "0 100% 100% 0",
+            transform: "rotate(-30deg)",
+            position: "relative",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              width: "2px",
+              height: "70px",
+              backgroundColor: "#463c2e",
+              left: "0",
+              top: "5px",
+            }}
+          />
+        </div>
+      </div>
+    ),
+    // Heart
+    () => (
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "96px", height: "96px" }}>
+        <div style={{ position: "relative", width: "64px", height: "64px" }}>
+          <div
+            style={{
+              position: "absolute",
+              width: "32px",
+              height: "48px",
+              backgroundColor: "#b65232",
+              borderRadius: "32px 32px 0 0",
+              left: "0",
+              top: "8px",
+              transform: "rotate(-45deg)",
+              transformOrigin: "100% 100%",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              width: "32px",
+              height: "48px",
+              backgroundColor: "#b65232",
+              borderRadius: "32px 32px 0 0",
+              right: "0",
+              top: "8px",
+              transform: "rotate(45deg)",
+              transformOrigin: "0% 100%",
+            }}
+          />
+        </div>
+      </div>
+    ),
+    // Simple Circle with Wave pattern
+    () => (
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "96px", height: "96px", backgroundColor: "#B5C5B5", borderRadius: "50%", position: "relative", overflow: "hidden" }}>
+        <div style={{ position: "absolute", bottom: "0", left: "0", right: "0", height: "40px", backgroundColor: "#6b7a5c", borderRadius: "50% 50% 0 0" }} />
+        <div style={{ position: "absolute", bottom: "12px", left: "0", right: "0", height: "30px", backgroundColor: "#8e9b7d", borderRadius: "50% 50% 0 0" }} />
+      </div>
+    ),
+    // Star-like shape
+    () => (
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "96px", height: "96px" }}>
+        <div style={{ position: "relative", width: "80px", height: "80px" }}>
+          {[0, 60, 120, 180, 240, 300].map((angle) => (
+            <div
+              key={angle}
+              style={{
+                position: "absolute",
+                width: "20px",
+                height: "20px",
+                backgroundColor: "#D4A356",
+                borderRadius: "50%",
+                top: "30px",
+                left: "30px",
+                transform: `rotate(${angle}deg) translateY(-30px)`,
+              }}
+            />
+          ))}
+          <div style={{ position: "absolute", width: "30px", height: "30px", backgroundColor: "#c68f3e", borderRadius: "50%", top: "25px", left: "25px" }} />
+        </div>
+      </div>
+    ),
+  ];
+
+  const hash = hashString(senderName);
+  const iconIndex = hash % icons.length;
+  const IconComponent = icons[iconIndex];
+  
+  return <IconComponent />;
+}
+
 export async function GET(_request: Request, context: RouteContext) {
   const { shareToken: rawShareToken } = await context.params;
   const shareToken = normalizeShareToken(rawShareToken);
   const { data: voiceNote } = await fetchPublicVoiceNote(shareToken);
 
   const senderName = formatDisplayName(voiceNote?.sender_name ?? "") || "a friend";
-  const senderInitial = senderName[0]?.toUpperCase() ?? "K";
 
   return new ImageResponse(
     (
@@ -25,7 +186,7 @@ export async function GET(_request: Request, context: RouteContext) {
           flexDirection: "column",
           width: "100%",
           height: "100%",
-          backgroundColor: "#2F4032",
+          backgroundColor: "#f2ead9",
           padding: "80px",
           fontFamily: "Georgia, serif",
         }}
@@ -42,14 +203,14 @@ export async function GET(_request: Request, context: RouteContext) {
             style={{
               fontSize: "28px",
               fontWeight: 500,
-              color: "#E8F0E8",
+              color: "#1f1a14",
             }}
           >
             Kin
             <span
               style={{
                 fontStyle: "italic",
-                color: "#D4A356",
+                color: "#b65232",
               }}
             >
               Match
@@ -63,7 +224,7 @@ export async function GET(_request: Request, context: RouteContext) {
               position: "relative",
             }}
           >
-            {/* Left silhouette (light sage) */}
+            {/* Left silhouette */}
             <div
               style={{
                 position: "absolute",
@@ -78,20 +239,20 @@ export async function GET(_request: Request, context: RouteContext) {
                   width: "14px",
                   height: "14px",
                   borderRadius: "50%",
-                  backgroundColor: "#B5C5B5",
+                  backgroundColor: "#6b7a5c",
                 }}
               />
               <div
                 style={{
                   width: "20px",
                   height: "14px",
-                  backgroundColor: "#B5C5B5",
+                  backgroundColor: "#6b7a5c",
                   borderRadius: "0 0 10px 10px",
                   marginTop: "1px",
                 }}
               />
             </div>
-            {/* Right silhouette (terracotta) */}
+            {/* Right silhouette */}
             <div
               style={{
                 position: "absolute",
@@ -106,14 +267,14 @@ export async function GET(_request: Request, context: RouteContext) {
                   width: "14px",
                   height: "14px",
                   borderRadius: "50%",
-                  backgroundColor: "#D4A356",
+                  backgroundColor: "#b65232",
                 }}
               />
               <div
                 style={{
                   width: "20px",
                   height: "14px",
-                  backgroundColor: "#D4A356",
+                  backgroundColor: "#b65232",
                   borderRadius: "0 0 10px 10px",
                   marginTop: "1px",
                 }}
@@ -138,29 +299,14 @@ export async function GET(_request: Request, context: RouteContext) {
               gap: "24px",
             }}
           >
-            <div
-              style={{
-                width: "96px",
-                height: "96px",
-                borderRadius: "50%",
-                backgroundColor: "#B5C5B5",
-                color: "#2F4032",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "40px",
-                fontWeight: 500,
-              }}
-            >
-              {senderInitial}
-            </div>
+            {getSenderIcon(senderName)}
             <div style={{ display: "flex", flexDirection: "column" }}>
               <span
                 style={{
                   fontSize: "20px",
                   textTransform: "uppercase",
                   letterSpacing: "0.15em",
-                  color: "rgba(232, 240, 232, 0.7)",
+                  color: "rgba(31, 26, 20, 0.6)",
                   fontWeight: 500,
                 }}
               >
@@ -170,7 +316,7 @@ export async function GET(_request: Request, context: RouteContext) {
                 style={{
                   fontSize: "80px",
                   fontWeight: 500,
-                  color: "#E8F0E8",
+                  color: "#1f1a14",
                   lineHeight: 1.1,
                   marginTop: "8px",
                 }}
@@ -184,7 +330,7 @@ export async function GET(_request: Request, context: RouteContext) {
             style={{
               fontSize: "32px",
               fontStyle: "italic",
-              color: "rgba(232, 240, 232, 0.8)",
+              color: "rgba(31, 26, 20, 0.7)",
               marginTop: "24px",
             }}
           >
