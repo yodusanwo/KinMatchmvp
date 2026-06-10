@@ -60,3 +60,9 @@ agent/__pycache__/
 agent/*.pyc
 agent/.env
 agent/*.json
+
+# Planning/build documents (archived)
+kinmatch-14-day-build-plan.md
+kinmatch-wireframe-to-build.md
+kinmatch-mvp-brief.md
+DEFERRED.md
