@@ -1,16 +1,16 @@
 """
 adk_agent.py — KinMatch Relational Care Agent (ADK version)
 
-Wraps the existing KinMatch agent logic in Google's Agent Development Kit (ADK).
-Built side-by-side with agent.py during the contest sprint; once verified,
-this becomes the contest submission's primary agent.
+The primary contest submission agent. Built on Google's Agent Development Kit (ADK),
+this agent reasons through Gemini 2.5 Flash via Vertex AI and deploys natively to
+Google Cloud Run.
 
 Architecture:
 - ADK LlmAgent orchestration (Track 1 requirement)
-- Gemini 2.5 Flash via Vertex AI (same as before)
+- Gemini 2.5 Flash via Vertex AI
 - Tools passed directly as Python functions — ADK auto-generates declarations
   from type hints and docstrings
-- Same system prompt content as agent.py
+- System prompt loaded from system_prompt.py
 - Deployable to Cloud Run via `adk deploy cloud_run`
 """
 import os
