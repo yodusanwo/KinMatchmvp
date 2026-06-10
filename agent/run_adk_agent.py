@@ -51,7 +51,7 @@ async def main():
     from google.adk.runners import Runner
     from google.adk.sessions import InMemorySessionService
     from google.genai import types
-    from adk_agent import root_agent
+    from .adk_agent import root_agent
 
     if mode == "demo":
         from fake_data import set_active_scenario
