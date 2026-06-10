@@ -218,7 +218,7 @@ adk deploy cloud_run \
 
 ### Why ADK over a hand-rolled agent loop
 
-We initially built a hand-rolled agent (`agent.py`) using direct Gemini API calls and a manual tool-call loop. Migrating to ADK gave us: (1) standardized session management, (2) auto-generated tool schemas from Python type hints and docstrings, (3) native Cloud Run deployment via `adk deploy cloud_run`, and (4) automatic Cloud Trace integration. The ADK port reduced our reasoning-loop boilerplate by ~60% and gave us production-grade observability for free.
+We initially built a hand-rolled agent (`agent.py`) using direct Gemini API calls and a manual tool-call loop. Migrating to ADK gave us: (1) standardized session management, (2) auto-generated tool schemas from Python type hints and docstrings, (3) native Cloud Run deployment via `adk deploy cloud_run`, and (4) automatic Cloud Trace integration. The ADK port significantly reduced our reasoning-loop boilerplate and gave us production-grade observability for free.
 
 ### Why MCP for tool exposure
 
