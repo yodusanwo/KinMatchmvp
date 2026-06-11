@@ -1,11 +1,22 @@
-import { avatarColorClasses, getInitials } from "@/lib/onboarding/avatar-colors";
+import {
+  getAvatarTextColor,
+  getFriendColor,
+  getInitials,
+} from "@/lib/friends/avatar-colors";
 import type { AvatarColor } from "@/lib/onboarding/types";
 import { cn } from "@/lib/cn";
 import Image from "next/image";
 
 type MiniAvatarProps = {
   name: string;
-  avatarColor: AvatarColor;
+  /**
+   * Optional explicit seed for the color (defaults to `name`). Pass a stable
+   * value like the friend's id if you have it; otherwise the name is used so
+   * the same person gets the same color on every page.
+   */
+  colorSeed?: string;
+  /** @deprecated kept for backwards compatibility; color now derives from name/colorSeed. */
+  avatarColor?: AvatarColor;
   avatarUrl?: string | null;
   size?: "sm" | "md" | "lg";
   className?: string;
@@ -19,7 +30,7 @@ const sizeClasses = {
 
 export function MiniAvatar({
   name,
-  avatarColor,
+  colorSeed,
   avatarUrl,
   size = "sm",
   className,
@@ -46,14 +57,16 @@ export function MiniAvatar({
     );
   }
 
+  const bgColor = getFriendColor(colorSeed ?? name);
+
   return (
     <span
       className={cn(
         "inline-flex shrink-0 items-center justify-center rounded-full font-sans font-medium",
         sizeClasses[size],
-        avatarColorClasses[avatarColor],
         className
       )}
+      style={{ backgroundColor: bgColor, color: getAvatarTextColor(bgColor) }}
       aria-hidden
     >
       {getInitials(name)}

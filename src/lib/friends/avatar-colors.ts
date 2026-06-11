@@ -1,38 +1,62 @@
-import type { FriendCategory } from "@/lib/api/types";
-
-// Consistent color palettes for each category
-const CATEGORY_COLOR_PALETTES: Record<FriendCategory, string[]> = {
-  inner_circle: [
-    "#E89470", "#C68F3E", "#D4A67C", "#B8977A", "#E8A88C",
-    "#D4926A", "#B07D4E", "#E0A882", "#C89058", "#D89876"
-  ],
-  village: [
-    "#9DB58A", "#D4A356", "#8BA878", "#C69546", "#AAC79A",
-    "#91AB7C", "#C8A04C", "#A5C28E", "#BA9842", "#98B384"
-  ],
-  family: [
-    "#D4A67C", "#B8977A", "#C89668", "#A88665", "#E0B68A",
-    "#CC9E70", "#B48E72", "#D8AE84", "#C0926C", "#DCB08C"
-  ],
-  acquaintance: [
-    "#9DB58A", "#D4A356", "#B8977A", "#C89058",
-    "#A5C28E", "#C8A04C", "#B0927C", "#BC9848",
-    "#91AB7C", "#C69546"
-  ],
-};
+// A single, shared palette used for every friend avatar across the whole app.
+// One friend = one color, everywhere. Colors are chosen to be maximally
+// distinct from one another so people in your tribe are easy to tell apart.
+export const SHARED_AVATAR_PALETTE = [
+  "#D9534F", // red
+  "#E07B39", // orange
+  "#E0A93E", // amber
+  "#9CA63E", // olive
+  "#5FA85B", // green
+  "#3FA89B", // teal
+  "#3E9BC9", // cyan
+  "#4F7FD9", // blue
+  "#6366D9", // indigo
+  "#8A5CD9", // violet
+  "#A94FC9", // purple
+  "#D14FA8", // magenta
+  "#E0689B", // pink
+  "#A9745A", // brown
+  "#6E8AA6", // slate
+] as const;
 
 /**
- * Generate a consistent color for a friend based on their ID and category.
- * Uses a hash of the ID to deterministically select from the category palette.
+ * Deterministic string hash (FNV-1a). Stable across pages and sessions, and
+ * distributes similar strings (e.g. "Mary B" vs "Mark B") to different buckets.
  */
-export function getFriendColor(friendId: string, category: FriendCategory): string {
-  const palette = CATEGORY_COLOR_PALETTES[category];
-  const hash = [...friendId].reduce((sum, char) => sum + char.charCodeAt(0), 0);
-  return palette[hash % palette.length];
+function hashString(seed: string): number {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < seed.length; i += 1) {
+    hash ^= seed.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return hash >>> 0;
 }
 
 /**
- * Get initials from a name
+ * Returns a consistent color for a friend, seeded by a stable key (their name).
+ * The same seed always maps to the same color, on every page of the app.
+ */
+export function getFriendColor(seed: string): string {
+  const key = seed?.trim() || "?";
+  return SHARED_AVATAR_PALETTE[hashString(key) % SHARED_AVATAR_PALETTE.length];
+}
+
+/**
+ * Pick a legible text color (dark ink or white) for a given background, based
+ * on its perceived luminance, so initials stay readable on every swatch.
+ */
+export function getAvatarTextColor(bgHex: string): string {
+  const hex = bgHex.replace("#", "");
+  const r = parseInt(hex.slice(0, 2), 16);
+  const g = parseInt(hex.slice(2, 4), 16);
+  const b = parseInt(hex.slice(4, 6), 16);
+  // Relative luminance (sRGB approximation)
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.6 ? "#1F1A14" : "#FFFFFF";
+}
+
+/**
+ * Get initials from a name.
  */
 export function getInitials(name: string): string {
   const parts = name.trim().split(/\s+/);

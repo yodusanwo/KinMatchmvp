@@ -12,7 +12,11 @@ import { TodayPageSkeleton } from "@/components/ui/Skeleton";
 import { fetchJson } from "@/lib/api/fetch-client";
 import type { FriendCategory, FriendSummary } from "@/lib/api/types";
 import { formatDisplayName } from "@/lib/names/format";
-import { getFriendColor, getInitials } from "@/lib/friends/avatar-colors";
+import {
+  getAvatarTextColor,
+  getFriendColor,
+  getInitials,
+} from "@/lib/friends/avatar-colors";
 
 type FriendsResponse = {
   friends: FriendSummary[];
@@ -23,7 +27,7 @@ function initials(name: string) {
 }
 
 function categoryColor(friend: FriendSummary) {
-  return getFriendColor(friend.id, friend.category);
+  return getFriendColor(friend.name);
 }
 
 function quietLabel(friend: FriendSummary) {
@@ -425,11 +429,12 @@ function FriendGrid({
         >
           <div className="relative">
             <span
-              className="flex items-center justify-center rounded-full font-sans font-semibold text-cream"
+              className="flex items-center justify-center rounded-full font-sans font-semibold"
               style={{
                 width: avatarSize,
                 height: avatarSize,
                 backgroundColor: categoryColor(friend),
+                color: getAvatarTextColor(categoryColor(friend)),
                 fontSize: avatarTextSize,
                 boxShadow: halo
                   ? "0 0 0 1.5px rgba(232,240,232,0.3), 0 0 0 3px rgba(181,197,181,0.2)"

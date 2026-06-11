@@ -2,7 +2,11 @@ import Link from "next/link";
 import type { FriendSummary } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 import { formatDisplayName } from "@/lib/names/format";
-import { getFriendColor, getInitials } from "@/lib/friends/avatar-colors";
+import {
+  getAvatarTextColor,
+  getFriendColor,
+  getInitials,
+} from "@/lib/friends/avatar-colors";
 
 type TribeCircleGraphicProps = {
   tribe: FriendSummary[];
@@ -62,12 +66,15 @@ export function TribeCircleGraphic({
           >
             <span
               className={cn(
-                "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-sans text-sm font-medium text-ink ring-2 ring-cream",
+                "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-sans text-sm font-medium ring-2 ring-cream",
                 friend.is_drifting && "ring-terracotta/60",
                 friend.id === highlightFriendId &&
                   "shadow-[0_0_0_2px_rgba(182,82,50,0.3)]"
               )}
-              style={{ backgroundColor: getFriendColor(friend.id, friend.category) }}
+              style={{
+                backgroundColor: getFriendColor(friend.name),
+                color: getAvatarTextColor(getFriendColor(friend.name)),
+              }}
               aria-hidden
             >
               {getInitials(friend.name)}

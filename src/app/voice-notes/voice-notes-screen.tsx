@@ -7,7 +7,11 @@ import { BrandBar, Eyebrow, Headline, Subhead, TextLink } from "@/components/bra
 import { AppShell } from "@/components/layout/AppShell";
 import { BottomNav } from "@/components/nav/BottomNav";
 import { formatDuration } from "@/components/voice-note/format-duration";
-import { getFriendColor, getInitials } from "@/lib/friends/avatar-colors";
+import {
+  getAvatarTextColor,
+  getFriendColor,
+  getInitials,
+} from "@/lib/friends/avatar-colors";
 import type { FriendCategory } from "@/lib/api/types";
 
 type VoiceNoteRow = {
@@ -174,11 +178,11 @@ export function VoiceNotesScreen({
                           <div className="flex min-w-0 items-center gap-3">
                             {friend && (
                               <span
-                                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[12px] font-medium text-ink"
+                                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[12px] font-medium"
                                 style={{
-                                  backgroundColor: getFriendColor(
-                                    friend.id,
-                                    friend.category ?? "inner_circle"
+                                  backgroundColor: getFriendColor(friend.name),
+                                  color: getAvatarTextColor(
+                                    getFriendColor(friend.name)
                                   ),
                                 }}
                               >
