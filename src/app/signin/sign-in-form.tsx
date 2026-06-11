@@ -270,6 +270,13 @@ export function SignInForm({
         Continue with Google
       </SecondaryButton>
 
+      <p className="text-center font-inter text-xs text-ink-soft">
+        By signing in, you agree to our{" "}
+        <TextLink href="/terms" className="text-xs">Terms</TextLink>
+        {" and "}
+        <TextLink href="/privacy" className="text-xs">Privacy Policy</TextLink>
+      </p>
+
       <p className="text-center">
         <TextLink href="/">← Back to welcome</TextLink>
       </p>

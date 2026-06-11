@@ -477,6 +477,8 @@ export function ProfileScreen({
           You sign in with a magic link, no password. Use the button below to
           switch accounts on this device.{" "}
           <TextLink href="/privacy">Privacy</TextLink>
+          {" · "}
+          <TextLink href="/terms">Terms</TextLink>
         </p>
 
         <div className="mt-8 space-y-4">
