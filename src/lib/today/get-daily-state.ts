@@ -104,6 +104,7 @@ function toSummary(friend: FriendContextRow | FriendRow): FriendSummary {
     id: friend.id,
     name: formatPersonName(friend.name),
     avatar_color: friend.avatar_color,
+    avatar_color_hex: friend.avatar_color_hex ?? null,
     vibe: friend.vibe,
     category: normalizedCategory(friend.category),
     cadence_days: friend.cadence_days,
@@ -169,6 +170,7 @@ function toUpNext(
     friend_id: summary.id,
     name: summary.name,
     avatar_color: summary.avatar_color,
+    avatar_color_hex: summary.avatar_color_hex ?? null,
     days_quiet: summary.days_quiet,
     prompt_text: formatPersonalizedSpotlightPrompt(
       { barriers },
@@ -190,6 +192,7 @@ async function loadFriendContext(supabase: Supabase, userId: string) {
       id,
       name,
       avatar_color,
+      avatar_color_hex,
       vibe,
       category,
       cadence_days,
@@ -225,7 +228,7 @@ async function getPendingCapture(
       recipient_friend_id,
       created_at,
       duration_seconds,
-      friends:friends!voice_notes_friend_id_fkey(id, name, avatar_color, vibe, cadence_days, last_touch_at, created_at, is_wished_closer, archived_at),
+      friends:friends!voice_notes_friend_id_fkey(id, name, avatar_color, avatar_color_hex, vibe, cadence_days, last_touch_at, created_at, is_wished_closer, archived_at),
       discovery_prompts(question, prompt_day, prompt_cycle)
       `
     )

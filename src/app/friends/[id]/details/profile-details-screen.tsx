@@ -155,7 +155,7 @@ export function ProfileDetailsScreen({
         open={memoryModalOpen}
         friendId={friend.id}
         friendName={friend.name}
-        avatarColor={friend.avatar_color}
+        colorHex={friend.avatar_color_hex}
         initialCategory={memoryModalCategory}
         onClose={() => {
           setMemoryModalOpen(false);
@@ -168,7 +168,7 @@ export function ProfileDetailsScreen({
         open={sharedInterestModalOpen}
         friendId={friend.id}
         friendName={friend.name}
-        avatarColor={friend.avatar_color}
+        colorHex={friend.avatar_color_hex}
         onClose={() => setSharedInterestModalOpen(false)}
         onSaved={handleSharedInterestSaved}
       />

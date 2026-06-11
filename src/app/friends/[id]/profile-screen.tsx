@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/layout/AppShell";
 import { BottomNav } from "@/components/nav/BottomNav";
 import {
+  AvatarColorPicker,
   FriendManagementSheet,
   FriendPhoneSection,
   MemoryCaptureModal,
@@ -240,6 +241,19 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
       <div className="px-5 pb-24 pt-4">
         <ProfileHeader friend={friend} />
 
+        <div className="flex justify-center">
+          <AvatarColorPicker
+            friendId={friend.id}
+            friendName={friend.name}
+            colorHex={friend.avatar_color_hex}
+            onSaved={(colorHex) =>
+              setFriend((current) =>
+                current ? { ...current, avatar_color_hex: colorHex } : current
+              )
+            }
+          />
+        </div>
+
         {prompt.kind === "send" && (
           <div id="friend-phone" className="mt-4">
             <FriendPhoneSection
@@ -329,7 +343,7 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
         open={memoryModalOpen}
         friendId={friend.id}
         friendName={friend.name}
-        avatarColor={friend.avatar_color}
+        colorHex={friend.avatar_color_hex}
         initialCategory={memoryModalCategory}
         onClose={() => {
           setMemoryModalOpen(false);

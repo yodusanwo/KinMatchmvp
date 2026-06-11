@@ -4,7 +4,7 @@ import { cn } from "@/lib/cn";
 import { formatDisplayName } from "@/lib/names/format";
 import {
   getAvatarTextColor,
-  getFriendColor,
+  resolveFriendColor,
   getInitials,
 } from "@/lib/friends/avatar-colors";
 
@@ -72,8 +72,13 @@ export function TribeCircleGraphic({
                   "shadow-[0_0_0_2px_rgba(182,82,50,0.3)]"
               )}
               style={{
-                backgroundColor: getFriendColor(friend.name),
-                color: getAvatarTextColor(getFriendColor(friend.name)),
+                backgroundColor: resolveFriendColor(
+                  friend.name,
+                  friend.avatar_color_hex
+                ),
+                color: getAvatarTextColor(
+                  resolveFriendColor(friend.name, friend.avatar_color_hex)
+                ),
               }}
               aria-hidden
             >

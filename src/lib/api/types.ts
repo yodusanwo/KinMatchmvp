@@ -5,6 +5,7 @@ export type FriendSummary = {
   id: string;
   name: string;
   avatar_color: AvatarColor;
+  avatar_color_hex?: string | null;
   vibe: string;
   category: FriendCategory;
   cadence_days: number;
@@ -21,6 +22,7 @@ export type TodaySpotlight = {
   friend_id: string;
   name: string;
   avatar_color: AvatarColor;
+  avatar_color_hex?: string | null;
   days_quiet: number;
   prompt_text: string;
   suggested_action: string;

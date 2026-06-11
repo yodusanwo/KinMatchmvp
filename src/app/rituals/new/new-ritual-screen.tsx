@@ -165,7 +165,7 @@ export function NewRitualScreen({ template }: { template?: string }) {
                       : "border-ink/[0.16]"
                   }`}
                 >
-                  <MiniAvatar name={friend.name} avatarColor={friend.avatar_color} size="sm" />
+                  <MiniAvatar name={friend.name} colorHex={friend.avatar_color_hex} size="sm" />
                   {friend.name.split(/\s+/)[0]}
                 </button>
               ))}

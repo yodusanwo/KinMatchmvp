@@ -42,6 +42,7 @@ export async function GET() {
           friend_id: dailyState.friend.id,
           name: dailyState.friend.name,
           avatar_color: dailyState.friend.avatar_color,
+          avatar_color_hex: dailyState.friend.avatar_color_hex ?? null,
           days_quiet: dailyState.friend.days_quiet,
           prompt_text:
             dailyState.kind === "send_discovery"

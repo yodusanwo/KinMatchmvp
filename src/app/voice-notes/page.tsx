@@ -19,6 +19,7 @@ type FriendRow = {
   id: string;
   name: string;
   category: FriendCategory | null;
+  avatar_color_hex?: string | null;
 };
 
 type InteractionRow = {
@@ -53,7 +54,7 @@ export default async function VoiceNotesPage() {
     friendIds.length > 0
       ? supabase
           .from("friends")
-          .select("id, name, category")
+          .select("id, name, category, avatar_color_hex")
           .in("id", friendIds)
           .is("archived_at", null)
       : Promise.resolve({ data: [] }),

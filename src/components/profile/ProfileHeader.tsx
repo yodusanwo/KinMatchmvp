@@ -8,6 +8,7 @@ type ProfileHeaderProps = {
     FriendProfile,
     | "name"
     | "avatar_color"
+    | "avatar_color_hex"
     | "vibe_label"
     | "cadence_label"
     | "days_quiet"
@@ -21,7 +22,7 @@ export function ProfileHeader({ friend }: ProfileHeaderProps) {
     <div className="flex flex-col items-center text-center">
       <MiniAvatar
         name={friend.name}
-        avatarColor={friend.avatar_color}
+        colorHex={friend.avatar_color_hex}
         size="md"
         className="h-12 w-12 text-xs"
       />

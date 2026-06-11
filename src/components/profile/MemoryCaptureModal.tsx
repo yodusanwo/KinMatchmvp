@@ -30,7 +30,8 @@ type MemoryCaptureModalProps = {
   open: boolean;
   friendId: string;
   friendName: string;
-  avatarColor: AvatarColor;
+  avatarColor?: AvatarColor;
+  colorHex?: string | null;
   initialCategory?: MemoryCategory;
   onClose: () => void;
   onSaved: (notes: MemoryNote[]) => void;
@@ -84,7 +85,7 @@ export function MemoryCaptureModal({
   open,
   friendId,
   friendName,
-  avatarColor,
+  colorHex,
   initialCategory,
   onClose,
   onSaved,
@@ -221,7 +222,7 @@ export function MemoryCaptureModal({
 
         <div className="flex flex-1 flex-col overflow-y-auto px-5 pb-8 pt-6">
           <div className="flex items-center gap-3">
-            <MiniAvatar name={friendName} avatarColor={avatarColor} size="sm" />
+            <MiniAvatar name={friendName} colorHex={colorHex} size="sm" />
             <Eyebrow>A note about {friendName}</Eyebrow>
           </div>
 

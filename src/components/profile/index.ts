@@ -1,3 +1,4 @@
+export { AvatarColorPicker } from "./AvatarColorPicker";
 export { InterestPills } from "./InterestPills";
 export { FriendContactInfoSection } from "./FriendContactInfoSection";
 export { FriendManagementSheet } from "./FriendManagementSheet";

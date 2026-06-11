@@ -14,7 +14,7 @@ import type { FriendCategory, FriendSummary } from "@/lib/api/types";
 import { formatDisplayName } from "@/lib/names/format";
 import {
   getAvatarTextColor,
-  getFriendColor,
+  resolveFriendColor,
   getInitials,
 } from "@/lib/friends/avatar-colors";
 
@@ -27,7 +27,7 @@ function initials(name: string) {
 }
 
 function categoryColor(friend: FriendSummary) {
-  return getFriendColor(friend.name);
+  return resolveFriendColor(friend.name, friend.avatar_color_hex);
 }
 
 function quietLabel(friend: FriendSummary) {

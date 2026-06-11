@@ -35,7 +35,7 @@ export function TribeList({ tribe, className }: TribeListProps) {
             <div className="flex min-w-0 items-center gap-3">
               <MiniAvatar
                 name={friend.name}
-                avatarColor={friend.avatar_color}
+                colorHex={friend.avatar_color_hex}
                 size="sm"
               />
               <span className="truncate font-sans text-sm font-medium text-ink group-hover:text-terracotta">

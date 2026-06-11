@@ -41,6 +41,25 @@ export function getFriendColor(seed: string): string {
   return SHARED_AVATAR_PALETTE[hashString(key) % SHARED_AVATAR_PALETTE.length];
 }
 
+/** True if a string is one of the palette colors (case-insensitive). */
+export function isPaletteColor(hex: string): boolean {
+  const value = hex.trim().toUpperCase();
+  return SHARED_AVATAR_PALETTE.some((c) => c.toUpperCase() === value);
+}
+
+/**
+ * The final color to render for a friend: their chosen color if set, otherwise
+ * the deterministic color derived from their name. Use this everywhere so a
+ * person looks the same on every screen.
+ */
+export function resolveFriendColor(
+  seed: string,
+  overrideHex?: string | null
+): string {
+  if (overrideHex && overrideHex.trim()) return overrideHex;
+  return getFriendColor(seed);
+}
+
 /**
  * Pick a legible text color (dark ink or white) for a given background, based
  * on its perceived luminance, so initials stay readable on every swatch.

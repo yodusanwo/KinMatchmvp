@@ -9,6 +9,7 @@ import {
   type FriendRow,
 } from "@/lib/friends/utils";
 import { categoryRelationshipLabel } from "@/lib/friends/categories";
+import { isPaletteColor } from "@/lib/friends/avatar-colors";
 import { formatPersonName } from "@/lib/names/format";
 import {
   isLikelyInvalidPhone,
@@ -99,7 +100,7 @@ export async function GET(_request: Request, context: RouteContext) {
   const { data: friend, error: friendError } = await supabase
     .from("friends")
     .select(
-      "id, name, avatar_color, vibe, category, cadence_days, last_touch_at, created_at, where_met, phone_number, is_wished_closer, archived_at"
+      "id, name, avatar_color, avatar_color_hex, vibe, category, cadence_days, last_touch_at, created_at, where_met, phone_number, is_wished_closer, archived_at"
     )
     .eq("id", id)
     .eq("user_id", user.id)
@@ -167,6 +168,7 @@ export async function GET(_request: Request, context: RouteContext) {
     id: row.id,
     name: formatPersonName(row.name),
     avatar_color: row.avatar_color,
+    avatar_color_hex: row.avatar_color_hex ?? null,
     vibe: row.vibe,
     category,
     cadence_days: row.cadence_days,
@@ -205,39 +207,59 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  let body: { phone_number?: unknown };
+  let body: { phone_number?: unknown; avatar_color_hex?: unknown };
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  if (!("phone_number" in body)) {
-    return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
+  const updates: { phone_number?: string | null; avatar_color_hex?: string | null } =
+    {};
+
+  if ("phone_number" in body) {
+    let phoneNumber: string | null = null;
+    const raw = body.phone_number;
+    if (raw !== null && raw !== "") {
+      if (typeof raw !== "string") {
+        return NextResponse.json({ error: "Invalid phone number" }, { status: 400 });
+      }
+      if (isLikelyInvalidPhone(raw)) {
+        return NextResponse.json(
+          { error: "That doesn't look like a phone number, try with area code." },
+          { status: 400 }
+        );
+      }
+      phoneNumber = normalizePhone(raw);
+    }
+    updates.phone_number = phoneNumber;
   }
 
-  let phoneNumber: string | null = null;
-  const raw = body.phone_number;
-  if (raw !== null && raw !== "") {
-    if (typeof raw !== "string") {
-      return NextResponse.json({ error: "Invalid phone number" }, { status: 400 });
-    }
-    if (isLikelyInvalidPhone(raw)) {
+  if ("avatar_color_hex" in body) {
+    const raw = body.avatar_color_hex;
+    if (raw === null || raw === "") {
+      updates.avatar_color_hex = null; // reset to the auto color
+    } else if (typeof raw === "string" && isPaletteColor(raw)) {
+      updates.avatar_color_hex = raw;
+    } else {
       return NextResponse.json(
-        { error: "That doesn't look like a phone number, try with area code." },
+        { error: "Pick one of the available colors." },
         { status: 400 }
       );
     }
-    phoneNumber = normalizePhone(raw);
+  }
+
+  if (Object.keys(updates).length === 0) {
+    return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
   }
 
   const { data, error } = await supabase
     .from("friends")
-    .update({ phone_number: phoneNumber })
+    .update(updates)
     .eq("id", id)
     .eq("user_id", user.id)
     .is("archived_at", null)
-    .select("id, phone_number")
+    .select("id, phone_number, avatar_color_hex")
     .maybeSingle();
 
   if (error) {
@@ -248,5 +270,8 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  return NextResponse.json({ phone_number: data.phone_number });
+  return NextResponse.json({
+    phone_number: data.phone_number,
+    avatar_color_hex: data.avatar_color_hex,
+  });
 }

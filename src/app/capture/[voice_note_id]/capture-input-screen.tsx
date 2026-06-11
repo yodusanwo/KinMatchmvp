@@ -120,7 +120,7 @@ export function CaptureInputScreen({
         <div className="mt-6 flex items-center gap-3">
           <MiniAvatar
             name={voiceNote.friend_name}
-            avatarColor={voiceNote.friend_avatar_color}
+            colorHex={voiceNote.friend_avatar_color_hex}
             size="md"
           />
           <div>

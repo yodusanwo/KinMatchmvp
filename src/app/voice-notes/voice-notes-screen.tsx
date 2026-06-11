@@ -9,7 +9,7 @@ import { BottomNav } from "@/components/nav/BottomNav";
 import { formatDuration } from "@/components/voice-note/format-duration";
 import {
   getAvatarTextColor,
-  getFriendColor,
+  resolveFriendColor,
   getInitials,
 } from "@/lib/friends/avatar-colors";
 import type { FriendCategory } from "@/lib/api/types";
@@ -31,6 +31,7 @@ type FriendRow = {
   id: string;
   name: string;
   category: FriendCategory | null;
+  avatar_color_hex?: string | null;
 };
 
 type InteractionRow = {
@@ -180,9 +181,15 @@ export function VoiceNotesScreen({
                               <span
                                 className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[12px] font-medium"
                                 style={{
-                                  backgroundColor: getFriendColor(friend.name),
+                                  backgroundColor: resolveFriendColor(
+                                    friend.name,
+                                    friend.avatar_color_hex
+                                  ),
                                   color: getAvatarTextColor(
-                                    getFriendColor(friend.name)
+                                    resolveFriendColor(
+                                      friend.name,
+                                      friend.avatar_color_hex
+                                    )
                                   ),
                                 }}
                               >

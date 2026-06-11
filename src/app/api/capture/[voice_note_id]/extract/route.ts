@@ -39,7 +39,7 @@ export async function POST(request: Request, context: RouteContext) {
       friend_id,
       recipient_friend_id,
       created_at,
-      friends:friends!voice_notes_friend_id_fkey(id, name, avatar_color),
+      friends:friends!voice_notes_friend_id_fkey(id, name, avatar_color, avatar_color_hex),
       discovery_prompts(question, category)
       `
     )
