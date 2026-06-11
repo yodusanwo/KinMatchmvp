@@ -14,7 +14,6 @@ The agent reads structured engagement signals (whether voice notes get listened 
 
 | Resource | Link |
 |---|---|
-| **Live Cloud Run Agent** | https://kinmatch-agent-46939916931.us-central1.run.app |
 | **Agent API Documentation** | https://kinmatch-agent-46939916931.us-central1.run.app/docs |
 | **Consumer App** (pilot) | https://app.kinmatch.co |
 | **Marketing Site** | https://kinmatch.co |
