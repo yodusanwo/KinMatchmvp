@@ -286,7 +286,7 @@ export function ProfileScreen({
           <div className="mt-4 flex justify-center">
             <MiniAvatar
               name={savedName || "User"}
-              avatarColor="terracotta"
+              avatarColor="t"
               avatarUrl={avatarUrl}
               size="lg"
               className="h-20 w-20"
