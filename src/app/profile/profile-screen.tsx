@@ -14,6 +14,7 @@ import {
 import { AppShell } from "@/components/layout/AppShell";
 import { BottomNav } from "@/components/nav/BottomNav";
 import { FriendContactInfoSection } from "@/components/profile/FriendContactInfoSection";
+import { MiniAvatar } from "@/components/onboarding/MiniAvatar";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/cn";
 import {
@@ -32,6 +33,7 @@ type EmailPreferences = {
 type ProfileScreenProps = {
   email: string;
   name: string | null;
+  avatarUrl?: string | null;
   onboardingComplete: boolean;
   emailPreferences: EmailPreferences | null;
 };
@@ -92,6 +94,7 @@ function ToggleSwitch({ checked }: { checked: boolean }) {
 export function ProfileScreen({
   email,
   name,
+  avatarUrl,
   onboardingComplete,
   emailPreferences,
 }: ProfileScreenProps) {
@@ -279,8 +282,23 @@ export function ProfileScreen({
       <BrandBar />
       <div className="flex min-h-screen flex-col px-5 pb-28 pt-6">
         <Eyebrow>your account</Eyebrow>
-        <Headline className="mt-2">{savedName || "Profile"}</Headline>
-        <Subhead className="mt-2">{email}</Subhead>
+        {avatarUrl && (
+          <div className="mt-4 flex justify-center">
+            <MiniAvatar
+              name={savedName || "User"}
+              avatarColor="terracotta"
+              avatarUrl={avatarUrl}
+              size="lg"
+              className="h-20 w-20"
+            />
+          </div>
+        )}
+        <Headline className={avatarUrl ? "mt-4 text-center" : "mt-2"}>
+          {savedName || "Profile"}
+        </Headline>
+        <Subhead className={avatarUrl ? "mt-1 text-center" : "mt-2"}>
+          {email}
+        </Subhead>
 
         <dl className="mt-8 space-y-4 rounded-2xl border border-ink/[0.12] bg-cream-deep/60 p-5">
           <div
