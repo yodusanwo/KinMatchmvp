@@ -57,19 +57,26 @@ export function SendSpotlight({ state, onRefresh }: SendSpotlightProps) {
       : `/friends/${state.friend.id}/voice-note`;
 
   async function skipPrompt() {
+    if (skipping) return; // Prevent double-clicks
     setSkipping(true);
-    // Call defer endpoint which handles both discovery and algorithmic modes
-    await fetch(`/api/discovery/defer`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        friend_id: state.friend.id,
-        day_number: state.kind === "send_discovery" ? state.day_number : undefined,
-      }),
-    });
-    // Small delay to ensure database write completes
-    await new Promise(resolve => setTimeout(resolve, 500));
-    onRefresh();
+    
+    try {
+      // Call defer endpoint which handles both discovery and algorithmic modes
+      await fetch(`/api/discovery/defer`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          friend_id: state.friend.id,
+          day_number: state.kind === "send_discovery" ? state.day_number : undefined,
+        }),
+      });
+      // Small delay to ensure database write completes
+      await new Promise(resolve => setTimeout(resolve, 500));
+      onRefresh();
+    } catch (error) {
+      console.error("Failed to skip prompt:", error);
+      setSkipping(false); // Reset on error
+    }
   }
 
   if (skipping) {
@@ -119,7 +126,8 @@ export function SendSpotlight({ state, onRefresh }: SendSpotlightProps) {
         <button
           type="button"
           onClick={() => void skipPrompt()}
-          className="flex-1 rounded-full border border-ink/[0.2] px-3 py-2.5 font-sans text-xs font-medium text-ink"
+          disabled={skipping}
+          className="flex-1 rounded-full border border-ink/[0.2] px-3 py-2.5 font-sans text-xs font-medium text-ink disabled:opacity-50"
         >
           Not now
         </button>
@@ -142,13 +150,20 @@ export function CaptureSpotlight({ state, onRefresh }: CaptureSpotlightProps) {
   const [dismissing, setDismissing] = useState(false);
 
   async function skipCapture() {
+    if (dismissing) return; // Prevent double-clicks
     setDismissing(true);
-    await fetch(`/api/capture/${state.voice_note.id}/defer`, {
-      method: "POST",
-    });
-    // Small delay to ensure database write completes before refresh
-    await new Promise(resolve => setTimeout(resolve, 500));
-    onRefresh();
+    
+    try {
+      await fetch(`/api/capture/${state.voice_note.id}/defer`, {
+        method: "POST",
+      });
+      // Small delay to ensure database write completes before refresh
+      await new Promise(resolve => setTimeout(resolve, 500));
+      onRefresh();
+    } catch (error) {
+      console.error("Failed to skip capture:", error);
+      setDismissing(false); // Reset on error
+    }
   }
 
   if (dismissing) {
@@ -196,7 +211,8 @@ export function CaptureSpotlight({ state, onRefresh }: CaptureSpotlightProps) {
         <button
           type="button"
           onClick={() => void skipCapture()}
-          className="flex-1 rounded-full border border-ink/[0.2] px-3 py-2.5 font-sans text-xs font-medium text-ink"
+          disabled={dismissing}
+          className="flex-1 rounded-full border border-ink/[0.2] px-3 py-2.5 font-sans text-xs font-medium text-ink disabled:opacity-50"
         >
           Not yet
         </button>
