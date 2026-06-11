@@ -12,11 +12,22 @@ export default async function ProfilePage() {
     .eq("id", user.id)
     .single();
 
+  // Backfill avatar_url from Google OAuth if missing
+  let avatarUrl = profile?.avatar_url ?? null;
+  if (!avatarUrl && user.user_metadata?.avatar_url) {
+    avatarUrl = user.user_metadata.avatar_url;
+    // Update the database with the avatar URL
+    await supabase
+      .from("users")
+      .update({ avatar_url: avatarUrl })
+      .eq("id", user.id);
+  }
+
   return (
     <ProfileScreen
       email={profile?.email ?? user.email ?? ""}
       name={profile?.name ?? null}
-      avatarUrl={profile?.avatar_url ?? null}
+      avatarUrl={avatarUrl}
       onboardingComplete={Boolean(profile?.onboarding_completed_at)}
       emailPreferences={{
         daily_checkin_enabled: profile?.daily_checkin_enabled ?? true,
