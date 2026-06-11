@@ -121,6 +121,7 @@ export function CaptureInputScreen({
           <MiniAvatar
             name={voiceNote.friend_name}
             colorHex={voiceNote.friend_avatar_color_hex}
+            initials={voiceNote.friend_avatar_initials}
             size="md"
           />
           <div>

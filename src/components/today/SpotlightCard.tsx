@@ -31,6 +31,7 @@ export function SpotlightCard({ spotlight, className }: SpotlightCardProps) {
         <MiniAvatar
           name={spotlight.name}
           colorHex={spotlight.avatar_color_hex}
+          initials={spotlight.avatar_initials}
           size="sm"
         />
         <div>

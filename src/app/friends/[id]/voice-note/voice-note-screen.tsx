@@ -37,6 +37,7 @@ type FriendForSendKeys =
   | "name"
   | "avatar_color"
   | "avatar_color_hex"
+  | "avatar_initials"
   | "phone_number"
   | "category"
   | "days_quiet";
@@ -96,6 +97,7 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
       name: data.name,
       avatar_color: data.avatar_color,
       avatar_color_hex: data.avatar_color_hex ?? null,
+      avatar_initials: data.avatar_initials ?? null,
       phone_number: data.phone_number,
       category: data.category,
       days_quiet: data.days_quiet,
@@ -278,6 +280,7 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
           <MiniAvatar
             name={friend.name}
             colorHex={friend.avatar_color_hex}
+            initials={friend.avatar_initials}
             size="md"
           />
           <div>

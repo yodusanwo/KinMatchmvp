@@ -156,6 +156,7 @@ export function ProfileDetailsScreen({
         friendId={friend.id}
         friendName={friend.name}
         colorHex={friend.avatar_color_hex}
+        initials={friend.avatar_initials}
         initialCategory={memoryModalCategory}
         onClose={() => {
           setMemoryModalOpen(false);
@@ -169,6 +170,7 @@ export function ProfileDetailsScreen({
         friendId={friend.id}
         friendName={friend.name}
         colorHex={friend.avatar_color_hex}
+        initials={friend.avatar_initials}
         onClose={() => setSharedInterestModalOpen(false)}
         onSaved={handleSharedInterestSaved}
       />

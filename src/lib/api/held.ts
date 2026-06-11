@@ -9,6 +9,7 @@ export type HeldFriendEntry = {
   name: string;
   avatar_color: AvatarColor;
   avatar_color_hex?: string | null;
+  avatar_initials?: string | null;
   email: string | null;
   days_quiet: number;
   threshold_days: number;
@@ -46,6 +47,7 @@ export type HeldResponse = {
     name: string;
     avatar_color: AvatarColor;
     avatar_color_hex?: string | null;
+    avatar_initials?: string | null;
   }[];
   quiet_threshold_days: number;
   max_watchers: number;

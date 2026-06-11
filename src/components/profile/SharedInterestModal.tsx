@@ -20,6 +20,7 @@ type SharedInterestModalProps = {
   friendName: string;
   avatarColor?: AvatarColor;
   colorHex?: string | null;
+  initials?: string | null;
   onClose: () => void;
   onSaved: (interest: SharedInterest) => void;
 };
@@ -31,6 +32,7 @@ export function SharedInterestModal({
   friendId,
   friendName,
   colorHex,
+  initials,
   onClose,
   onSaved,
 }: SharedInterestModalProps) {
@@ -118,7 +120,7 @@ export function SharedInterestModal({
 
         <div className="flex flex-1 flex-col overflow-y-auto px-5 pb-8 pt-6">
           <div className="flex items-center gap-3">
-            <MiniAvatar name={friendName} colorHex={colorHex} size="sm" />
+            <MiniAvatar name={friendName} colorHex={colorHex} initials={initials} size="sm" />
             <Eyebrow>Shared with {friendName}</Eyebrow>
           </div>
 

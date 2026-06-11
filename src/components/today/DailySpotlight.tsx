@@ -98,6 +98,7 @@ export function SendSpotlight({ state, onRefresh }: SendSpotlightProps) {
         <MiniAvatar
           name={state.friend.name}
           colorHex={state.friend.avatar_color_hex}
+          initials={state.friend.avatar_initials}
           size="md"
         />
         <div>
@@ -182,6 +183,7 @@ export function CaptureSpotlight({ state, onRefresh }: CaptureSpotlightProps) {
         <MiniAvatar
           name={state.friend.name}
           colorHex={state.friend.avatar_color_hex}
+          initials={state.friend.avatar_initials}
           size="md"
         />
         <div>

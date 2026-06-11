@@ -84,3 +84,23 @@ export function getInitials(name: string): string {
   }
   return name.trim().slice(0, 2).toUpperCase();
 }
+
+/** Max length for custom initials. */
+export const MAX_AVATAR_INITIALS = 3;
+
+/** Clean up user-entered initials: trim, collapse spaces, cap length. */
+export function sanitizeInitials(value: string): string {
+  return value.replace(/\s+/g, "").slice(0, MAX_AVATAR_INITIALS);
+}
+
+/**
+ * The initials to render for a friend: their custom initials if set, otherwise
+ * the ones derived from their name. Used everywhere so they look the same.
+ */
+export function resolveInitials(
+  name: string,
+  override?: string | null
+): string {
+  if (override && override.trim()) return override.trim().toUpperCase();
+  return getInitials(name);
+}

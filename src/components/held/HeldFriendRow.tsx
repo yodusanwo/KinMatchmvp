@@ -62,6 +62,7 @@ export function HeldFriendRow({ entry }: HeldFriendRowProps) {
           <MiniAvatar
             name={entry.name}
             colorHex={entry.avatar_color_hex}
+            initials={entry.avatar_initials}
             size="sm"
           />
           <div className="min-w-0">

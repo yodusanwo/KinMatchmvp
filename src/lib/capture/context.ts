@@ -7,6 +7,7 @@ export type CaptureVoiceNoteContext = {
   friend_name: string;
   friend_avatar_color: AvatarColor;
   friend_avatar_color_hex?: string | null;
+  friend_avatar_initials?: string | null;
   created_at: string;
   original_question: string | null;
   intended_category: string;
@@ -33,12 +34,14 @@ type VoiceNoteRow = {
         name: string;
         avatar_color: AvatarColor;
         avatar_color_hex?: string | null;
+        avatar_initials?: string | null;
       }
     | {
         id: string;
         name: string;
         avatar_color: AvatarColor;
         avatar_color_hex?: string | null;
+        avatar_initials?: string | null;
       }[]
     | null;
 };
@@ -61,6 +64,7 @@ export function mapCaptureVoiceNoteContext(
     friend_name: formatPersonName(friend.name),
     friend_avatar_color: friend.avatar_color,
     friend_avatar_color_hex: friend.avatar_color_hex ?? null,
+    friend_avatar_initials: friend.avatar_initials ?? null,
     created_at: row.created_at,
     original_question: prompt?.question ?? null,
     intended_category: prompt?.category ?? "current",

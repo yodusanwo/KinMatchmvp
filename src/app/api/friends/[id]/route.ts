@@ -9,7 +9,7 @@ import {
   type FriendRow,
 } from "@/lib/friends/utils";
 import { categoryRelationshipLabel } from "@/lib/friends/categories";
-import { isPaletteColor } from "@/lib/friends/avatar-colors";
+import { isPaletteColor, sanitizeInitials } from "@/lib/friends/avatar-colors";
 import { formatPersonName } from "@/lib/names/format";
 import {
   isLikelyInvalidPhone,
@@ -100,7 +100,7 @@ export async function GET(_request: Request, context: RouteContext) {
   const { data: friend, error: friendError } = await supabase
     .from("friends")
     .select(
-      "id, name, avatar_color, avatar_color_hex, vibe, category, cadence_days, last_touch_at, created_at, where_met, phone_number, is_wished_closer, archived_at"
+      "id, name, avatar_color, avatar_color_hex, avatar_initials, vibe, category, cadence_days, last_touch_at, created_at, where_met, phone_number, is_wished_closer, archived_at"
     )
     .eq("id", id)
     .eq("user_id", user.id)
@@ -169,6 +169,7 @@ export async function GET(_request: Request, context: RouteContext) {
     name: formatPersonName(row.name),
     avatar_color: row.avatar_color,
     avatar_color_hex: row.avatar_color_hex ?? null,
+    avatar_initials: row.avatar_initials ?? null,
     vibe: row.vibe,
     category,
     cadence_days: row.cadence_days,
@@ -207,15 +208,22 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  let body: { phone_number?: unknown; avatar_color_hex?: unknown };
+  let body: {
+    phone_number?: unknown;
+    avatar_color_hex?: unknown;
+    avatar_initials?: unknown;
+  };
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const updates: { phone_number?: string | null; avatar_color_hex?: string | null } =
-    {};
+  const updates: {
+    phone_number?: string | null;
+    avatar_color_hex?: string | null;
+    avatar_initials?: string | null;
+  } = {};
 
   if ("phone_number" in body) {
     let phoneNumber: string | null = null;
@@ -249,6 +257,25 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     }
   }
 
+  if ("avatar_initials" in body) {
+    const raw = body.avatar_initials;
+    if (raw === null || raw === "") {
+      updates.avatar_initials = null; // reset to the name-derived initials
+    } else if (typeof raw === "string") {
+      const cleaned = sanitizeInitials(raw).toUpperCase();
+      if (cleaned.length === 0) {
+        updates.avatar_initials = null;
+      } else {
+        updates.avatar_initials = cleaned;
+      }
+    } else {
+      return NextResponse.json(
+        { error: "That doesn't look right — use 1 to 3 characters." },
+        { status: 400 }
+      );
+    }
+  }
+
   if (Object.keys(updates).length === 0) {
     return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
   }
@@ -259,7 +286,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     .eq("id", id)
     .eq("user_id", user.id)
     .is("archived_at", null)
-    .select("id, phone_number, avatar_color_hex")
+    .select("id, phone_number, avatar_color_hex, avatar_initials")
     .maybeSingle();
 
   if (error) {
@@ -273,5 +300,6 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
   return NextResponse.json({
     phone_number: data.phone_number,
     avatar_color_hex: data.avatar_color_hex,
+    avatar_initials: data.avatar_initials,
   });
 }

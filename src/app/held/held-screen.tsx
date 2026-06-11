@@ -292,7 +292,12 @@ function WatcherRow({
 }) {
   return (
     <div className="flex items-center gap-3 py-3.5">
-      <MiniAvatar name={entry.name} colorHex={entry.avatar_color_hex} size="sm" />
+      <MiniAvatar
+        name={entry.name}
+        colorHex={entry.avatar_color_hex}
+        initials={entry.avatar_initials}
+        size="sm"
+      />
       <Link href={`/friends/${entry.friend_id}`} className="min-w-0 flex-1">
         <p className="truncate font-sans text-[15px] font-medium text-ink">
           {formatDisplayName(entry.name)}
@@ -533,6 +538,7 @@ function FriendPill({
     name: string;
     avatar_color: AvatarColor;
     avatar_color_hex?: string | null;
+    avatar_initials?: string | null;
   };
   selected: boolean;
   onClick: () => void;
@@ -547,7 +553,12 @@ function FriendPill({
           : "border-ink/[0.16] text-ink"
       }`}
     >
-      <MiniAvatar name={friend.name} colorHex={friend.avatar_color_hex} size="sm" />
+      <MiniAvatar
+        name={friend.name}
+        colorHex={friend.avatar_color_hex}
+        initials={friend.avatar_initials}
+        size="sm"
+      />
       {formatDisplayName(friend.name)}
     </button>
   );

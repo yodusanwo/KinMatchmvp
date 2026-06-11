@@ -15,15 +15,15 @@ import { formatDisplayName } from "@/lib/names/format";
 import {
   getAvatarTextColor,
   resolveFriendColor,
-  getInitials,
+  resolveInitials,
 } from "@/lib/friends/avatar-colors";
 
 type FriendsResponse = {
   friends: FriendSummary[];
 };
 
-function initials(name: string) {
-  return getInitials(name);
+function initials(friend: Pick<FriendSummary, "name" | "avatar_initials">) {
+  return resolveInitials(friend.name, friend.avatar_initials);
 }
 
 function categoryColor(friend: FriendSummary) {
@@ -441,7 +441,7 @@ function FriendGrid({
                   : undefined,
               }}
             >
-              {initials(friend.name)}
+              {initials(friend)}
             </span>
             {isArchived && (
               <span className="absolute bottom-0 right-0 rounded-full bg-ink/80 px-1.5 py-0.5 font-sans text-[7px] font-semibold uppercase tracking-wider text-cream">

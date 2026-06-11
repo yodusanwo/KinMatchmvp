@@ -5,7 +5,7 @@ import { formatDisplayName } from "@/lib/names/format";
 import {
   getAvatarTextColor,
   resolveFriendColor,
-  getInitials,
+  resolveInitials,
 } from "@/lib/friends/avatar-colors";
 
 type TribeCircleGraphicProps = {
@@ -82,7 +82,7 @@ export function TribeCircleGraphic({
               }}
               aria-hidden
             >
-              {getInitials(friend.name)}
+              {resolveInitials(friend.name, friend.avatar_initials)}
             </span>
             <span className="max-w-[64px] truncate font-sans text-[15px] font-medium leading-none text-ink">
               {formatDisplayName(friend.name)}

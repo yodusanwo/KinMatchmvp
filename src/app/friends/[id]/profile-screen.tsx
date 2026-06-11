@@ -51,6 +51,7 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
   >("actions");
   const [savingAction, setSavingAction] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [avatarEditorOpen, setAvatarEditorOpen] = useState(false);
 
   const loadProfile = useCallback(async () => {
     const result = await fetchJson<FriendProfile>(`/api/friends/${friendId}`);
@@ -239,16 +240,22 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
       />
 
       <div className="px-5 pb-24 pt-4">
-        <ProfileHeader friend={friend} />
+        <ProfileHeader
+          friend={friend}
+          onEditAvatar={() => setAvatarEditorOpen((open) => !open)}
+        />
 
         <div className="flex justify-center">
           <AvatarColorPicker
             friendId={friend.id}
             friendName={friend.name}
             colorHex={friend.avatar_color_hex}
-            onSaved={(colorHex) =>
+            initials={friend.avatar_initials}
+            open={avatarEditorOpen}
+            onClose={() => setAvatarEditorOpen(false)}
+            onSaved={(patch) =>
               setFriend((current) =>
-                current ? { ...current, avatar_color_hex: colorHex } : current
+                current ? { ...current, ...patch } : current
               )
             }
           />
@@ -344,6 +351,7 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
         friendId={friend.id}
         friendName={friend.name}
         colorHex={friend.avatar_color_hex}
+        initials={friend.avatar_initials}
         initialCategory={memoryModalCategory}
         onClose={() => {
           setMemoryModalOpen(false);

@@ -19,6 +19,7 @@ type FriendLite = {
   email: string | null;
   avatar_color: AvatarColor;
   avatar_color_hex?: string | null;
+  avatar_initials?: string | null;
   last_touch_at: string | null;
   created_at: string;
   archived_at?: string | null;
@@ -73,6 +74,7 @@ export async function GET() {
         email,
         avatar_color,
         avatar_color_hex,
+        avatar_initials,
         last_touch_at,
         created_at,
         archived_at
@@ -118,6 +120,7 @@ export async function GET() {
         email: friend.email,
         avatar_color: friend.avatar_color,
         avatar_color_hex: friend.avatar_color_hex ?? null,
+        avatar_initials: friend.avatar_initials ?? null,
         days_quiet: quiet,
         threshold_days: threshold,
         invited_at: row.invited_at ?? row.setup_notified_at ?? new Date().toISOString(),
@@ -216,7 +219,7 @@ export async function GET() {
   const activeFriendIds = new Set(holding.map((entry) => entry.friend_id));
   const { data: eligibleRows } = await supabase
     .from("friends")
-    .select("id, name, avatar_color, avatar_color_hex")
+    .select("id, name, avatar_color, avatar_color_hex, avatar_initials")
     .eq("user_id", user.id)
     .eq("in_tribe", true)
     .is("archived_at", null)
@@ -237,6 +240,7 @@ export async function GET() {
       name: string;
       avatar_color: AvatarColor;
       avatar_color_hex?: string | null;
+      avatar_initials?: string | null;
     }[]).filter((friend) => !activeFriendIds.has(friend.id)),
     quiet_threshold_days: profile?.held_quiet_threshold_days ?? 14,
     max_watchers: MAX_WATCHERS,

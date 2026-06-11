@@ -36,6 +36,7 @@ export function TribeList({ tribe, className }: TribeListProps) {
               <MiniAvatar
                 name={friend.name}
                 colorHex={friend.avatar_color_hex}
+                initials={friend.avatar_initials}
                 size="sm"
               />
               <span className="truncate font-sans text-sm font-medium text-ink group-hover:text-terracotta">

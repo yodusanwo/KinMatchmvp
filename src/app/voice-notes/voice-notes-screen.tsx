@@ -10,7 +10,7 @@ import { formatDuration } from "@/components/voice-note/format-duration";
 import {
   getAvatarTextColor,
   resolveFriendColor,
-  getInitials,
+  resolveInitials,
 } from "@/lib/friends/avatar-colors";
 import type { FriendCategory } from "@/lib/api/types";
 
@@ -32,6 +32,7 @@ type FriendRow = {
   name: string;
   category: FriendCategory | null;
   avatar_color_hex?: string | null;
+  avatar_initials?: string | null;
 };
 
 type InteractionRow = {
@@ -193,7 +194,7 @@ export function VoiceNotesScreen({
                                   ),
                                 }}
                               >
-                                {getInitials(friend.name)}
+                                {resolveInitials(friend.name, friend.avatar_initials)}
                               </span>
                             )}
                             <div className="min-w-0">

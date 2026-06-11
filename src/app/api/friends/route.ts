@@ -17,6 +17,7 @@ type FriendInsertRow = {
   phone_number: string | null;
   avatar_color: AvatarColor;
   avatar_color_hex: string | null;
+  avatar_initials: string | null;
   vibe: string;
   category: FriendSummary["category"];
   cadence_days: number;
@@ -39,6 +40,7 @@ function toSummary(friend: FriendListRow): FriendSummary {
     phone_number: friend.phone_number ?? null,
     avatar_color: friend.avatar_color,
     avatar_color_hex: friend.avatar_color_hex ?? null,
+    avatar_initials: friend.avatar_initials ?? null,
     vibe: friend.vibe,
     category: friend.category ?? "inner_circle",
     cadence_days: friend.cadence_days,
@@ -62,7 +64,7 @@ export async function GET() {
 
   const { data, error } = await supabase
     .from("friends")
-    .select("id, name, phone_number, avatar_color, avatar_color_hex, vibe, category, cadence_days, last_touch_at, created_at, archived_at")
+    .select("id, name, phone_number, avatar_color, avatar_color_hex, avatar_initials, vibe, category, cadence_days, last_touch_at, created_at, archived_at")
     .eq("user_id", user.id)
     .eq("in_tribe", true)
     .order("last_touch_at", { ascending: false, nullsFirst: false })
@@ -155,7 +157,7 @@ export async function POST(req: NextRequest) {
       is_wished_closer: false,
       in_tribe: true,
     })
-    .select("id, name, phone_number, avatar_color, avatar_color_hex, vibe, category, cadence_days, last_touch_at, created_at, archived_at")
+    .select("id, name, phone_number, avatar_color, avatar_color_hex, avatar_initials, vibe, category, cadence_days, last_touch_at, created_at, archived_at")
     .single<FriendListRow>();
 
   if (error || !friend) {

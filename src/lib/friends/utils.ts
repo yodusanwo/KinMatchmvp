@@ -6,6 +6,7 @@ export type FriendRow = {
   name: string;
   avatar_color: AvatarColor;
   avatar_color_hex?: string | null;
+  avatar_initials?: string | null;
   vibe: string;
   category?: FriendCategory | null;
   cadence_days: number;

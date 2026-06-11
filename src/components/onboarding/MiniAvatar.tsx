@@ -1,7 +1,7 @@
 import {
   getAvatarTextColor,
   resolveFriendColor,
-  getInitials,
+  resolveInitials,
 } from "@/lib/friends/avatar-colors";
 import type { AvatarColor } from "@/lib/onboarding/types";
 import { cn } from "@/lib/cn";
@@ -16,6 +16,8 @@ type MiniAvatarProps = {
   colorSeed?: string;
   /** An explicit color the user chose for this friend; wins over the auto color. */
   colorHex?: string | null;
+  /** Custom initials the user chose; wins over the ones derived from the name. */
+  initials?: string | null;
   /** @deprecated kept for backwards compatibility; color now derives from name/colorHex. */
   avatarColor?: AvatarColor;
   avatarUrl?: string | null;
@@ -33,6 +35,7 @@ export function MiniAvatar({
   name,
   colorSeed,
   colorHex,
+  initials,
   avatarUrl,
   size = "sm",
   className,
@@ -71,7 +74,7 @@ export function MiniAvatar({
       style={{ backgroundColor: bgColor, color: getAvatarTextColor(bgColor) }}
       aria-hidden
     >
-      {getInitials(name)}
+      {resolveInitials(name, initials)}
     </span>
   );
 }
