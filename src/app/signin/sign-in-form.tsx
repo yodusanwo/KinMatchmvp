@@ -93,10 +93,30 @@ export function SignInForm({
     setMessage(null);
 
     const supabase = createClient();
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // Check if user exists
+    const { data: existingUser } = await supabase
+      .from("users")
+      .select("id, onboarding_completed_at")
+      .eq("email", normalizedEmail)
+      .maybeSingle();
+
+    // Show helpful message if user is in wrong flow
+    if (gettingStarted && existingUser?.onboarding_completed_at) {
+      setMessage(
+        "You already have an account. Sending your sign-in link..."
+      );
+    } else if (!gettingStarted && !existingUser) {
+      setMessage(
+        "No account found with that email. Creating your account and sending link..."
+      );
+    }
+
     const redirectTo = `${authOrigin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
 
     const { error } = await supabase.auth.signInWithOtp({
-      email: email.trim().toLowerCase(),
+      email: normalizedEmail,
       options: { emailRedirectTo: redirectTo },
     });
 
@@ -155,6 +175,12 @@ export function SignInForm({
 
       {message && status === "error" && (
         <p className="font-inter text-sm italic text-terracotta-deep" role="alert">
+          {message}
+        </p>
+      )}
+
+      {message && status === "loading" && (
+        <p className="font-inter text-sm italic text-ink-soft" role="status">
           {message}
         </p>
       )}
