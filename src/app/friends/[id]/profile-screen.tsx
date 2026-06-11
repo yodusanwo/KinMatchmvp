@@ -8,7 +8,6 @@ import { BottomNav } from "@/components/nav/BottomNav";
 import {
   AvatarColorPicker,
   FriendManagementSheet,
-  FriendPhoneSection,
   MemoryCaptureModal,
   MemorySection,
   ProfileHeader,
@@ -227,7 +226,6 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
   }
 
   const name = formatDisplayName(friend.name);
-  const prompt = friend.profile_prompt;
 
   return (
     <AppShell>
@@ -251,6 +249,7 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
             friendName={friend.name}
             colorHex={friend.avatar_color_hex}
             initials={friend.avatar_initials}
+            phoneNumber={friend.phone_number}
             open={avatarEditorOpen}
             onClose={() => setAvatarEditorOpen(false)}
             onSaved={(patch) =>
@@ -260,22 +259,6 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
             }
           />
         </div>
-
-        {prompt.kind === "send" && (
-          <div id="friend-phone" className="mt-4">
-            <FriendPhoneSection
-              friendId={friend.id}
-              friendName={friend.name}
-              phoneNumber={friend.phone_number}
-              onSaved={(phoneNumber) =>
-                setFriend((current) =>
-                  current ? { ...current, phone_number: phoneNumber } : current
-                )
-              }
-              onToast={showToast}
-            />
-          </div>
-        )}
 
         {friend.memories.length > 0 && (
           <div className="mt-5">
@@ -290,6 +273,15 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
             />
           </div>
         )}
+
+        <p className="mt-4 text-center">
+          <Link
+            href={`/friends/${friend.id}/details`}
+            className="font-inter text-sm text-terracotta underline decoration-terracotta/60 underline-offset-2"
+          >
+            See everything about {name} →
+          </Link>
+        </p>
 
         <div className="mt-8">
           <SuggestedNextStepCard
@@ -309,18 +301,13 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
               friend.phone_number ? (
                 "→ Opens in Messages"
               ) : (
-                <Link
-                  href={`#friend-phone`}
+                <button
+                  type="button"
+                  onClick={() => setAvatarEditorOpen(true)}
                   className="text-terracotta underline decoration-terracotta/60 underline-offset-2"
-                  onClick={(event) => {
-                    event.preventDefault();
-                    document
-                      .getElementById("friend-phone")
-                      ?.scrollIntoView({ behavior: "smooth" });
-                  }}
                 >
-                  Add {name}&apos;s number for one-tap sending →
-                </Link>
+                  Add a number for one-tap sending →
+                </button>
               )
             }
           />

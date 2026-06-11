@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Check } from "lucide-react";
+import { OptionalPhoneField } from "@/components/friends/OptionalPhoneField";
 import {
   MAX_AVATAR_INITIALS,
   SHARED_AVATAR_PALETTE,
@@ -17,6 +18,7 @@ import { cn } from "@/lib/cn";
 type AvatarPatch = {
   avatar_color_hex?: string | null;
   avatar_initials?: string | null;
+  phone_number?: string | null;
 };
 
 type AvatarColorPickerProps = {
@@ -26,6 +28,8 @@ type AvatarColorPickerProps = {
   colorHex?: string | null;
   /** The currently saved initials override, or null when derived from the name. */
   initials?: string | null;
+  /** The currently saved phone number, or null. */
+  phoneNumber?: string | null;
   open: boolean;
   onClose: () => void;
   onSaved: (patch: AvatarPatch) => void;
@@ -36,6 +40,7 @@ export function AvatarColorPicker({
   friendName,
   colorHex,
   initials,
+  phoneNumber,
   open,
   onClose,
   onSaved,
@@ -43,10 +48,17 @@ export function AvatarColorPicker({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [initialsDraft, setInitialsDraft] = useState(initials ?? "");
+  const [phoneDraft, setPhoneDraft] = useState(phoneNumber ?? "");
+  const [phoneError, setPhoneError] = useState<string | null>(null);
+  const [savingPhone, setSavingPhone] = useState(false);
 
   useEffect(() => {
     setInitialsDraft(initials ?? "");
   }, [initials, open]);
+
+  useEffect(() => {
+    setPhoneDraft(phoneNumber ?? "");
+  }, [phoneNumber, open]);
 
   const currentColor = colorHex ?? null;
   const previewColor = resolveFriendColor(friendName, currentColor);
@@ -89,6 +101,33 @@ export function AvatarColorPicker({
     await patch({ avatar_initials: next }, { avatar_initials: initials ?? null });
   }
 
+  async function savePhone() {
+    const trimmed = phoneDraft.trim();
+    if (trimmed === (phoneNumber ?? "")) return;
+    setSavingPhone(true);
+    setPhoneError(null);
+
+    const response = await fetch(`/api/friends/${friendId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone_number: trimmed }),
+    });
+    const data = (await response.json().catch(() => ({}))) as {
+      phone_number?: string | null;
+      error?: string;
+    };
+
+    setSavingPhone(false);
+
+    if (!response.ok) {
+      setPhoneError(data.error ?? "Couldn't save that number — try again.");
+      return;
+    }
+
+    onSaved({ phone_number: data.phone_number ?? null });
+    setPhoneDraft(data.phone_number ?? "");
+  }
+
   if (!open) return null;
 
   return (
@@ -106,10 +145,10 @@ export function AvatarColorPicker({
         </span>
         <div className="min-w-0">
           <p className="font-sans text-sm font-medium text-ink">
-            {friendName.split(/\s+/)[0]}&apos;s avatar
+            {friendName.split(/\s+/)[0]}&apos;s details
           </p>
           <p className="font-inter text-xs italic text-ink-soft">
-            Pick a color and how their initials read.
+            How they look, and how you reach them.
           </p>
         </div>
       </div>
@@ -197,10 +236,29 @@ export function AvatarColorPicker({
         </p>
       )}
 
+      <div className="mt-4 border-t border-ink/[0.08] pt-4">
+        <OptionalPhoneField
+          friendName={friendName}
+          value={phoneDraft}
+          onChange={setPhoneDraft}
+          onBlur={() => void savePhone()}
+          id={`avatar-phone-${friendId}`}
+        />
+        {savingPhone && (
+          <p className="mt-1 font-inter text-xs italic text-ink-soft">saving…</p>
+        )}
+        {phoneError && (
+          <p className="mt-1 font-inter text-xs italic text-terracotta-deep" role="alert">
+            {phoneError}
+          </p>
+        )}
+      </div>
+
       <button
         type="button"
         onClick={() => {
           void saveInitials();
+          void savePhone();
           onClose();
         }}
         className="mt-4 block w-full text-center font-inter text-xs text-ink-soft underline underline-offset-2"

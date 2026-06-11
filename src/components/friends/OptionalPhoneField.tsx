@@ -7,6 +7,7 @@ type OptionalPhoneFieldProps = {
   friendName: string;
   value: string;
   onChange: (value: string) => void;
+  onBlur?: () => void;
   className?: string;
   id?: string;
 };
@@ -15,6 +16,7 @@ export function OptionalPhoneField({
   friendName,
   value,
   onChange,
+  onBlur,
   className,
   id = "friend-phone",
 }: OptionalPhoneFieldProps) {
@@ -36,6 +38,7 @@ export function OptionalPhoneField({
         pattern="[0-9+\-\s()]*"
         value={value}
         onChange={(event) => onChange(event.target.value)}
+        onBlur={onBlur}
         placeholder="+1 (312) 632-0027"
         className="w-full rounded-xl border border-ink/[0.35] bg-cream px-4 py-3 font-inter text-base text-ink placeholder:text-ink-soft/70 focus:border-terracotta focus:outline-none focus:ring-1 focus:ring-terracotta/30"
       />
