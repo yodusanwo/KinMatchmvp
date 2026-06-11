@@ -96,7 +96,7 @@ export function SignInForm({
     const redirectTo = `${authOrigin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
 
     const { error } = await supabase.auth.signInWithOtp({
-      email: email.trim(),
+      email: email.trim().toLowerCase(),
       options: { emailRedirectTo: redirectTo },
     });
 
