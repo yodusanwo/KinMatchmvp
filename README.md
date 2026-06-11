@@ -17,7 +17,7 @@ The agent reads structured engagement signals (whether voice notes get listened 
 | **Agent API Documentation** | https://kinmatch-agent-46939916931.us-central1.run.app/docs |
 | **Consumer App** (pilot) | https://app.kinmatch.co |
 | **Marketing Site** | https://kinmatch.co |
-| **Demo Video** | [YouTube link — added after upload] |
+| **Demo Video** | https://youtu.be/AChsqAtgb1I?si=SdAM8H66Np7bI5zw |
 
 ## Mandatory Technologies
 
