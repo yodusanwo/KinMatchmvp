@@ -12,7 +12,7 @@ export function NameChip({ person, onRemove, className }: NameChipProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-2 rounded-full border border-hairline bg-cream py-1.5 pl-1.5 pr-2",
+        "inline-flex items-center gap-2 rounded-sm border border-hairline bg-cream-deep py-1.5 pl-1.5 pr-2",
         className
       )}
     >

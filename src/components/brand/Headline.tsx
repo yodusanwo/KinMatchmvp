@@ -6,12 +6,12 @@ type HeadlineProps = {
   className?: string;
 };
 
-/** Helvetica-Now-style section heading — medium weight, tight leading. */
+/** Bold sans headline — hierarchy comes from weight, not color. */
 export function Headline({ children, as: Tag = "h1", className }: HeadlineProps) {
   return (
     <Tag
       className={cn(
-        "font-sans text-[24px] font-medium leading-[1.2] text-ink",
+        "font-sans text-[24px] font-bold leading-tight tracking-tight text-ink",
         className
       )}
     >

@@ -101,7 +101,7 @@ export function ConstellationView({
                 />
                 {heartBadge && selected && (
                   <span
-                    className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-terracotta text-[12px] text-white"
+                    className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-terracotta text-[12px] text-black"
                     aria-hidden
                   >
                     ♥
@@ -127,10 +127,10 @@ export function ConstellationView({
                   disabled={!selectable}
                   onClick={() => selectable && onToggleSelect?.(face.id)}
                   className={cn(
-                    "flex items-center gap-2 rounded-full border px-3 py-1",
+                    "flex items-center gap-2 rounded-sm border-2 px-2 py-1",
                     selected
-                      ? "border-ink bg-ink text-white"
-                      : "border-hairline text-ink-soft"
+                      ? "border-terracotta bg-terracotta/10"
+                      : "border-hairline"
                   )}
                 >
                   <MiniAvatar
@@ -138,7 +138,7 @@ export function ConstellationView({
                     avatarColor={face.avatarColor}
                     size="sm"
                   />
-                  <span className="font-sans text-xs">{face.name}</span>
+                  <span className="font-sans text-xs text-ink">{face.name}</span>
                 </button>
               </li>
             );

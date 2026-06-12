@@ -147,7 +147,7 @@ export function TodayScreen() {
         )}
       </div>
       {toast && (
-        <p className="fixed bottom-24 left-1/2 z-50 w-[calc(100%-40px)] max-w-[420px] -translate-x-1/2 rounded-lg bg-ink px-4 py-3 text-center font-inter text-sm text-white shadow-lg">
+        <p className="fixed bottom-24 left-1/2 z-50 w-[calc(100%-40px)] max-w-[420px] -translate-x-1/2 rounded-sm bg-ink px-4 py-3 text-center font-inter text-sm text-white shadow-lg">
           {toast}
         </p>
       )}

@@ -6,7 +6,7 @@ type PrimaryButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   className?: string;
 };
 
-/** Solid black Nike pill — the universal primary CTA. */
+/** Solid NVIDIA-Green CTA — the one button that carries the brand. */
 export function PrimaryButton({
   children,
   className,

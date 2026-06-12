@@ -8,14 +8,11 @@ const config = {
         "cream-deep": "var(--cream-deep)",
         "surface-dark": "var(--surface-dark)",
         "surface-elevated": "var(--surface-elevated)",
-        "surface-strong": "var(--surface-strong)",
         ink: "var(--ink)",
         "ink-soft": "var(--ink-soft)",
-        body: "var(--body)",
         terracotta: "var(--terracotta)",
         "terracotta-deep": "var(--terracotta-deep)",
         hairline: "var(--hairline)",
-        "hairline-soft": "var(--hairline-soft)",
         "hairline-strong": "var(--hairline-strong)",
         mute: "var(--mute)",
         stone: "var(--stone)",
@@ -30,24 +27,22 @@ const config = {
         honey: "var(--honey)",
       },
       fontFamily: {
-        // Inter substitutes for Helvetica Now (UI workhorse).
-        sans: ["var(--font-inter)", "Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
-        inter: ["var(--font-inter)", "Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
-        // Bebas Neue stands in for Nike Futura ND — campaign display tier only.
-        display: ["var(--font-bebas)", "Helvetica Neue", "Impact", "sans-serif"],
+        // One family across the system; Inter substitutes for NVIDIA-EMEA.
+        sans: ["var(--font-inter)", "Arial", "Helvetica", "sans-serif"],
+        inter: ["var(--font-inter)", "Arial", "Helvetica", "sans-serif"],
       },
-      // Nike shape vocabulary: cards/containers are 0-radius and flat; the only
-      // rounding is the CTA pill (full) and the search input (md, 24px).
+      // NVIDIA geometry: aggressively angular. Everything that isn't a circle
+      // collapses to a 2px radius. `full` is preserved for avatars/icon dots.
       borderRadius: {
         none: "0px",
-        xs: "0px",
-        sm: "0px",
-        DEFAULT: "0px",
-        md: "24px",
-        lg: "0px",
-        xl: "0px",
-        "2xl": "0px",
-        "3xl": "0px",
+        xs: "1px",
+        sm: "2px",
+        DEFAULT: "2px",
+        md: "2px",
+        lg: "2px",
+        xl: "2px",
+        "2xl": "2px",
+        "3xl": "2px",
         full: "9999px",
       },
       fontSize: {

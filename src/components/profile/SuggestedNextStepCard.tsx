@@ -27,7 +27,7 @@ export function SuggestedNextStepCard({
   return (
     <article
       className={cn(
-        "rounded-2xl border border-hairline bg-cream p-3.5",
+        "kin-corner-square relative rounded-sm border border-hairline bg-cream p-3.5 pt-5",
         className
       )}
     >

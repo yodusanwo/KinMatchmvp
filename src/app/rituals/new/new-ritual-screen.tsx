@@ -148,8 +148,8 @@ export function NewRitualScreen({ template }: { template?: string }) {
                   setSolo(true);
                   setSelectedIds([]);
                 }}
-                className={`rounded-full border px-4 py-2 font-sans text-xs font-medium ${
-                  solo ? "border-ink bg-ink text-white" : "border-hairline text-ink-soft"
+                className={`rounded-sm border-2 px-3 py-2 font-sans text-xs font-bold ${
+                  solo ? "border-terracotta bg-terracotta/10" : "border-hairline"
                 }`}
               >
                 Just me
@@ -159,10 +159,10 @@ export function NewRitualScreen({ template }: { template?: string }) {
                   key={friend.id}
                   type="button"
                   onClick={() => toggleFriend(friend.id)}
-                  className={`flex items-center gap-2 rounded-full border px-4 py-2 font-sans text-xs font-medium ${
+                  className={`flex items-center gap-2 rounded-sm border-2 px-3 py-2 font-sans text-xs font-bold ${
                     selectedIds.includes(friend.id)
-                      ? "border-ink bg-ink text-white"
-                      : "border-hairline text-ink-soft"
+                      ? "border-terracotta bg-terracotta/10"
+                      : "border-hairline"
                   }`}
                 >
                   <MiniAvatar name={friend.name} colorHex={friend.avatar_color_hex} initials={friend.avatar_initials} size="sm" />

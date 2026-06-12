@@ -37,7 +37,7 @@ export function BottomNav({ heldBadge = false }: BottomNavProps) {
 
   return (
     <nav
-      className="fixed bottom-0 left-1/2 z-20 w-full max-w-[480px] -translate-x-1/2 border-t border-hairline bg-cream px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+      className="fixed bottom-0 left-1/2 z-20 w-full max-w-[480px] -translate-x-1/2 border-t border-hairline-strong bg-surface-dark px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
       aria-label="Main"
     >
       <ul className="flex items-center justify-between">
@@ -49,7 +49,7 @@ export function BottomNav({ heldBadge = false }: BottomNavProps) {
                 href={href}
                 className={cn(
                   "relative flex flex-col items-center gap-1 px-1 py-1 min-[360px]:px-2",
-                  active ? "text-terracotta" : "text-ink-soft"
+                  active ? "text-terracotta" : "text-white/70"
                 )}
                 aria-current={active ? "page" : undefined}
               >

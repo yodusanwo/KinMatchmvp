@@ -43,7 +43,7 @@ export function InterestPills({
           {interests.map((interest) => (
             <span
               key={interest.id}
-              className="rounded-full border border-hairline bg-cream px-3 py-1 font-sans text-xs text-ink"
+              className="rounded-sm border border-hairline bg-cream-deep px-3 py-1 font-sans text-xs text-ink"
             >
               {interest.label}
             </span>
