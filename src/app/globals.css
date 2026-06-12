@@ -13,8 +13,8 @@
   /* Surface — paper-white body, soft-gray panels, black chapters */
   --cream: #ffffff; /* page canvas */
   --cream-deep: #f7f7f7; /* soft surface: panels, rows, fills */
-  --surface-dark: #241a12; /* hero / footer / dark chapters */
-  --surface-elevated: #342819; /* nested dark panels (warm, lifts off canvas) */
+  --surface-dark: #14211a; /* deep pine: hero / footer / dark chapters */
+  --surface-elevated: #20342a; /* nested dark panels (lifted pine) */
 
   /* Ink — true black headlines, gray hierarchy by weight not color */
   --ink: #000000; /* headlines + body on canvas */
