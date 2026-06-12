@@ -31,7 +31,7 @@ export function PendingCaptureCard({
       <div className="mt-2 flex items-center gap-2">
         <Link
           href={`/friends/${capture.friend_id}/details?capture=${capture.interaction_id}`}
-          className="flex-1 rounded-full bg-terracotta px-3 py-2 text-center font-sans text-xs font-medium text-cream"
+          className="flex-1 rounded-sm bg-terracotta px-3 py-2 text-center font-sans text-xs font-bold text-black"
         >
           Capture →
         </Link>
@@ -39,7 +39,7 @@ export function PendingCaptureCard({
           type="button"
           disabled={dismissing}
           onClick={() => void dismiss()}
-          className="flex-1 rounded-full border border-ink/[0.2] px-3 py-2 font-sans text-xs font-medium text-ink disabled:opacity-50"
+          className="flex-1 rounded-sm border border-hairline px-3 py-2 font-sans text-xs font-bold text-ink disabled:opacity-50"
         >
           Not yet
         </button>

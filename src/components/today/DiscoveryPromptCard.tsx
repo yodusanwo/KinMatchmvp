@@ -22,7 +22,7 @@ export function DiscoveryPromptCard({ prompt }: DiscoveryPromptCardProps) {
       <div className="mt-2 flex items-center gap-2">
         <Link
           href={prompt.primary_cta_url}
-          className="flex-1 rounded-full bg-terracotta px-3 py-2 text-center font-sans text-xs font-medium text-cream"
+          className="flex-1 rounded-sm bg-terracotta px-3 py-2 text-center font-sans text-xs font-bold text-black"
         >
           {prompt.primary_cta_label}
         </Link>

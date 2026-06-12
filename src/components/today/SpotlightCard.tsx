@@ -20,7 +20,7 @@ export function SpotlightCard({ spotlight, className }: SpotlightCardProps) {
   return (
     <article
       className={cn(
-        "rounded-2xl border border-ink/[0.12] bg-cream-deep/80 p-3.5",
+        "kin-corner-square relative rounded-sm border border-hairline bg-cream p-3.5 pt-5",
         className
       )}
     >

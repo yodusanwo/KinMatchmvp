@@ -231,7 +231,7 @@ export function HeldScreen() {
 
       <BottomNav heldBadge={holdingCount > 0} />
       {toast && (
-        <p className="fixed bottom-24 left-1/2 z-50 w-[calc(100%-40px)] max-w-[420px] -translate-x-1/2 rounded-full bg-ink px-4 py-3 text-center font-inter text-sm italic text-cream shadow-lg">
+        <p className="fixed bottom-24 left-1/2 z-50 w-[calc(100%-40px)] max-w-[420px] -translate-x-1/2 rounded-sm bg-ink px-4 py-3 text-center font-inter text-sm text-white shadow-lg">
           {toast}
         </p>
       )}
@@ -274,7 +274,7 @@ function EmptyHeldState({ onAdd }: { onAdd: () => void }) {
       <button
         type="button"
         onClick={onAdd}
-        className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-terracotta px-6 py-3.5 font-sans text-sm font-medium text-cream"
+        className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-sm bg-terracotta px-6 py-3 font-sans text-sm font-bold text-black"
       >
         <Plus className="h-4 w-4" aria-hidden />
         Add someone to your circle
@@ -415,14 +415,14 @@ function HeldSheet({
               type="button"
               onClick={onArchive}
               disabled={saving}
-              className="w-full rounded-full bg-terracotta-deep px-6 py-3.5 font-sans text-sm font-semibold text-cream disabled:opacity-50"
+              className="w-full rounded-sm bg-terracotta-deep px-6 py-3 font-sans text-sm font-bold text-white disabled:opacity-50"
             >
               {saving ? "Removing…" : `Remove ${name}`}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="w-full rounded-full border border-ink/[0.2] px-6 py-3.5 font-sans text-sm font-semibold text-ink"
+              className="w-full rounded-sm border-2 border-terracotta px-6 py-3 font-sans text-sm font-bold text-ink"
             >
               Cancel
             </button>
@@ -470,14 +470,14 @@ function HeldSheet({
               type="button"
               onClick={onInvite}
               disabled={!selectedFriendId || setupMessage.trim().length < 20 || saving}
-              className="w-full rounded-full bg-terracotta px-6 py-3.5 font-sans text-sm font-semibold text-cream disabled:opacity-50"
+              className="w-full rounded-sm bg-terracotta px-6 py-3 font-sans text-sm font-bold text-black disabled:opacity-50"
             >
               {saving ? "Sending…" : "Send invitation →"}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="w-full rounded-full border border-ink/[0.2] px-6 py-3.5 font-sans text-sm font-semibold text-ink"
+              className="w-full rounded-sm border-2 border-terracotta px-6 py-3 font-sans text-sm font-bold text-ink"
             >
               Cancel
             </button>
@@ -510,14 +510,14 @@ function HeldSheet({
               type="button"
               onClick={onSaveThreshold}
               disabled={saving}
-              className="w-full rounded-full bg-terracotta px-6 py-3.5 font-sans text-sm font-semibold text-cream disabled:opacity-50"
+              className="w-full rounded-sm bg-terracotta px-6 py-3 font-sans text-sm font-bold text-black disabled:opacity-50"
             >
               {saving ? "Saving…" : "Save quiet window"}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="w-full rounded-full border border-ink/[0.2] px-6 py-3.5 font-sans text-sm font-semibold text-ink"
+              className="w-full rounded-sm border-2 border-terracotta px-6 py-3 font-sans text-sm font-bold text-ink"
             >
               Cancel
             </button>
@@ -547,10 +547,10 @@ function FriendPill({
     <button
       type="button"
       onClick={onClick}
-      className={`flex items-center gap-2 rounded-full border px-3 py-2 font-sans text-sm font-semibold ${
+      className={`flex items-center gap-2 rounded-sm border-2 px-3 py-2 font-sans text-sm font-bold ${
         selected
           ? "border-terracotta bg-terracotta/10 text-ink"
-          : "border-ink/[0.16] text-ink"
+          : "border-hairline text-ink"
       }`}
     >
       <MiniAvatar

@@ -6,7 +6,7 @@ type PrimaryButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   className?: string;
 };
 
-/** Terracotta pill CTA for brand-defining moments. */
+/** Solid NVIDIA-Green CTA — the one button that carries the brand. */
 export function PrimaryButton({
   children,
   className,

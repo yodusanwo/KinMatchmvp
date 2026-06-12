@@ -26,16 +26,16 @@ export function BrandMark({ size = 28, className }: BrandMarkProps) {
         </clipPath>
       </defs>
       
-      {/* Left silhouette (light sage) */}
+      {/* Left silhouette (neutral stone) */}
       <g>
-        <circle cx="12" cy="12" r="4" className="fill-[#b5c5b5]" />
+        <circle cx="12" cy="12" r="4" className="fill-stone" />
         <path
           d="M6 20c0-2.2 2.7-4 6-4s6 1.8 6 4v6H6v-6z"
-          className="fill-[#b5c5b5]"
+          className="fill-stone"
         />
       </g>
       
-      {/* Right silhouette (terracotta) */}
+      {/* Right silhouette (NVIDIA Green) */}
       <g>
         <circle cx="20" cy="12" r="4" className="fill-terracotta" />
         <path
@@ -44,12 +44,12 @@ export function BrandMark({ size = 28, className }: BrandMarkProps) {
         />
       </g>
       
-      {/* Overlap/intersection (mustard) */}
+      {/* Overlap/intersection (deep green) */}
       <g clipPath={`url(#${clipId})`}>
-        <circle cx="20" cy="12" r="4" className="fill-mustard" />
+        <circle cx="20" cy="12" r="4" className="fill-terracotta-deep" />
         <path
           d="M14 20c0-2.2 2.7-4 6-4s6 1.8 6 4v6h-12v-6z"
-          className="fill-mustard"
+          className="fill-terracotta-deep"
         />
       </g>
     </svg>

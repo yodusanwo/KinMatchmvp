@@ -46,10 +46,10 @@ export function MemoryCategoryFilters({
             type="button"
             onClick={handleAllClick}
             className={cn(
-              "flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 font-sans text-xs font-medium transition-colors",
+              "flex shrink-0 items-center gap-1.5 rounded-sm px-3 py-1.5 font-sans text-xs font-bold transition-colors",
               isAllActive
-                ? "bg-terracotta text-cream"
-                : "bg-cream-deep/50 text-ink-soft hover:bg-cream-deep"
+                ? "bg-ink text-white"
+                : "bg-cream-deep text-ink-soft hover:bg-hairline/40"
             )}
           >
             <span>All</span>
@@ -68,10 +68,10 @@ export function MemoryCategoryFilters({
                 type="button"
                 onClick={() => handleCategoryClick(categoryId)}
                 className={cn(
-                  "flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 font-sans text-xs font-medium transition-colors",
+                  "flex shrink-0 items-center gap-1.5 rounded-sm px-3 py-1.5 font-sans text-xs font-bold transition-colors",
                   isActive
-                    ? "bg-terracotta text-cream"
-                    : "bg-cream-deep/50 text-ink-soft hover:bg-cream-deep"
+                    ? "bg-ink text-white"
+                    : "bg-cream-deep text-ink-soft hover:bg-hairline/40"
                 )}
               >
                 <Icon

@@ -112,7 +112,7 @@ export function RitualDetailScreen({ ritual }: { ritual: DetailRitual }) {
             {frequencyLabel(ritual.frequency, ritual.recurrence_pattern)} ·{" "}
             {participantText}
           </p>
-          <span className="inline-flex rounded-full bg-terracotta/10 px-3 py-1 font-sans text-[15px] font-medium text-terracotta">
+          <span className="inline-flex rounded-sm bg-terracotta/10 px-3 py-1 font-sans text-[15px] font-bold text-terracotta-deep">
             Next: {formatDate(ritual.next_date)}
           </span>
         </div>
@@ -137,7 +137,7 @@ export function RitualDetailScreen({ ritual }: { ritual: DetailRitual }) {
             type="button"
             disabled={Boolean(saving)}
             onClick={() => void archive()}
-            className="w-full rounded-full border border-terracotta/30 px-6 py-3.5 font-sans text-sm font-medium text-terracotta-deep disabled:opacity-50"
+            className="w-full rounded-sm border-2 border-terracotta px-6 py-3 font-sans text-sm font-bold text-terracotta-deep disabled:opacity-50"
           >
             {saving === "archive" ? "Archiving…" : "Archive ritual"}
           </button>

@@ -66,6 +66,8 @@ kinmatch-14-day-build-plan.md
 kinmatch-wireframe-to-build.md
 kinmatch-mvp-brief.md
 DEFERRED.md
+PILOT_BLOCKERS.md
+SPOTLIGHT_RANKING.md
 
 # Backup env files
 agent/.env.backup

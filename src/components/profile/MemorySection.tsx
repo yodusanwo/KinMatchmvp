@@ -107,7 +107,7 @@ export function MemorySection({
           onClick={() => onAddCategory("current")}
           className="group flex w-full items-center gap-3 rounded-2xl border border-terracotta/35 bg-terracotta/10 p-4 text-left transition-colors active:bg-terracotta/15"
         >
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-terracotta text-cream">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-terracotta text-black">
             <Plus className="h-4 w-4" strokeWidth={2} aria-hidden />
           </span>
           <span className="min-w-0 flex-1">

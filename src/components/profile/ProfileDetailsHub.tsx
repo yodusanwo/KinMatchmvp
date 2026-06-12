@@ -72,7 +72,7 @@ export function ProfileDetailsHub({
         onClick={() => onAddMemory("current")}
         className="flex w-full items-center gap-3 rounded-2xl border border-terracotta/30 bg-terracotta/10 p-3 text-left"
       >
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-terracotta text-cream">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-terracotta text-black">
           <Plus className="h-4 w-4" strokeWidth={2} aria-hidden />
         </span>
         <span className="min-w-0">

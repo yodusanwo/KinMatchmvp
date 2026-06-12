@@ -1,38 +1,106 @@
 @import "tailwindcss";
 @config "../../tailwind.config.ts";
 
+/*
+ * KinMatch chrome follows the NVIDIA design system (DESIGN-nvidia.md):
+ * a flat paper-white canvas framed by black chapters, a single violently
+ * saturated NVIDIA Green accent, hairline borders instead of shadows, and
+ * 2px geometry on every interactive surface. The legacy KinMatch token
+ * names (cream / ink / terracotta) are remapped onto NVIDIA roles so the
+ * whole app re-skins from here.
+ */
 :root {
-  --cream: #f2ead9;
-  --cream-deep: #ebe0c9;
-  --ink: #1f1a14;
-  --ink-soft: #463c2e;
-  --terracotta: #b65232;
-  --terracotta-deep: #8e3d22;
-  --forest: #2f4032;
-  --sage: #6b7a5c;
-  --mustard: #c68f3e;
-  --honey: #e8d494;
+  /* Surface — paper-white body, soft-gray panels, black chapters */
+  --cream: #ffffff; /* page canvas */
+  --cream-deep: #f7f7f7; /* soft surface: panels, rows, fills */
+  --surface-dark: #000000; /* hero / footer / dark chapters */
+  --surface-elevated: #1a1a1a; /* nested dark panels */
+
+  /* Ink — true black headlines, gray hierarchy by weight not color */
+  --ink: #000000; /* headlines + body on canvas */
+  --ink-soft: #757575; /* metadata, secondary text, mute */
+
+  /* Accent — the one color doing all the work */
+  --terracotta: #76b900; /* NVIDIA Green: every CTA + active state */
+  --terracotta-deep: #5a8d00; /* pressed green */
+
+  /* Hairline rules (borders carry separation, never shadow) */
+  --hairline: #cccccc;
+  --hairline-strong: #5e5e5e;
+
+  /* Neutral text steps */
+  --mute: #757575;
+  --stone: #898989;
+  --ash: #a7a7a7;
+
+  /* Semantic */
+  --link-blue: #0046a4; /* the only blue — inline prose links */
+  --error: #e52020;
+  --warning: #df6500;
+  --success-deep: #3f8500;
+
+  /* Legacy accent names kept for any stray references */
+  --forest: #1a1a1a;
+  --sage: #898989;
+  --mustard: #df6500;
+  --honey: #feeeb2;
 }
 
 @theme inline {
   --color-cream: var(--cream);
   --color-cream-deep: var(--cream-deep);
+  --color-surface-dark: var(--surface-dark);
+  --color-surface-elevated: var(--surface-elevated);
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
   --color-terracotta: var(--terracotta);
   --color-terracotta-deep: var(--terracotta-deep);
+  --color-hairline: var(--hairline);
+  --color-hairline-strong: var(--hairline-strong);
+  --color-mute: var(--mute);
+  --color-stone: var(--stone);
+  --color-ash: var(--ash);
+  --color-link-blue: var(--link-blue);
+  --color-error: var(--error);
+  --color-warning: var(--warning);
+  --color-success-deep: var(--success-deep);
   --color-forest: var(--forest);
   --color-sage: var(--sage);
   --color-mustard: var(--mustard);
   --color-honey: var(--honey);
-  --font-sans:
-    var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-inter: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* Inter stands in for the proprietary NVIDIA-EMEA cut (weights 400/700),
+     Arial is the documented fallback. One family across the whole system. */
+  --font-sans: var(--font-inter), Arial, Helvetica, sans-serif;
+  --font-inter: var(--font-inter), Arial, Helvetica, sans-serif;
 }
 
 body {
   background-color: var(--cream);
   color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Green border is the only focus signal in the system. */
+*:focus-visible {
+  outline: 2px solid var(--terracotta);
+  outline-offset: 2px;
+}
+
+/*
+ * Signature corner square — a ~12px solid NVIDIA-Green block anchored to one
+ * corner of a card. The system's only consistent ornamental device.
+ * Apply `.kin-card` to a relatively-positioned card and the square paints
+ * itself into the top-left corner.
+ */
+.kin-corner-square::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 12px;
+  height: 12px;
+  background-color: var(--terracotta);
 }
 
 @keyframes skeleton-shimmer {

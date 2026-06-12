@@ -275,7 +275,7 @@ export function TribeScreen() {
               <button
                 type="button"
                 onClick={() => setAddOpen(true)}
-                className="w-full rounded-full bg-terracotta px-6 py-3.5 font-sans text-sm font-semibold text-cream"
+                className="w-full rounded-sm bg-terracotta px-6 py-3 font-sans text-sm font-bold text-black"
               >
                 Add your first person →
               </button>
@@ -310,7 +310,7 @@ export function TribeScreen() {
                   <button
                     type="submit"
                     disabled={adding}
-                    className="shrink-0 rounded-full bg-terracotta px-4 py-3 font-sans text-sm font-semibold text-cream transition-colors hover:bg-terracotta-deep disabled:cursor-not-allowed disabled:opacity-60"
+                    className="shrink-0 rounded-sm bg-terracotta px-4 py-3 font-sans text-sm font-bold text-black transition-colors hover:bg-terracotta-deep disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {adding ? "Adding" : "Add"}
                   </button>
@@ -334,10 +334,10 @@ export function TribeScreen() {
                       key={category}
                       type="button"
                       onClick={() => setNewCategory(category)}
-                      className={`rounded-full border px-3 py-2 font-sans text-[15px] font-semibold ${
+                      className={`rounded-sm border-2 px-3 py-2 font-sans text-[15px] font-bold ${
                         newCategory === category
                           ? "border-terracotta bg-terracotta/10 text-ink"
-                          : "border-ink/[0.16] text-ink-soft"
+                          : "border-hairline text-ink-soft"
                       }`}
                     >
                       {label}
@@ -358,7 +358,7 @@ export function TribeScreen() {
           <button
             type="button"
             onClick={handleToastClick}
-            className={`fixed bottom-24 left-1/2 z-50 w-[calc(100%-40px)] max-w-[420px] -translate-x-1/2 rounded-full bg-ink px-4 py-3 text-center font-inter text-sm italic text-cream shadow-lg ${toastClickable ? "cursor-pointer hover:bg-ink/90" : "cursor-default"}`}
+            className={`fixed bottom-24 left-1/2 z-50 w-[calc(100%-40px)] max-w-[420px] -translate-x-1/2 rounded-sm bg-ink px-4 py-3 text-center font-inter text-sm text-white shadow-lg ${toastClickable ? "cursor-pointer hover:bg-surface-elevated" : "cursor-default"}`}
           >
             {toast}
           </button>
@@ -444,7 +444,7 @@ function FriendGrid({
               {initials(friend)}
             </span>
             {isArchived && (
-              <span className="absolute bottom-0 right-0 rounded-full bg-ink/80 px-1.5 py-0.5 font-sans text-[7px] font-semibold uppercase tracking-wider text-cream">
+              <span className="absolute bottom-0 right-0 rounded-sm bg-ink px-1.5 py-0.5 font-sans text-[7px] font-bold uppercase tracking-wider text-white">
                 archived
               </span>
             )}

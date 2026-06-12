@@ -150,10 +150,10 @@ export function CaptureReviewScreen({
                       type="button"
                       onClick={() => updateItem(index, { checked: !item.checked })}
                       className={cn(
-                        "mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-md border transition-colors",
+                        "mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-sm border-2 transition-colors",
                         item.checked
-                          ? "border-terracotta bg-terracotta text-cream"
-                          : "border-ink/[0.18] bg-cream text-transparent"
+                          ? "border-terracotta bg-terracotta text-black"
+                          : "border-hairline bg-cream text-transparent"
                       )}
                       aria-label={item.checked ? "Remove detail" : "Save detail"}
                     >

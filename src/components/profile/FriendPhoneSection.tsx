@@ -125,7 +125,7 @@ export function FriendPhoneSection({
             setValue(phoneNumber ?? "");
             setError(null);
           }}
-          className="rounded-full px-4 py-2.5 font-sans text-sm text-ink-soft underline underline-offset-2"
+          className="rounded-sm px-4 py-2.5 font-sans text-sm text-ink-soft underline underline-offset-2"
         >
           Cancel
         </button>
@@ -134,7 +134,7 @@ export function FriendPhoneSection({
             type="button"
             disabled={saving}
             onClick={() => void savePhone("")}
-            className="rounded-full px-4 py-2.5 font-sans text-sm text-terracotta underline underline-offset-2"
+            className="rounded-sm px-4 py-2.5 font-sans text-sm text-terracotta-deep underline underline-offset-2"
           >
             Remove
           </button>

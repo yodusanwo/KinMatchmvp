@@ -86,7 +86,7 @@ export function AudioPlayer({
         <button
           type="button"
           onClick={togglePlay}
-          className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-full bg-terracotta text-cream transition-colors hover:bg-terracotta-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-terracotta"
+          className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-full bg-terracotta text-black transition-colors hover:bg-terracotta-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-terracotta"
           aria-label={isPlaying ? "Pause" : "Play voice note"}
         >
           {isPlaying ? (

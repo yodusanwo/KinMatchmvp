@@ -208,7 +208,7 @@ export function VoiceNotesScreen({
                             </div>
                           </div>
                           <span
-                            className={`shrink-0 rounded-full px-2 py-1 font-sans text-[12px] font-medium ${status.className}`}
+                            className={`shrink-0 rounded-sm px-2 py-1 font-sans text-[12px] font-bold uppercase tracking-wide ${status.className}`}
                           >
                             {status.label}
                           </span>

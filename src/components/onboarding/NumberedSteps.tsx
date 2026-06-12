@@ -1,9 +1,9 @@
 import { cn } from "@/lib/cn";
 
 const STEP_COLORS = [
-  "bg-terracotta text-cream",
-  "bg-forest text-cream",
-  "bg-mustard text-cream",
+  "bg-terracotta text-black",
+  "bg-ink text-white",
+  "bg-terracotta-deep text-white",
 ] as const;
 
 type Step = {
@@ -30,9 +30,9 @@ export function NumberedSteps({
         <li key={step.number} className="flex gap-4">
           <span
             className={cn(
-              "flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-sans text-sm font-medium",
+              "flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-sans text-sm font-bold",
               terracottaOnly
-                ? "bg-terracotta text-cream"
+                ? "bg-terracotta text-black"
                 : STEP_COLORS[index % STEP_COLORS.length]
             )}
             aria-hidden

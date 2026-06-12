@@ -152,7 +152,7 @@ export function FriendManagementSheet({
               type="button"
               onClick={onConfirmDelete}
               disabled={saving}
-              className="w-full rounded-full bg-terracotta-deep px-6 py-3.5 font-sans text-sm font-semibold text-cream disabled:opacity-50"
+              className="w-full rounded-sm bg-terracotta-deep px-6 py-3 font-sans text-sm font-bold text-white disabled:opacity-50"
             >
               {saving ? "Deleting…" : `Delete permanently`}
             </button>
@@ -160,7 +160,7 @@ export function FriendManagementSheet({
               type="button"
               onClick={onClose}
               disabled={saving}
-              className="w-full rounded-full border border-ink/[0.2] px-6 py-3.5 font-sans text-sm font-semibold text-ink"
+              className="w-full rounded-sm border-2 border-terracotta px-6 py-3 font-sans text-sm font-bold text-ink"
             >
               Cancel
             </button>
@@ -179,7 +179,7 @@ export function FriendManagementSheet({
               type="button"
               onClick={onConfirmArchive}
               disabled={saving}
-              className="w-full rounded-full bg-terracotta-deep px-6 py-3.5 font-sans text-sm font-semibold text-cream disabled:opacity-50"
+              className="w-full rounded-sm bg-terracotta-deep px-6 py-3 font-sans text-sm font-bold text-white disabled:opacity-50"
             >
               {saving ? "Archiving…" : `Archive ${name}`}
             </button>
@@ -187,7 +187,7 @@ export function FriendManagementSheet({
               type="button"
               onClick={onClose}
               disabled={saving}
-              className="w-full rounded-full border border-ink/[0.2] px-6 py-3.5 font-sans text-sm font-semibold text-ink"
+              className="w-full rounded-sm border-2 border-terracotta px-6 py-3 font-sans text-sm font-bold text-ink"
             >
               Cancel
             </button>
