@@ -62,7 +62,7 @@ export function AddPersonInput({
         />
         <button
           type="submit"
-          className="shrink-0 rounded-sm border border-ink px-4 py-3 font-sans text-sm font-medium text-ink transition-colors hover:bg-cream-deep"
+          className="shrink-0 rounded-full bg-cream-deep px-5 py-3 font-sans text-sm font-medium text-ink transition-colors hover:bg-surface-strong"
         >
           Add
         </button>

@@ -30,22 +30,24 @@ const config = {
         honey: "var(--honey)",
       },
       fontFamily: {
-        // One family across the system; Inter substitutes for Airbnb Cereal VF.
-        sans: ["var(--font-inter)", "Circular", "-apple-system", "system-ui", "sans-serif"],
-        inter: ["var(--font-inter)", "Circular", "-apple-system", "system-ui", "sans-serif"],
+        // Inter substitutes for Helvetica Now (UI workhorse).
+        sans: ["var(--font-inter)", "Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
+        inter: ["var(--font-inter)", "Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
+        // Bebas Neue stands in for Nike Futura ND — campaign display tier only.
+        display: ["var(--font-bebas)", "Helvetica Neue", "Impact", "sans-serif"],
       },
-      // Airbnb shape language: soft everywhere, no hard corners. Buttons 8px,
-      // cards ~14–24px, pills/orbs/avatars fully round.
+      // Nike shape vocabulary: cards/containers are 0-radius and flat; the only
+      // rounding is the CTA pill (full) and the search input (md, 24px).
       borderRadius: {
         none: "0px",
-        xs: "4px",
-        sm: "8px",
-        DEFAULT: "8px",
-        md: "14px",
-        lg: "16px",
-        xl: "20px",
-        "2xl": "24px",
-        "3xl": "28px",
+        xs: "0px",
+        sm: "0px",
+        DEFAULT: "0px",
+        md: "24px",
+        lg: "0px",
+        xl: "0px",
+        "2xl": "0px",
+        "3xl": "0px",
         full: "9999px",
       },
       fontSize: {

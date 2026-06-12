@@ -163,7 +163,7 @@ export function SharedInterestModal({
                   }
                   setLabel(suggestion);
                 }}
-                className="rounded-sm border border-hairline px-3 py-1 font-inter text-xs italic text-ink-soft transition-colors hover:border-terracotta hover:text-terracotta-deep"
+                className="rounded-full border border-hairline px-3 py-1 font-inter text-xs text-ink-soft transition-colors hover:border-ink hover:text-ink"
               >
                 {suggestion}
               </button>

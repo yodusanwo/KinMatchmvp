@@ -128,7 +128,7 @@ export function SendSpotlight({ state, onRefresh }: SendSpotlightProps) {
           type="button"
           onClick={() => void skipPrompt()}
           disabled={skipping}
-          className="flex-1 rounded-sm border border-ink px-3 py-2.5 font-sans text-xs font-medium text-ink disabled:opacity-50"
+          className="flex-1 rounded-full bg-cream-deep px-3 py-2.5 font-sans text-xs font-medium text-ink disabled:opacity-50"
         >
           Not now
         </button>
@@ -214,7 +214,7 @@ export function CaptureSpotlight({ state, onRefresh }: CaptureSpotlightProps) {
           type="button"
           onClick={() => void skipCapture()}
           disabled={dismissing}
-          className="flex-1 rounded-sm border border-ink px-3 py-2.5 font-sans text-xs font-medium text-ink disabled:opacity-50"
+          className="flex-1 rounded-full bg-cream-deep px-3 py-2.5 font-sans text-xs font-medium text-ink disabled:opacity-50"
         >
           Not yet
         </button>

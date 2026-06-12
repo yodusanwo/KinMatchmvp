@@ -38,7 +38,7 @@ export function TodayPageSkeleton() {
           </div>
         </div>
         <Skeleton className="mt-4 h-12 w-full" />
-        <Skeleton className="mt-4 h-10 w-full rounded-sm" />
+        <Skeleton className="mt-4 h-10 w-full rounded-full" />
       </div>
       <div>
         <Skeleton className="mb-4 h-3 w-32" />

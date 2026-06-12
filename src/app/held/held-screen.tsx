@@ -274,7 +274,7 @@ function EmptyHeldState({ onAdd }: { onAdd: () => void }) {
       <button
         type="button"
         onClick={onAdd}
-        className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-sm bg-terracotta px-6 py-3.5 font-sans text-base font-medium text-white"
+        className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-ink px-8 py-3.5 font-sans text-base font-medium text-white"
       >
         <Plus className="h-4 w-4" aria-hidden />
         Add someone to your circle
@@ -415,14 +415,14 @@ function HeldSheet({
               type="button"
               onClick={onArchive}
               disabled={saving}
-              className="w-full rounded-sm bg-terracotta px-6 py-3.5 font-sans text-base font-medium text-white disabled:opacity-50"
+              className="w-full rounded-full bg-ink px-8 py-3.5 font-sans text-base font-medium text-white disabled:opacity-50"
             >
               {saving ? "Removing…" : `Remove ${name}`}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="w-full rounded-sm border border-ink px-6 py-3.5 font-sans text-base font-medium text-ink"
+              className="w-full rounded-full bg-cream-deep px-8 py-3.5 font-sans text-base font-medium text-ink"
             >
               Cancel
             </button>
@@ -470,14 +470,14 @@ function HeldSheet({
               type="button"
               onClick={onInvite}
               disabled={!selectedFriendId || setupMessage.trim().length < 20 || saving}
-              className="w-full rounded-sm bg-terracotta px-6 py-3.5 font-sans text-base font-medium text-white disabled:opacity-50"
+              className="w-full rounded-full bg-ink px-8 py-3.5 font-sans text-base font-medium text-white disabled:opacity-50"
             >
               {saving ? "Sending…" : "Send invitation →"}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="w-full rounded-sm border border-ink px-6 py-3.5 font-sans text-base font-medium text-ink"
+              className="w-full rounded-full bg-cream-deep px-8 py-3.5 font-sans text-base font-medium text-ink"
             >
               Cancel
             </button>
@@ -510,14 +510,14 @@ function HeldSheet({
               type="button"
               onClick={onSaveThreshold}
               disabled={saving}
-              className="w-full rounded-sm bg-terracotta px-6 py-3.5 font-sans text-base font-medium text-white disabled:opacity-50"
+              className="w-full rounded-full bg-ink px-8 py-3.5 font-sans text-base font-medium text-white disabled:opacity-50"
             >
               {saving ? "Saving…" : "Save quiet window"}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="w-full rounded-sm border border-ink px-6 py-3.5 font-sans text-base font-medium text-ink"
+              className="w-full rounded-full bg-cream-deep px-8 py-3.5 font-sans text-base font-medium text-ink"
             >
               Cancel
             </button>

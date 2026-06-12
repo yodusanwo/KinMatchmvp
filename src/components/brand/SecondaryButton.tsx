@@ -5,7 +5,7 @@ type SecondaryButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   className?: string;
 };
 
-/** Secondary action: white pane, ink label, 1px ink outline, 8px radius. */
+/** Secondary action: soft-cloud pill, ink label, no border (Nike). */
 export function SecondaryButton({
   children,
   className,
@@ -16,9 +16,9 @@ export function SecondaryButton({
     <button
       type={type}
       className={cn(
-        "inline-flex w-full items-center justify-center rounded-sm border border-ink bg-cream px-6 py-3.5 font-sans text-base font-medium text-ink transition-colors duration-200 ease-out",
-        "hover:bg-cream-deep",
-        "disabled:cursor-not-allowed disabled:border-hairline-strong disabled:text-stone",
+        "inline-flex w-full items-center justify-center rounded-full bg-cream-deep px-8 py-3.5 font-sans text-base font-medium text-ink transition-transform duration-150 ease-out",
+        "hover:bg-surface-strong active:scale-[0.98]",
+        "disabled:cursor-not-allowed disabled:text-stone",
         className
       )}
       {...props}

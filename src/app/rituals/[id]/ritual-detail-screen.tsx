@@ -137,7 +137,7 @@ export function RitualDetailScreen({ ritual }: { ritual: DetailRitual }) {
             type="button"
             disabled={Boolean(saving)}
             onClick={() => void archive()}
-            className="w-full rounded-sm border border-ink px-6 py-3.5 font-sans text-base font-medium text-ink disabled:opacity-50"
+            className="w-full rounded-full bg-cream-deep px-8 py-3.5 font-sans text-base font-medium text-ink disabled:opacity-50"
           >
             {saving === "archive" ? "Archiving…" : "Archive ritual"}
           </button>

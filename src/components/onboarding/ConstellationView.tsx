@@ -129,8 +129,8 @@ export function ConstellationView({
                   className={cn(
                     "flex items-center gap-2 rounded-full border px-3 py-1",
                     selected
-                      ? "border-ink bg-cream-deep"
-                      : "border-hairline"
+                      ? "border-ink bg-ink text-white"
+                      : "border-hairline text-ink-soft"
                   )}
                 >
                   <MiniAvatar
@@ -138,7 +138,7 @@ export function ConstellationView({
                     avatarColor={face.avatarColor}
                     size="sm"
                   />
-                  <span className="font-sans text-xs text-ink">{face.name}</span>
+                  <span className="font-sans text-xs">{face.name}</span>
                 </button>
               </li>
             );

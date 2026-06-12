@@ -6,7 +6,7 @@ type PrimaryButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   className?: string;
 };
 
-/** Rausch CTA — the one button that carries the brand. */
+/** Solid black Nike pill — the universal primary CTA. */
 export function PrimaryButton({
   children,
   className,

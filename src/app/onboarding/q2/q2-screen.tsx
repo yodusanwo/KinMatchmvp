@@ -98,7 +98,7 @@ export function Q2Screen() {
                     className={cn(
                       "rounded-full border px-3 py-2 font-sans text-[15px] font-medium transition-colors",
                       selected
-                        ? "border-ink bg-cream-deep text-ink"
+                        ? "border-ink bg-ink text-white"
                         : "border-hairline text-ink-soft hover:border-ink hover:text-ink"
                     )}
                     aria-pressed={selected}

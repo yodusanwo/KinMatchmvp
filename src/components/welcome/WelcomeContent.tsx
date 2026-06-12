@@ -1,6 +1,5 @@
 import {
   BrandMark,
-  Headline,
   PrimaryLink,
   Subhead,
   TextLink,
@@ -15,34 +14,39 @@ export function WelcomeContent({ auth }: { auth: WelcomeAuthState }) {
   return (
     <AppShell>
       <WelcomeSessionSync showForGuest={isGuest} />
-      {/* Airbnb-style hero: white canvas, generous whitespace, modest type,
-          one Rausch CTA. Imagery and air carry the weight, not heavy type. */}
+      {/* Nike editorial hero: white canvas, towering uppercase display lockup
+          burned lower-left, monochrome, anchored by a single black pill CTA. */}
       <main className="flex min-h-screen flex-col justify-between px-6 py-14">
-        <div className="flex flex-1 flex-col items-center justify-center text-center">
-          <BrandMark size={56} className="mb-6" />
-          <span className="font-sans text-2xl font-semibold tracking-tight text-terracotta">
+        <div className="flex items-center gap-2.5">
+          <BrandMark size={40} />
+          <span className="font-display text-2xl uppercase tracking-wide text-ink">
             KinMatch
           </span>
-          <p className="mt-3 font-inter text-lg italic text-ink-soft">
-            Turn connections into community
-          </p>
+        </div>
 
+        <div className="flex flex-1 flex-col justify-end">
           {isGuest ? (
             <>
-              <Headline className="mt-8 max-w-xs text-center">
-                Stay close to the people who matter most.
-              </Headline>
-              <Subhead className="mt-4 max-w-xs text-center">
+              <p className="font-sans text-sm font-medium uppercase tracking-[0.2em] text-mute">
+                Turn connections into community
+              </p>
+              <h1 className="mt-3 font-display text-[64px] uppercase leading-[0.9] tracking-[-0.01em] text-ink">
+                Stay close to your people.
+              </h1>
+              <Subhead className="mt-5 max-w-xs">
                 A science-based way to deepen the friendships you&apos;re building
                 in life.
               </Subhead>
             </>
           ) : auth.status === "onboarding" ? (
             <>
-              <Headline className="mt-8 max-w-xs text-center">
+              <p className="font-sans text-sm font-medium uppercase tracking-[0.2em] text-mute">
                 Welcome back
-              </Headline>
-              <Subhead className="mt-4 max-w-xs text-center">
+              </p>
+              <h1 className="mt-3 font-display text-[64px] uppercase leading-[0.9] tracking-[-0.01em] text-ink">
+                Pick up where you left off.
+              </h1>
+              <Subhead className="mt-5 max-w-xs">
                 {auth.email ? (
                   <>
                     Signed in as{" "}

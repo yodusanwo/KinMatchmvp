@@ -138,7 +138,7 @@ export function HeldFriendRow({ entry }: HeldFriendRowProps) {
             type="button"
             onClick={() => void saveSettings()}
             disabled={saving}
-            className="rounded-sm bg-terracotta px-4 py-2 font-sans text-xs font-medium text-white disabled:opacity-50"
+            className="rounded-full bg-ink px-4 py-2 font-sans text-xs font-medium text-white disabled:opacity-50"
           >
             {saving ? "Sending..." : "Save and send"}
           </button>

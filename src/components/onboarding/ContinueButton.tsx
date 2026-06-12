@@ -2,9 +2,9 @@ import Link from "next/link";
 import { cn } from "@/lib/cn";
 
 const inkClassName = cn(
-  "inline-flex w-full items-center justify-center rounded-sm bg-ink px-6 py-3.5 font-sans text-base font-medium text-white transition-colors duration-200 ease-out",
-  "hover:bg-body",
-  "disabled:cursor-not-allowed disabled:bg-hairline disabled:text-stone"
+  "inline-flex w-full items-center justify-center rounded-full bg-ink px-8 py-3.5 font-sans text-base font-medium text-white transition-transform duration-150 ease-out",
+  "hover:bg-terracotta-deep active:scale-[0.98]",
+  "disabled:cursor-not-allowed disabled:bg-cream-deep disabled:text-stone"
 );
 
 type ContinueButtonProps = {
@@ -17,9 +17,9 @@ type ContinueButtonProps = {
 };
 
 const terracottaClassName = cn(
-  "inline-flex w-full items-center justify-center rounded-sm bg-terracotta px-6 py-3.5 font-sans text-base font-medium text-white transition-colors duration-200 ease-out",
-  "hover:bg-terracotta-deep",
-  "disabled:cursor-not-allowed disabled:bg-honey disabled:text-white"
+  "inline-flex w-full items-center justify-center rounded-full bg-ink px-8 py-3.5 font-sans text-base font-medium text-white transition-transform duration-150 ease-out",
+  "hover:bg-terracotta-deep active:scale-[0.98]",
+  "disabled:cursor-not-allowed disabled:bg-cream-deep disabled:text-stone"
 );
 
 export function ContinueButton({

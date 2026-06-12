@@ -2,53 +2,54 @@
 @config "../../tailwind.config.ts";
 
 /*
- * KinMatch chrome follows the Airbnb design system (DESIGN-airbnb.md):
- * a generous, photography-led marketplace on a pure-white canvas, near-black
- * #222 ink (never pure black), soft rounding everywhere (no hard corners),
- * and a single voltage of Rausch (#ff385c) carrying every primary CTA and
- * save/active state. Modest type weights — the system trusts whitespace and
- * imagery over typographic muscle. The legacy KinMatch token names
- * (cream / ink / terracotta) are remapped onto Airbnb roles so the whole app
- * re-skins from here.
+ * KinMatch chrome follows the Nike design system (DESIGN-nike.md):
+ * a photography-first, near-monochrome commerce system — pure white canvas,
+ * Nike black (#111) as the only "color," a single soft-cloud gray (#f5f5f5)
+ * studio surface, pill-shaped black CTAs, zero-radius flat cards, and color
+ * reserved strictly for signal (sale/error red, success green). Every
+ * chromatic moment belongs to photography, never to decorative chrome.
+ * The legacy KinMatch token names (cream / ink / terracotta) are remapped
+ * onto Nike roles so the whole app re-skins from here. Note: the brand
+ * "accent" (terracotta) is intentionally mapped to Nike black.
  */
 :root {
-  /* Surface — pure white canvas, soft + strong gray fills */
+  /* Surface — pure white canvas + the single soft-cloud studio gray */
   --cream: #ffffff; /* canvas */
-  --cream-deep: #f7f7f7; /* surface-soft */
-  --surface-strong: #f2f2f2; /* circular icon-button fill */
-  --surface-dark: #ffffff; /* Airbnb has no dark mode — keep light */
-  --surface-elevated: #f7f7f7;
+  --cream-deep: #f5f5f5; /* soft-cloud: card stages, secondary pills, fills */
+  --surface-strong: #ebebeb;
+  --surface-dark: #111111; /* dark editorial / member tiles */
+  --surface-elevated: #f5f5f5;
 
-  /* Ink — near-black headlines, gray running text */
-  --ink: #222222; /* headlines + primary text (never pure black) */
-  --ink-soft: #6a6a6a; /* muted: subtitles, inactive labels, meta */
-  --body: #3f3f3f; /* long-form running text */
+  /* Ink — true Nike black, gray hierarchy */
+  --ink: #111111; /* headlines, body, nav */
+  --ink-soft: #707072; /* mute: subtitles, inactive labels, metadata */
+  --body: #39393b; /* charcoal: softer running text */
 
-  /* Accent — Rausch, the single brand voltage */
-  --terracotta: #ff385c; /* primary CTA + save/active */
-  --terracotta-deep: #e00b41; /* pressed / active */
+  /* Accent — Nike black IS the accent (every primary pill / active state) */
+  --terracotta: #111111;
+  --terracotta-deep: #000000; /* pressed */
 
   /* Hairlines & borders */
-  --hairline: #dddddd; /* default 1px border */
-  --hairline-soft: #ebebeb; /* lighter editorial divider */
-  --hairline-strong: #c1c1c1; /* heavier stroke / focused inputs */
+  --hairline: #cacacb;
+  --hairline-soft: #e5e5e5;
+  --hairline-strong: #9e9ea0;
 
   /* Neutral text steps */
-  --mute: #6a6a6a;
-  --stone: #929292; /* muted-soft: disabled link text */
-  --ash: #929292;
+  --mute: #707072;
+  --stone: #9e9ea0;
+  --ash: #4b4b4d;
 
-  /* Semantic */
-  --link-blue: #428bff; /* legal-link blue */
-  --error: #c13515; /* form error text */
-  --warning: #c13515;
-  --success-deep: #008a05;
+  /* Semantic — the only chroma allowed in chrome */
+  --link-blue: #1151ff;
+  --error: #d30005; /* sale / error red */
+  --warning: #d30005;
+  --success-deep: #007d48;
 
-  /* Legacy accent names kept for any stray references */
-  --forest: #222222;
-  --sage: #6a6a6a;
-  --mustard: #ff385c;
-  --honey: #ffd1da;
+  /* Legacy accent names kept for any stray references (kept monochrome) */
+  --forest: #111111;
+  --sage: #707072;
+  --mustard: #d30005;
+  --honey: #f5f5f5;
 }
 
 @theme inline {
@@ -77,12 +78,11 @@
   --color-mustard: var(--mustard);
   --color-honey: var(--honey);
 
-  /* Inter substitutes for Airbnb Cereal VF (documented closest match).
-     One family across the whole system. */
-  --font-sans: var(--font-inter), Circular, -apple-system, system-ui, Roboto,
-    "Helvetica Neue", sans-serif;
-  --font-inter: var(--font-inter), Circular, -apple-system, system-ui, Roboto,
-    "Helvetica Neue", sans-serif;
+  /* Inter substitutes for Helvetica Now (UI). Bebas Neue carries the
+     towering uppercase campaign display tier. */
+  --font-sans: var(--font-inter), "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-inter: var(--font-inter), "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-display: var(--font-bebas), "Helvetica Neue", Impact, sans-serif;
 }
 
 body {
@@ -91,10 +91,10 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Airbnb focus: a clean ink outline, no colored glow ring. */
+/* Nike focus: clean ink outline, no colored glow. */
 *:focus-visible {
   outline: 2px solid var(--ink);
-  outline-offset: 1px;
+  outline-offset: 2px;
 }
 
 @keyframes skeleton-shimmer {

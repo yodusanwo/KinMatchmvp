@@ -25,9 +25,9 @@ export function BarrierPillGroup({
             type="button"
             onClick={() => onToggle(option.id)}
             className={cn(
-              "rounded-md border px-4 py-3 text-left font-sans text-sm transition-colors duration-200 ease-out",
+              "rounded-full border px-4 py-3 text-left font-sans text-sm transition-colors duration-200 ease-out",
               isSelected
-                ? "border-ink bg-cream-deep text-ink"
+                ? "border-ink bg-ink text-white"
                 : "border-hairline bg-transparent text-ink-soft hover:border-ink hover:text-ink"
             )}
             aria-pressed={isSelected}

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Instrument_Sans } from "next/font/google";
+import { Inter, Instrument_Sans, Bebas_Neue } from "next/font/google";
 import { PlausibleScript } from "@/components/analytics/PlausibleScript";
 import { OnboardingProvider } from "@/contexts/onboarding-context";
 import "./globals.css";
@@ -12,6 +12,13 @@ const inter = Inter({
 
 const instrumentSans = Instrument_Sans({
   variable: "--font-instrument-sans",
+  subsets: ["latin"],
+});
+
+// Bebas Neue stands in for Nike's proprietary Futura ND campaign display tier.
+const bebasNeue = Bebas_Neue({
+  variable: "--font-bebas",
+  weight: "400",
   subsets: ["latin"],
 });
 
@@ -28,7 +35,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${instrumentSans.variable} font-sans antialiased`}
+        className={`${inter.variable} ${instrumentSans.variable} ${bebasNeue.variable} font-sans antialiased`}
       >
         <PlausibleScript />
         <OnboardingProvider>{children}</OnboardingProvider>
