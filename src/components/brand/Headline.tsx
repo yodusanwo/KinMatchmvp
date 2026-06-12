@@ -6,12 +6,12 @@ type HeadlineProps = {
   className?: string;
 };
 
-/** Bold sans headline — hierarchy comes from weight, not color. */
+/** Modest-weight Cereal-style display headline. */
 export function Headline({ children, as: Tag = "h1", className }: HeadlineProps) {
   return (
     <Tag
       className={cn(
-        "font-sans text-[24px] font-bold leading-tight tracking-tight text-ink",
+        "font-sans text-[24px] font-semibold leading-snug tracking-[-0.01em] text-ink",
         className
       )}
     >

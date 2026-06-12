@@ -2,48 +2,53 @@
 @config "../../tailwind.config.ts";
 
 /*
- * KinMatch chrome follows the NVIDIA design system (DESIGN-nvidia.md):
- * a flat paper-white canvas framed by black chapters, a single violently
- * saturated NVIDIA Green accent, hairline borders instead of shadows, and
- * 2px geometry on every interactive surface. The legacy KinMatch token
- * names (cream / ink / terracotta) are remapped onto NVIDIA roles so the
- * whole app re-skins from here.
+ * KinMatch chrome follows the Airbnb design system (DESIGN-airbnb.md):
+ * a generous, photography-led marketplace on a pure-white canvas, near-black
+ * #222 ink (never pure black), soft rounding everywhere (no hard corners),
+ * and a single voltage of Rausch (#ff385c) carrying every primary CTA and
+ * save/active state. Modest type weights — the system trusts whitespace and
+ * imagery over typographic muscle. The legacy KinMatch token names
+ * (cream / ink / terracotta) are remapped onto Airbnb roles so the whole app
+ * re-skins from here.
  */
 :root {
-  /* Surface — paper-white body, soft-gray panels, black chapters */
-  --cream: #ffffff; /* page canvas */
-  --cream-deep: #f7f7f7; /* soft surface: panels, rows, fills */
-  --surface-dark: #000000; /* hero / footer / dark chapters */
-  --surface-elevated: #1a1a1a; /* nested dark panels */
+  /* Surface — pure white canvas, soft + strong gray fills */
+  --cream: #ffffff; /* canvas */
+  --cream-deep: #f7f7f7; /* surface-soft */
+  --surface-strong: #f2f2f2; /* circular icon-button fill */
+  --surface-dark: #ffffff; /* Airbnb has no dark mode — keep light */
+  --surface-elevated: #f7f7f7;
 
-  /* Ink — true black headlines, gray hierarchy by weight not color */
-  --ink: #000000; /* headlines + body on canvas */
-  --ink-soft: #757575; /* metadata, secondary text, mute */
+  /* Ink — near-black headlines, gray running text */
+  --ink: #222222; /* headlines + primary text (never pure black) */
+  --ink-soft: #6a6a6a; /* muted: subtitles, inactive labels, meta */
+  --body: #3f3f3f; /* long-form running text */
 
-  /* Accent — the one color doing all the work */
-  --terracotta: #76b900; /* NVIDIA Green: every CTA + active state */
-  --terracotta-deep: #5a8d00; /* pressed green */
+  /* Accent — Rausch, the single brand voltage */
+  --terracotta: #ff385c; /* primary CTA + save/active */
+  --terracotta-deep: #e00b41; /* pressed / active */
 
-  /* Hairline rules (borders carry separation, never shadow) */
-  --hairline: #cccccc;
-  --hairline-strong: #5e5e5e;
+  /* Hairlines & borders */
+  --hairline: #dddddd; /* default 1px border */
+  --hairline-soft: #ebebeb; /* lighter editorial divider */
+  --hairline-strong: #c1c1c1; /* heavier stroke / focused inputs */
 
   /* Neutral text steps */
-  --mute: #757575;
-  --stone: #898989;
-  --ash: #a7a7a7;
+  --mute: #6a6a6a;
+  --stone: #929292; /* muted-soft: disabled link text */
+  --ash: #929292;
 
   /* Semantic */
-  --link-blue: #0046a4; /* the only blue — inline prose links */
-  --error: #e52020;
-  --warning: #df6500;
-  --success-deep: #3f8500;
+  --link-blue: #428bff; /* legal-link blue */
+  --error: #c13515; /* form error text */
+  --warning: #c13515;
+  --success-deep: #008a05;
 
   /* Legacy accent names kept for any stray references */
-  --forest: #1a1a1a;
-  --sage: #898989;
-  --mustard: #df6500;
-  --honey: #feeeb2;
+  --forest: #222222;
+  --sage: #6a6a6a;
+  --mustard: #ff385c;
+  --honey: #ffd1da;
 }
 
 @theme inline {
@@ -51,11 +56,14 @@
   --color-cream-deep: var(--cream-deep);
   --color-surface-dark: var(--surface-dark);
   --color-surface-elevated: var(--surface-elevated);
+  --color-surface-strong: var(--surface-strong);
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
+  --color-body: var(--body);
   --color-terracotta: var(--terracotta);
   --color-terracotta-deep: var(--terracotta-deep);
   --color-hairline: var(--hairline);
+  --color-hairline-soft: var(--hairline-soft);
   --color-hairline-strong: var(--hairline-strong);
   --color-mute: var(--mute);
   --color-stone: var(--stone);
@@ -69,10 +77,12 @@
   --color-mustard: var(--mustard);
   --color-honey: var(--honey);
 
-  /* Inter stands in for the proprietary NVIDIA-EMEA cut (weights 400/700),
-     Arial is the documented fallback. One family across the whole system. */
-  --font-sans: var(--font-inter), Arial, Helvetica, sans-serif;
-  --font-inter: var(--font-inter), Arial, Helvetica, sans-serif;
+  /* Inter substitutes for Airbnb Cereal VF (documented closest match).
+     One family across the whole system. */
+  --font-sans: var(--font-inter), Circular, -apple-system, system-ui, Roboto,
+    "Helvetica Neue", sans-serif;
+  --font-inter: var(--font-inter), Circular, -apple-system, system-ui, Roboto,
+    "Helvetica Neue", sans-serif;
 }
 
 body {
@@ -81,26 +91,10 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Green border is the only focus signal in the system. */
+/* Airbnb focus: a clean ink outline, no colored glow ring. */
 *:focus-visible {
-  outline: 2px solid var(--terracotta);
-  outline-offset: 2px;
-}
-
-/*
- * Signature corner square — a ~12px solid NVIDIA-Green block anchored to one
- * corner of a card. The system's only consistent ornamental device.
- * Apply `.kin-card` to a relatively-positioned card and the square paints
- * itself into the top-left corner.
- */
-.kin-corner-square::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 12px;
-  height: 12px;
-  background-color: var(--terracotta);
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
 }
 
 @keyframes skeleton-shimmer {

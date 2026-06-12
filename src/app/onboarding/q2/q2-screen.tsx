@@ -96,9 +96,9 @@ export function Q2Screen() {
                     type="button"
                     onClick={() => setCircleAssignment(person.id, option.id)}
                     className={cn(
-                      "rounded-sm border-2 px-2 py-2 font-sans text-[15px] font-bold transition-colors",
+                      "rounded-full border px-3 py-2 font-sans text-[15px] font-medium transition-colors",
                       selected
-                        ? "border-terracotta bg-terracotta/10 text-ink"
+                        ? "border-ink bg-cream-deep text-ink"
                         : "border-hairline text-ink-soft hover:border-ink hover:text-ink"
                     )}
                     aria-pressed={selected}

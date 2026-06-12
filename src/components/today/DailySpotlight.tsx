@@ -81,7 +81,7 @@ export function SendSpotlight({ state, onRefresh }: SendSpotlightProps) {
 
   if (skipping) {
     return (
-      <article className="kin-corner-square relative rounded-sm border border-hairline bg-cream p-4 pt-5">
+      <article className="rounded-2xl border border-hairline bg-cream p-4">
         <p className="font-inter text-sm italic text-ink-soft">
           Got it, next friend.
         </p>
@@ -90,7 +90,7 @@ export function SendSpotlight({ state, onRefresh }: SendSpotlightProps) {
   }
 
   return (
-    <article className="kin-corner-square relative rounded-sm border border-hairline bg-cream p-4 pt-5">
+    <article className="rounded-2xl border border-hairline bg-cream p-4">
       <Link
         href={`/friends/${state.friend.id}`}
         className="flex items-center gap-3 transition-opacity hover:opacity-80"
@@ -128,7 +128,7 @@ export function SendSpotlight({ state, onRefresh }: SendSpotlightProps) {
           type="button"
           onClick={() => void skipPrompt()}
           disabled={skipping}
-          className="flex-1 rounded-sm border border-hairline px-3 py-2.5 font-sans text-xs font-bold text-ink disabled:opacity-50"
+          className="flex-1 rounded-sm border border-ink px-3 py-2.5 font-sans text-xs font-medium text-ink disabled:opacity-50"
         >
           Not now
         </button>
@@ -169,7 +169,7 @@ export function CaptureSpotlight({ state, onRefresh }: CaptureSpotlightProps) {
 
   if (dismissing) {
     return (
-      <article className="kin-corner-square relative rounded-sm border border-hairline bg-cream p-4 pt-5">
+      <article className="rounded-2xl border border-hairline bg-cream p-4">
         <p className="font-inter text-sm italic text-ink-soft">
           Got it &mdash; see you tomorrow.
         </p>
@@ -178,7 +178,7 @@ export function CaptureSpotlight({ state, onRefresh }: CaptureSpotlightProps) {
   }
 
   return (
-    <article className="kin-corner-square relative rounded-sm border border-hairline bg-cream p-4 pt-5">
+    <article className="rounded-2xl border border-hairline bg-cream p-4">
       <div className="flex items-center gap-3">
         <MiniAvatar
           name={state.friend.name}
@@ -214,7 +214,7 @@ export function CaptureSpotlight({ state, onRefresh }: CaptureSpotlightProps) {
           type="button"
           onClick={() => void skipCapture()}
           disabled={dismissing}
-          className="flex-1 rounded-sm border border-hairline px-3 py-2.5 font-sans text-xs font-bold text-ink disabled:opacity-50"
+          className="flex-1 rounded-sm border border-ink px-3 py-2.5 font-sans text-xs font-medium text-ink disabled:opacity-50"
         >
           Not yet
         </button>

@@ -60,7 +60,7 @@ export function AddNameInput({
         />
         <button
           type="submit"
-          className="shrink-0 rounded-sm border-2 border-terracotta px-4 py-3 font-sans text-sm font-bold text-ink transition-colors hover:bg-cream-deep"
+          className="shrink-0 rounded-sm border border-ink px-4 py-3 font-sans text-sm font-medium text-ink transition-colors hover:bg-cream-deep"
         >
           Add
         </button>

@@ -5,7 +5,7 @@ type SecondaryButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   className?: string;
 };
 
-/** Secondary action: a clear pane bordered in NVIDIA Green, 2px corners. */
+/** Secondary action: white pane, ink label, 1px ink outline, 8px radius. */
 export function SecondaryButton({
   children,
   className,
@@ -16,9 +16,9 @@ export function SecondaryButton({
     <button
       type={type}
       className={cn(
-        "inline-flex w-full items-center justify-center rounded-sm border-2 border-terracotta bg-transparent px-6 py-3 font-sans text-sm font-bold text-ink transition-colors duration-150 ease-out",
-        "hover:bg-cream-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-terracotta",
-        "disabled:cursor-not-allowed disabled:border-hairline disabled:text-ash",
+        "inline-flex w-full items-center justify-center rounded-sm border border-ink bg-cream px-6 py-3.5 font-sans text-base font-medium text-ink transition-colors duration-200 ease-out",
+        "hover:bg-cream-deep",
+        "disabled:cursor-not-allowed disabled:border-hairline-strong disabled:text-stone",
         className
       )}
       {...props}

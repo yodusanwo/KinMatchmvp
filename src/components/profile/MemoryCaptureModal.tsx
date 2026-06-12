@@ -252,10 +252,10 @@ export function MemoryCaptureModal({
                     type="button"
                     onClick={() => setCategory(categoryId)}
                     className={cn(
-                      "flex shrink-0 items-center gap-1.5 rounded-sm px-3 py-1.5 font-inter text-xs font-bold transition-colors",
+                      "flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-1.5 font-inter text-xs font-medium transition-colors",
                       selected
-                        ? "bg-ink text-white"
-                        : "border border-hairline text-ink-soft"
+                        ? "border-ink bg-ink text-white"
+                        : "border-hairline text-ink-soft"
                     )}
                   >
                     <Icon className="h-3.5 w-3.5" strokeWidth={1.75} />

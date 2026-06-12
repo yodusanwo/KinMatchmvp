@@ -2,9 +2,9 @@ import Link from "next/link";
 import { cn } from "@/lib/cn";
 
 const inkClassName = cn(
-  "inline-flex w-full items-center justify-center rounded-sm bg-terracotta px-6 py-3 font-sans text-sm font-bold text-black transition-colors duration-150 ease-out",
-  "hover:bg-terracotta-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-terracotta",
-  "disabled:cursor-not-allowed disabled:bg-cream-deep disabled:text-ash"
+  "inline-flex w-full items-center justify-center rounded-sm bg-ink px-6 py-3.5 font-sans text-base font-medium text-white transition-colors duration-200 ease-out",
+  "hover:bg-body",
+  "disabled:cursor-not-allowed disabled:bg-hairline disabled:text-stone"
 );
 
 type ContinueButtonProps = {
@@ -17,9 +17,9 @@ type ContinueButtonProps = {
 };
 
 const terracottaClassName = cn(
-  "inline-flex w-full items-center justify-center rounded-sm bg-terracotta px-6 py-3 font-sans text-sm font-bold text-black transition-colors duration-150 ease-out",
-  "hover:bg-terracotta-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-terracotta",
-  "disabled:cursor-not-allowed disabled:bg-cream-deep disabled:text-ash"
+  "inline-flex w-full items-center justify-center rounded-sm bg-terracotta px-6 py-3.5 font-sans text-base font-medium text-white transition-colors duration-200 ease-out",
+  "hover:bg-terracotta-deep",
+  "disabled:cursor-not-allowed disabled:bg-honey disabled:text-white"
 );
 
 export function ContinueButton({

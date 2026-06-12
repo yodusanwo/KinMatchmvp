@@ -6,7 +6,7 @@ type PrimaryButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   className?: string;
 };
 
-/** Solid NVIDIA-Green CTA — the one button that carries the brand. */
+/** Rausch CTA — the one button that carries the brand. */
 export function PrimaryButton({
   children,
   className,

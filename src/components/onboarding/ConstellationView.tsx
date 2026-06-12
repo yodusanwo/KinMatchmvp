@@ -101,7 +101,7 @@ export function ConstellationView({
                 />
                 {heartBadge && selected && (
                   <span
-                    className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-terracotta text-[12px] text-black"
+                    className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-terracotta text-[12px] text-white"
                     aria-hidden
                   >
                     ♥
@@ -127,9 +127,9 @@ export function ConstellationView({
                   disabled={!selectable}
                   onClick={() => selectable && onToggleSelect?.(face.id)}
                   className={cn(
-                    "flex items-center gap-2 rounded-sm border-2 px-2 py-1",
+                    "flex items-center gap-2 rounded-full border px-3 py-1",
                     selected
-                      ? "border-terracotta bg-terracotta/10"
+                      ? "border-ink bg-cream-deep"
                       : "border-hairline"
                   )}
                 >

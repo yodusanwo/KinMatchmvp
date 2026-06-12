@@ -87,7 +87,7 @@ export function HeldFriendRow({ entry }: HeldFriendRowProps) {
         <button
           type="button"
           onClick={() => setExpanded((open) => !open)}
-          className="shrink-0 rounded-sm border border-hairline px-3 py-1.5 font-sans text-xs font-bold text-ink"
+          className="shrink-0 rounded-full border border-hairline px-3.5 py-1.5 font-sans text-xs font-medium text-ink"
           aria-expanded={expanded}
         >
           {expanded ? "Done" : "Manage"}
@@ -138,7 +138,7 @@ export function HeldFriendRow({ entry }: HeldFriendRowProps) {
             type="button"
             onClick={() => void saveSettings()}
             disabled={saving}
-            className="rounded-sm bg-terracotta px-4 py-2 font-sans text-xs font-bold text-black disabled:opacity-50"
+            className="rounded-sm bg-terracotta px-4 py-2 font-sans text-xs font-medium text-white disabled:opacity-50"
           >
             {saving ? "Sending..." : "Save and send"}
           </button>

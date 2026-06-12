@@ -36,7 +36,7 @@ export function ProfileHeader({ friend, onEditAvatar }: ProfileHeaderProps) {
             type="button"
             onClick={onEditAvatar}
             aria-label={`Edit ${friend.name.split(/\s+/)[0]}'s avatar`}
-            className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-cream bg-terracotta text-black transition-transform active:scale-95"
+            className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-cream bg-terracotta text-white shadow-sm transition-transform active:scale-95"
           >
             <Pencil className="h-3 w-3" strokeWidth={2} aria-hidden />
           </button>
