@@ -37,7 +37,7 @@ export function BottomNav({ heldBadge = false }: BottomNavProps) {
 
   return (
     <nav
-      className="fixed bottom-0 left-1/2 z-20 w-full max-w-[480px] -translate-x-1/2 border-t border-hairline-strong bg-surface-dark px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+      className="kin-halftone fixed bottom-0 left-1/2 z-20 w-full max-w-[480px] -translate-x-1/2 border-t-2 border-t-black bg-carbon px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
       aria-label="Main"
     >
       <ul className="flex items-center justify-between">
@@ -49,15 +49,15 @@ export function BottomNav({ heldBadge = false }: BottomNavProps) {
                 href={href}
                 className={cn(
                   "relative flex flex-col items-center gap-1 px-1 py-1 min-[360px]:px-2",
-                  active ? "text-terracotta" : "text-white/70"
+                  active ? "text-signal" : "text-nav-gold/70"
                 )}
                 aria-current={active ? "page" : undefined}
               >
-                <Icon className="h-3.5 w-3.5 min-[360px]:h-5 min-[360px]:w-5" strokeWidth={1.75} aria-hidden />
-                <span className="font-sans text-[12px] font-medium">{label}</span>
+                <Icon className="h-3.5 w-3.5 min-[360px]:h-5 min-[360px]:w-5" strokeWidth={2} aria-hidden />
+                <span className="font-sans text-[10px] font-bold uppercase tracking-[0.5px]">{label}</span>
                 {label === "Held" && heldBadge && (
                   <span
-                    className="absolute right-0 top-0 h-2 w-2 rounded-full bg-terracotta"
+                    className="absolute right-0 top-0 h-2 w-2 rounded-full bg-signal"
                     aria-label="Held active"
                   />
                 )}

@@ -1,8 +1,9 @@
 import { cn } from "@/lib/cn";
 
-// NVIDIA primary CTA: solid green fill, black label, 2px corners, no shadow.
+// Nintendo "forward" CTA: Signal Orange beveled chip, white uppercase label,
+// hard bottom shadow line (raised-button bevel), 2px corners.
 export const primaryButtonClassName = cn(
-  "inline-flex w-full items-center justify-center rounded-sm bg-terracotta px-6 py-3 font-sans text-sm font-bold text-black transition-colors duration-150 ease-out",
-  "hover:bg-terracotta-deep active:bg-terracotta-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-terracotta",
-  "disabled:cursor-not-allowed disabled:bg-cream-deep disabled:text-ash",
+  "inline-flex w-full items-center justify-center rounded-xs border-t border-white/40 border-b-2 border-b-[#b4630a] bg-terracotta px-6 py-3 font-sans text-xs font-bold uppercase tracking-[0.5px] text-white transition-colors duration-100 ease-out",
+  "hover:bg-terracotta-deep active:translate-y-px active:border-b active:bg-terracotta-deep",
+  "disabled:cursor-not-allowed disabled:border-b-chrome-indigo disabled:bg-muted-indigo disabled:text-ash",
 );

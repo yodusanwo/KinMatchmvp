@@ -1,17 +1,14 @@
 import type { Metadata } from "next";
-import { Inter, Instrument_Sans } from "next/font/google";
+import { Archivo_Black } from "next/font/google";
 import { PlausibleScript } from "@/components/analytics/PlausibleScript";
 import { OnboardingProvider } from "@/contexts/onboarding-context";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  style: ["normal", "italic"],
-});
-
-const instrumentSans = Instrument_Sans({
-  variable: "--font-instrument-sans",
+// Archivo Black stands in for Arial Black on the outlined box-art display
+// wordmarks. UI text uses the era-authentic Arial/Helvetica system stack.
+const archivoBlack = Archivo_Black({
+  variable: "--font-archivo-black",
+  weight: "400",
   subsets: ["latin"],
 });
 
@@ -28,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${instrumentSans.variable} font-sans antialiased`}
+        className={`${archivoBlack.variable} font-sans antialiased`}
       >
         <PlausibleScript />
         <OnboardingProvider>{children}</OnboardingProvider>

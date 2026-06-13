@@ -14,7 +14,7 @@ export default function Icon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: "#14211a",
+          backgroundColor: "#21242e",
         }}
       >
         <svg
@@ -23,21 +23,21 @@ export default function Icon() {
           viewBox="0 0 32 32"
           xmlns="http://www.w3.org/2000/svg"
         >
-          {/* Left silhouette (neutral stone) */}
-          <circle cx="12" cy="12" r="4" fill="#898989" />
+          {/* Left silhouette (muted indigo chrome) */}
+          <circle cx="12" cy="12" r="4" fill="#60619c" />
           <path
             d="M6 20c0-2.2 2.7-4 6-4s6 1.8 6 4v6H6v-6z"
-            fill="#898989"
+            fill="#60619c"
           />
 
-          {/* Right silhouette (NVIDIA Green) */}
-          <circle cx="20" cy="12" r="4" fill="#76b900" />
+          {/* Right silhouette (Signal Orange) */}
+          <circle cx="20" cy="12" r="4" fill="#f68d1f" />
           <path
             d="M14 20c0-2.2 2.7-4 6-4s6 1.8 6 4v6h-12v-6z"
-            fill="#76b900"
+            fill="#f68d1f"
           />
 
-          {/* Overlap/intersection (deep green) */}
+          {/* Overlap/intersection (Nav Gold) */}
           <defs>
             <clipPath id="clip">
               <circle cx="12" cy="12" r="4" />
@@ -45,10 +45,10 @@ export default function Icon() {
             </clipPath>
           </defs>
           <g clip-path="url(#clip)">
-            <circle cx="20" cy="12" r="4" fill="#5a8d00" />
+            <circle cx="20" cy="12" r="4" fill="#e48600" />
             <path
               d="M14 20c0-2.2 2.7-4 6-4s6 1.8 6 4v6h-12v-6z"
-              fill="#5a8d00"
+              fill="#e48600"
             />
           </g>
         </svg>

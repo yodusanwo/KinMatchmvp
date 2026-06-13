@@ -152,7 +152,7 @@ export function CaptureReviewScreen({
                       className={cn(
                         "mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-sm border-2 transition-colors",
                         item.checked
-                          ? "border-terracotta bg-terracotta text-black"
+                          ? "border-terracotta bg-terracotta text-white"
                           : "border-hairline bg-cream text-transparent"
                       )}
                       aria-label={item.checked ? "Remove detail" : "Save detail"}

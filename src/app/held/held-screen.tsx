@@ -274,7 +274,7 @@ function EmptyHeldState({ onAdd }: { onAdd: () => void }) {
       <button
         type="button"
         onClick={onAdd}
-        className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-sm bg-terracotta px-6 py-3 font-sans text-sm font-bold text-black"
+        className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-sm bg-terracotta px-6 py-3 font-sans text-sm font-bold text-white"
       >
         <Plus className="h-4 w-4" aria-hidden />
         Add someone to your circle
@@ -470,7 +470,7 @@ function HeldSheet({
               type="button"
               onClick={onInvite}
               disabled={!selectedFriendId || setupMessage.trim().length < 20 || saving}
-              className="w-full rounded-sm bg-terracotta px-6 py-3 font-sans text-sm font-bold text-black disabled:opacity-50"
+              className="w-full rounded-sm bg-terracotta px-6 py-3 font-sans text-sm font-bold text-white disabled:opacity-50"
             >
               {saving ? "Sending…" : "Send invitation →"}
             </button>
@@ -510,7 +510,7 @@ function HeldSheet({
               type="button"
               onClick={onSaveThreshold}
               disabled={saving}
-              className="w-full rounded-sm bg-terracotta px-6 py-3 font-sans text-sm font-bold text-black disabled:opacity-50"
+              className="w-full rounded-sm bg-terracotta px-6 py-3 font-sans text-sm font-bold text-white disabled:opacity-50"
             >
               {saving ? "Saving…" : "Save quiet window"}
             </button>

@@ -19,7 +19,7 @@ export function RecordButton({
       onContextMenu={(event) => event.preventDefault()}
       className={cn(
         "flex h-[120px] w-[120px] select-none items-center justify-center rounded-full",
-        "bg-terracotta text-black transition-transform duration-200",
+        "bg-terracotta text-white transition-transform duration-200",
         "hover:bg-terracotta-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-terracotta",
         "disabled:cursor-not-allowed disabled:opacity-50",
         isRecording && "scale-105 ring-4 ring-terracotta/25"

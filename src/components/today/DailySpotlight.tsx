@@ -81,7 +81,7 @@ export function SendSpotlight({ state, onRefresh }: SendSpotlightProps) {
 
   if (skipping) {
     return (
-      <article className="kin-corner-square relative rounded-sm border border-hairline bg-cream p-4 pt-5">
+      <article className="relative rounded-sm border border-hairline bg-cream p-4">
         <p className="font-inter text-sm italic text-ink-soft">
           Got it, next friend.
         </p>
@@ -90,7 +90,7 @@ export function SendSpotlight({ state, onRefresh }: SendSpotlightProps) {
   }
 
   return (
-    <article className="kin-corner-square relative rounded-sm border border-hairline bg-cream p-4 pt-5">
+    <article className="relative rounded-sm border border-hairline bg-cream p-4">
       <Link
         href={`/friends/${state.friend.id}`}
         className="flex items-center gap-3 transition-opacity hover:opacity-80"
@@ -169,7 +169,7 @@ export function CaptureSpotlight({ state, onRefresh }: CaptureSpotlightProps) {
 
   if (dismissing) {
     return (
-      <article className="kin-corner-square relative rounded-sm border border-hairline bg-cream p-4 pt-5">
+      <article className="relative rounded-sm border border-hairline bg-cream p-4">
         <p className="font-inter text-sm italic text-ink-soft">
           Got it &mdash; see you tomorrow.
         </p>
@@ -178,7 +178,7 @@ export function CaptureSpotlight({ state, onRefresh }: CaptureSpotlightProps) {
   }
 
   return (
-    <article className="kin-corner-square relative rounded-sm border border-hairline bg-cream p-4 pt-5">
+    <article className="relative rounded-sm border border-hairline bg-cream p-4">
       <div className="flex items-center gap-3">
         <MiniAvatar
           name={state.friend.name}

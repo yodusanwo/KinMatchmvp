@@ -1,61 +1,90 @@
-import {
-  BrandMark,
-  Headline,
-  PrimaryLink,
-  Subhead,
-  TextLink,
-} from "@/components/brand";
+import Link from "next/link";
+import { BrandMark, PrimaryLink } from "@/components/brand";
 import { AppShell } from "@/components/layout/AppShell";
 import { WelcomeSessionSync } from "./WelcomeSessionSync";
 import type { WelcomeAuthState } from "@/lib/auth/welcome-state";
+
+// Outlined "see the research / sign in" secondary — transparent on the
+// lavender field with a thin carbon border (matches the landing composition).
+const secondaryLinkClassName =
+  "inline-flex w-full items-center justify-center rounded-xs border border-carbon bg-transparent px-6 py-3 font-sans text-xs font-bold uppercase tracking-[0.5px] text-ink transition-colors duration-100 hover:bg-carbon/[0.06]";
 
 export function WelcomeContent({ auth }: { auth: WelcomeAuthState }) {
   const isGuest = auth.status === "guest";
 
   return (
-    <AppShell className="bg-surface-dark">
+    <AppShell>
       <WelcomeSessionSync showForGuest={isGuest} />
-      {/* NVIDIA-style black hero chapter: copy hugs the left, a single green
-          square marks the corner, white display headline, one green CTA. */}
-      <main className="relative flex min-h-screen flex-col justify-between px-6 py-14">
-        <span
-          className="absolute left-0 top-0 h-3 w-3 bg-terracotta"
-          aria-hidden
-        />
-
-        <div className="flex flex-1 flex-col justify-center">
-          <div className="mb-8 flex items-center gap-2">
-            <BrandMark size={36} />
-            <span className="font-sans text-xl font-bold tracking-tight text-white">
-              KinMatch
+      {/* Landing-style faceplate: carbon command masthead over a full-bleed
+          lavender field carrying a towering outlined box-art lockup, an
+          orange forward CTA, and an outlined secondary. */}
+      <main className="flex min-h-screen flex-col bg-lavender">
+        {/* Carbon command masthead with right-aligned orange pill */}
+        <header className="kin-halftone flex items-center justify-between border-b-2 border-b-black bg-carbon px-5 py-3">
+          <Link href={isGuest ? "/" : "/today"} className="flex items-center gap-2">
+            <BrandMark size={26} />
+            <span className="font-sans text-base font-black uppercase tracking-[0.5px]">
+              <span className="text-white">Kin</span>
+              <span className="text-signal">Match</span>
             </span>
-          </div>
+          </Link>
+          <Link
+            href={isGuest ? "/signin?next=/onboarding/name" : "/onboarding/name"}
+            className="inline-flex items-center rounded-xs border-t border-white/40 border-b-2 border-b-[#b4630a] bg-signal px-4 py-2 font-sans text-[11px] font-bold uppercase tracking-[0.5px] text-white"
+          >
+            {isGuest ? "Join the pilot" : "Continue"}
+          </Link>
+        </header>
 
-          <p className="mb-4 font-sans text-[14px] font-bold uppercase tracking-[0.08em] text-terracotta">
-            Turn connections into community
-          </p>
-
+        <div className="flex flex-1 flex-col px-6 pt-10">
           {isGuest ? (
             <>
-              <Headline className="max-w-sm !text-[40px] !leading-[1.1] !text-white">
-                Stay close to the people who matter most.
-              </Headline>
-              <Subhead className="mt-5 max-w-xs !text-white/70">
-                A science-based way to deepen the friendships you&apos;re building
-                in life.
-              </Subhead>
+              <h1 className="font-display text-[46px] uppercase leading-[0.95]">
+                <span className="kin-boxart">Turn your connections into </span>
+                <span className="kin-boxart-accent">community.</span>
+              </h1>
+
+              <p className="mt-7 font-sans text-[16px] text-ink">
+                For people <em className="font-bold not-italic">who want connection.</em>
+              </p>
+
+              <p className="mt-4 max-w-sm font-sans text-[16px] leading-relaxed text-ink">
+                You have <strong className="font-bold">people in your contacts</strong> — but
+                not a community you can count on. <strong className="font-bold">KinMatch</strong>{" "}
+                uses behavioral science to help you deepen the friendships you
+                already have, and build the local chosen family you&apos;ve been
+                missing.
+              </p>
+
+              <div className="mt-9 space-y-3">
+                <PrimaryLink href="/signin?next=/onboarding/name">
+                  Get started →
+                </PrimaryLink>
+                <Link href="/signin?next=/today" className={secondaryLinkClassName}>
+                  Already have an account? Sign in
+                </Link>
+              </div>
+
+              <p className="mt-7 max-w-sm font-sans text-[13px] leading-relaxed text-ink-soft">
+                Built on behavioral-science research into{" "}
+                <strong className="font-bold text-ink">friendship</strong>,{" "}
+                <strong className="font-bold text-ink">belonging</strong>, and{" "}
+                <strong className="font-bold text-ink">connection</strong>.
+              </p>
             </>
           ) : auth.status === "onboarding" ? (
             <>
-              <Headline className="max-w-sm !text-[40px] !leading-[1.1] !text-white">
-                Welcome back
-              </Headline>
-              <Subhead className="mt-5 max-w-xs !text-white/70">
+              <h1 className="font-display text-[46px] uppercase leading-[0.95]">
+                <span className="kin-boxart">Welcome </span>
+                <span className="kin-boxart-accent">back.</span>
+              </h1>
+
+              <p className="mt-7 max-w-sm font-sans text-[16px] leading-relaxed text-ink">
                 {auth.email ? (
                   <>
                     Signed in as{" "}
-                    <span className="text-white">{auth.email}</span>. Finish your
-                    reflection to set up your tribe.
+                    <strong className="font-bold">{auth.email}</strong>. Finish
+                    your reflection to set up your tribe.
                   </>
                 ) : (
                   <>
@@ -63,32 +92,16 @@ export function WelcomeContent({ auth }: { auth: WelcomeAuthState }) {
                     tribe.
                   </>
                 )}
-              </Subhead>
-            </>
-          ) : null}
-        </div>
+              </p>
 
-        <div className="space-y-4 pb-4">
-          {isGuest ? (
-            <>
-              <PrimaryLink href="/signin?next=/onboarding/name">Get started</PrimaryLink>
-              <p className="text-center">
-                <TextLink
-                  href="/signin?next=/today"
-                  className="!text-white/70 hover:!text-white"
-                >
-                  Already have an account? Sign in
-                </TextLink>
-              </p>
-            </>
-          ) : auth.status === "onboarding" ? (
-            <>
-              <PrimaryLink href="/onboarding/name">Continue your setup</PrimaryLink>
-              <p className="text-center">
-                <TextLink href="/profile" className="!text-white/70 hover:!text-white">
+              <div className="mt-9 space-y-3">
+                <PrimaryLink href="/onboarding/name">
+                  Continue your setup →
+                </PrimaryLink>
+                <Link href="/profile" className={secondaryLinkClassName}>
                   Account
-                </TextLink>
-              </p>
+                </Link>
+              </div>
             </>
           ) : null}
         </div>

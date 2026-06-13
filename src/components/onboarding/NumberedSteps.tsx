@@ -1,7 +1,7 @@
 import { cn } from "@/lib/cn";
 
 const STEP_COLORS = [
-  "bg-terracotta text-black",
+  "bg-terracotta text-white",
   "bg-ink text-white",
   "bg-terracotta-deep text-white",
 ] as const;
@@ -32,7 +32,7 @@ export function NumberedSteps({
             className={cn(
               "flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-sans text-sm font-bold",
               terracottaOnly
-                ? "bg-terracotta text-black"
+                ? "bg-terracotta text-white"
                 : STEP_COLORS[index % STEP_COLORS.length]
             )}
             aria-hidden

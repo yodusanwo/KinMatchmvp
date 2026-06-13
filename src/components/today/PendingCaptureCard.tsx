@@ -31,7 +31,7 @@ export function PendingCaptureCard({
       <div className="mt-2 flex items-center gap-2">
         <Link
           href={`/friends/${capture.friend_id}/details?capture=${capture.interaction_id}`}
-          className="flex-1 rounded-sm bg-terracotta px-3 py-2 text-center font-sans text-xs font-bold text-black"
+          className="flex-1 rounded-sm bg-terracotta px-3 py-2 text-center font-sans text-xs font-bold text-white"
         >
           Capture →
         </Link>
