@@ -28,7 +28,7 @@ export function BrandBar({ className }: BrandBarProps) {
     <>
       <header
         className={cn(
-          "kin-halftone flex items-center justify-between border-b-2 border-b-black bg-carbon px-5 py-3",
+          "flex items-center justify-between border-b border-b-black/30 bg-surface-dark px-5 py-3",
           className
         )}
       >
@@ -36,7 +36,7 @@ export function BrandBar({ className }: BrandBarProps) {
         <button
           type="button"
           onClick={() => setMenuOpen(!menuOpen)}
-          className="flex h-8 w-8 items-center justify-center rounded-xs text-nav-gold hover:bg-white/10"
+          className="flex h-9 w-9 items-center justify-center rounded-sm text-nav-inactive hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-nav-active"
           aria-label="Menu"
         >
           {menuOpen ? (
@@ -49,12 +49,11 @@ export function BrandBar({ className }: BrandBarProps) {
         {/* Logo/Profile on right */}
         <Link
           href={href}
-          className="flex items-center gap-2 rounded-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
+          className="flex items-center gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-nav-active"
           aria-label={label}
         >
-          <span className="font-display text-base uppercase tracking-[0.5px]">
-            <span className="text-white">Kin</span>
-            <span className="text-signal">Match</span>
+          <span className="font-display text-base uppercase tracking-[0.5px] text-white">
+            KinMatch
           </span>
           <BrandMark size={24} />
         </Link>

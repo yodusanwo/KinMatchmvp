@@ -19,20 +19,14 @@ export function WelcomeContent({ auth }: { auth: WelcomeAuthState }) {
           lavender field carrying a towering outlined box-art lockup, an
           orange forward CTA, and an outlined secondary. */}
       <main className="flex min-h-screen flex-col bg-lavender">
-        {/* Carbon command masthead with right-aligned orange pill */}
-        <header className="kin-halftone flex items-center justify-between border-b-2 border-b-black bg-carbon px-5 py-3">
+        {/* Carbon command masthead */}
+        <header className="kin-halftone flex items-center border-b-2 border-b-black bg-carbon px-5 py-3">
           <Link href={isGuest ? "/" : "/today"} className="flex items-center gap-2">
             <BrandMark size={26} />
-            <span className="font-display text-base uppercase tracking-[0.5px]">
+            <span className="font-display text-base tracking-[0.5px]">
               <span className="text-white">Kin</span>
               <span className="text-signal">Match</span>
             </span>
-          </Link>
-          <Link
-            href={isGuest ? "/signin?next=/onboarding/name" : "/onboarding/name"}
-            className="inline-flex items-center rounded-xs border-t border-white/40 border-b-2 border-b-[#b4630a] bg-signal px-4 py-2 font-sans text-[11px] font-bold uppercase tracking-[0.5px] text-white"
-          >
-            {isGuest ? "Join the pilot" : "Continue"}
           </Link>
         </header>
 

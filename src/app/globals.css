@@ -2,60 +2,61 @@
 @config "../../tailwind.config.ts";
 
 /*
- * KinMatch chrome follows the Nintendo.com (2001) design system
- * (DESIGN-nintendo-2001.md): a Y2K "console hardware" interface where the
- * page is one brushed-periwinkle machine faceplate built from beveled metal
- * plates, a carbon-navy command layer (nav / footer) carries the controls,
- * and warm color is rationed strictly as wayfinding signal — Signal Orange
- * for every forward / submit cue, Amber for utility chips and badges, Gold
- * for nav words. Cool periwinkle chrome never carries action color. The
- * legacy KinMatch token names (cream / ink / terracotta) are remapped onto
- * Nintendo roles so the whole app re-skins from here.
+ * KinMatch design system: a warm off-white canvas (#f7f3ec) under a dark
+ * warm-near-black nav (#1e1a16). Each screen leads with a muted eyebrow → a
+ * heavy display heading (ink #211c16) → an italic warm-slate subhead. The
+ * single most important action per screen rides in a periwinkle hero card
+ * (#a9abe8) tagged with a small orange corner-square. Orange (#ff880b) is a
+ * precious accent only — corner tag, active nav, links, the "gone quiet"
+ * ring, small emphasis — never a large fill on a light/periwinkle surface
+ * (use burnt orange #b35200 for orange text on light). The Welcome screen
+ * keeps a lavender console field. Legacy token names (cream / ink /
+ * terracotta) are remapped onto these roles so the whole app re-skins here.
  */
 :root {
-  /* ── Raw Nintendo palette ── */
-  --canvas: #7a8aba; /* periwinkle metallic — the interface body */
-  --periwinkle: #8ba1d4; /* raised mid panels */
-  --sky: #9fbee7; /* pale sky — secondary strips, light insets */
-  --lavender: #acace7; /* home hero field, promo cards */
-  --ice: #c0d5e6; /* news hero field */
-  --chrome-indigo: #3d4f97; /* beveled border / shadow line */
-  --muted-indigo: #60619c; /* inactive tabs, recessed chrome */
-  --platinum: #dedede; /* list-row / inset content surface */
-  --surface: #ffffff; /* white content cards, fields, logo pill */
-  --carbon: #21242e; /* command layer: nav, rail buttons, footer, ink */
-  --signal: #f68d1f; /* forward / submit — round arrows, CTAs */
-  --amber: #ecab37; /* utility chips, info-box tabs, badges */
-  --nav-gold: #e48600; /* primary nav words */
-  --systems-teal: #206479; /* page-accent tint */
-  --games-red: #a7282b; /* page-accent tint */
-  --nintendo-red: #e60012; /* brand logo / alert */
+  /* ── Welcome-screen accents (kept) ── */
+  --lavender: #acace7; /* Welcome hero field */
+  --surface: #ffffff; /* white surfaces / fields */
+  --signal: #ff880b; /* orange accent alias */
+  --chrome-indigo: #3d4f97; /* Welcome bevel border / shadow line */
 
   /* ── Surface roles (mapped onto legacy names) ──
-     The inner app rides on a clean white canvas; only the Welcome screen
-     keeps the periwinkle/lavender console field. Carbon command slabs and
-     warm signal accents carry the Nintendo DNA onto the cleaner surface. */
-  --cream: #ffffff; /* app body + content cards = white */
-  --cream-deep: #f3f4f7; /* recessed strips, insets, app frame = soft gray */
-  --surface-dark: #21242e; /* carbon command slab */
-  --surface-elevated: #2c3040; /* nested dark panel */
+     The app rides on a warm off-white canvas with dark warm-near-black nav.
+     Periwinkle hero cards carry the single most important action per screen;
+     orange is a precious accent (corner tag, active nav, links, quiet ring). */
+  --cream: #f7f3ec; /* warm off-white app canvas */
+  --cream-deep: #efe7d8; /* faint warm-gray quiet-card surface */
+  --surface-dark: #1e1a16; /* warm near-black nav (top + bottom) */
+  --surface-elevated: #2a241d; /* nested dark panel */
 
   /* ── Ink / text ── */
-  --ink: #21242e; /* carbon navy — primary text + command fill */
-  --ink-soft: #4b4f63; /* secondary text, chrome labels */
+  --ink: #211c16; /* heavy display + primary text */
+  --ink-soft: #5f574a; /* warm slate — italic subheads, secondary text */
 
-  /* ── Accent — warm signal only ── */
-  --terracotta: #f68d1f; /* Signal Orange: every forward / CTA */
-  --terracotta-deep: #e48600; /* Nav Gold: pressed / hover */
+  /* ── Accent — orange is precious ── */
+  --terracotta: #ff880b; /* orange accent: corner tag, active nav, links */
+  --terracotta-deep: #b35200; /* burnt orange — orange text on light surfaces */
 
-  /* ── Hairlines (clean neutral rules on white) ── */
-  --hairline: #e2e4ea; /* light divider */
-  --hairline-strong: #c3c7d2; /* stronger rule */
+  /* ── Hairlines (warm, faint) ── */
+  --hairline: #e6ddcb; /* 0.5px warm quiet-card border */
+  --hairline-strong: #cdbfa3; /* stronger warm rule */
 
   /* ── Neutral text steps ── */
-  --mute: #4b4f63;
-  --stone: #767b8c;
-  --ash: #aeb2c0;
+  --mute: #9a8d78; /* warm-muted eyebrow */
+  --stone: #6b7088; /* constellation "Xd quiet" slate */
+  --ash: #b5915a; /* muted tan — inactive nav */
+
+  /* ── Named system tokens ── */
+  --canvas: #f7f3ec; /* app background */
+  --carbon: #21242e; /* primary button + hero ink */
+  --hero: #a9abe8; /* periwinkle hero card */
+  --hero-meta: #43476e; /* secondary/meta text inside hero */
+  --constellation: #e7eafb; /* tribe network panel */
+  --eyebrow: #9a8d78; /* eyebrow muted warm */
+  --slate: #5f574a; /* italic subhead warm slate */
+  --burnt-orange: #b35200; /* orange text on light surfaces (AA) */
+  --nav-active: #ff880b; /* active nav item */
+  --nav-inactive: #b5915a; /* inactive nav item (muted tan) */
 
   /* ── Semantic ── */
   --link-blue: #3d4f97;
@@ -94,29 +95,24 @@
   --color-mustard: var(--mustard);
   --color-honey: var(--honey);
 
-  /* Named Nintendo chrome tokens */
+  /* Named system tokens */
   --color-canvas: var(--canvas);
-  --color-periwinkle: var(--periwinkle);
-  --color-sky: var(--sky);
-  --color-lavender: var(--lavender);
-  --color-ice: var(--ice);
-  --color-chrome-indigo: var(--chrome-indigo);
-  --color-muted-indigo: var(--muted-indigo);
-  --color-platinum: var(--platinum);
   --color-carbon: var(--carbon);
-  --color-signal: var(--signal);
-  --color-amber: var(--amber);
-  --color-nav-gold: var(--nav-gold);
-  --color-systems-teal: var(--systems-teal);
-  --color-games-red: var(--games-red);
-  --color-nintendo-red: var(--nintendo-red);
+  --color-hero: var(--hero);
+  --color-hero-meta: var(--hero-meta);
+  --color-constellation: var(--constellation);
+  --color-eyebrow: var(--eyebrow);
+  --color-slate: var(--slate);
+  --color-burnt-orange: var(--burnt-orange);
+  --color-nav-active: var(--nav-active);
+  --color-nav-inactive: var(--nav-inactive);
+  --color-signal: var(--terracotta);
 
   /* Arial / Helvetica is the era-authentic UI face (no webfonts).
      Archivo Black stands in for Arial Black hero box-art wordmarks. */
   --font-sans: Arial, Helvetica, "Liberation Sans", sans-serif;
   --font-inter: Arial, Helvetica, "Liberation Sans", sans-serif;
   --font-display: var(--font-archivo-black), "Arial Black", Arial, sans-serif;
-  --font-pixel: var(--font-pixel), Arial, sans-serif;
 }
 
 body {

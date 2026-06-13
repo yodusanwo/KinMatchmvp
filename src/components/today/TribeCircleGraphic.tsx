@@ -1,4 +1,7 @@
-import Link from "next/link";
+"use client";
+
+import { useMemo } from "react";
+import { useRouter } from "next/navigation";
 import type { FriendSummary } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 import { formatDisplayName } from "@/lib/names/format";
@@ -14,18 +17,32 @@ type TribeCircleGraphicProps = {
   className?: string;
 };
 
-const CIRCLE_SLOTS: { top: string; left: string }[] = [
-  { top: "18%", left: "50%" },
-  { top: "40%", left: "20%" },
-  { top: "40%", left: "80%" },
-  { top: "74%", left: "32%" },
-  { top: "74%", left: "68%" },
-  { top: "57%", left: "50%" },
-];
+const SIZE = 360;
+
+type RingNode = {
+  friend: FriendSummary;
+  id: string;
+  name: string;
+  initials: string;
+  color: string;
+  textColor: string;
+  quietLabel: string;
+  ariaLabel: string;
+  quiet: boolean;
+  highlight: boolean;
+  x: number;
+  y: number;
+};
 
 function quietLabel(friend: FriendSummary) {
   if (!friend.last_touch_at) return "not yet";
   return friend.days_quiet === 0 ? "today" : `${friend.days_quiet}d quiet`;
+}
+
+function quietAria(friend: FriendSummary) {
+  if (!friend.last_touch_at) return "not contacted yet";
+  if (friend.days_quiet === 0) return "reached out today";
+  return `${friend.days_quiet} ${friend.days_quiet === 1 ? "day" : "days"} quiet`;
 }
 
 export function TribeCircleGraphic({
@@ -33,75 +50,158 @@ export function TribeCircleGraphic({
   highlightFriendId,
   className,
 }: TribeCircleGraphicProps) {
+  const router = useRouter();
+
+  const layout = useMemo(() => {
+    const cx = SIZE / 2;
+    const cy = SIZE / 2 - 8;
+    const n = tribe.length;
+    const ringRadius = n <= 6 ? 120 : n <= 10 ? 132 : 140;
+    const nodeR = n <= 6 ? 25 : n <= 12 ? 19 : 14;
+    const hubR = nodeR + 7;
+    const showLabels = n <= 7; // hide labels past 7 to avoid collisions
+
+    const ring: RingNode[] = tribe.map((friend, i) => {
+      const a = ((-90 + (360 / n) * i) * Math.PI) / 180; // start at top, clockwise
+      const color = resolveFriendColor(friend.name, friend.avatar_color_hex);
+      return {
+        friend,
+        id: friend.id,
+        name: formatDisplayName(friend.name),
+        initials: resolveInitials(friend.name, friend.avatar_initials),
+        color,
+        textColor: getAvatarTextColor(color),
+        quietLabel: quietLabel(friend),
+        ariaLabel: `${formatDisplayName(friend.name)}, ${quietAria(friend)}`,
+        quiet: friend.is_drifting,
+        highlight: friend.id === highlightFriendId,
+        x: cx + ringRadius * Math.cos(a),
+        y: cy + ringRadius * Math.sin(a),
+      };
+    });
+
+    return { cx, cy, ring, ringRadius, nodeR, hubR, showLabels };
+  }, [tribe, highlightFriendId]);
+
   if (tribe.length === 0) {
     return (
-      <p className="font-inter text-sm italic text-ink-soft">
+      <p className="font-sans text-sm italic text-slate">
         Add your first connection to begin.
       </p>
     );
   }
 
-  const displayTribe = tribe.slice(0, CIRCLE_SLOTS.length);
-  const overflow = tribe.length - displayTribe.length;
+  const { cx, cy, ring, ringRadius, nodeR, hubR, showLabels } = layout;
+
+  function open(id: string) {
+    router.push(`/friends/${id}`);
+  }
 
   return (
-    <div
-      className={cn(
-        "relative mx-auto h-[200px] w-full max-w-[320px] rounded-[2rem] border border-ink/[0.1] bg-cream-deep/35",
-        className
-      )}
+    <svg
+      viewBox={`0 0 ${SIZE} ${SIZE}`}
+      width="100%"
+      role="img"
+      aria-label={`Your tribe of ${tribe.length} ${tribe.length === 1 ? "person" : "people"}`}
+      className={cn("mx-auto block max-w-[360px] font-sans", className)}
     >
-      <div className="absolute left-1/2 top-1/2 h-16 w-16 -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-terracotta/25" />
-      <div className="absolute left-1/2 top-1/2 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-ink/[0.1]" />
+      <rect x="2" y="2" width={SIZE - 4} height={SIZE - 4} rx="20" fill="#e7eafb" />
 
-      {displayTribe.map((friend, index) => {
-        const slot = CIRCLE_SLOTS[index];
-        return (
-          <Link
-            key={friend.id}
-            href={`/friends/${friend.id}`}
-            className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1 text-center transition-transform hover:scale-105 active:scale-95"
-            style={{ top: slot.top, left: slot.left }}
-            aria-label={`Open ${friend.name}'s profile`}
-          >
-            <span
-              className={cn(
-                "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-sans text-sm font-medium ring-2 ring-cream",
-                friend.is_drifting && "ring-terracotta/60",
-                friend.id === highlightFriendId &&
-                  "shadow-[0_0_0_2px_rgba(182,82,50,0.3)]"
-              )}
-              style={{
-                backgroundColor: resolveFriendColor(
-                  friend.name,
-                  friend.avatar_color_hex
-                ),
-                color: getAvatarTextColor(
-                  resolveFriendColor(friend.name, friend.avatar_color_hex)
-                ),
-              }}
-              aria-hidden
-            >
-              {resolveInitials(friend.name, friend.avatar_initials)}
-            </span>
-            <span className="max-w-[64px] truncate font-sans text-[15px] font-medium leading-none text-ink">
-              {formatDisplayName(friend.name)}
-            </span>
-            <span className="font-sans text-[9px] leading-none text-ink-soft">
-              {quietLabel(friend)}
-            </span>
-          </Link>
-        );
-      })}
+      {/* faint dashed orbit */}
+      <circle
+        cx={cx}
+        cy={cy}
+        r={ringRadius}
+        fill="none"
+        stroke="#b9c1e8"
+        strokeWidth="1.5"
+        strokeDasharray="3 6"
+      />
 
-      {overflow > 0 && (
-        <Link
-          href="/tribe"
-          className="absolute bottom-2 right-3 rounded-full bg-cream px-2 py-1 font-sans text-[12px] text-ink-soft"
+      {/* connector lines from each member to the hub */}
+      <g stroke="#aeb5dc" strokeWidth="1.5">
+        {ring.map((p) => (
+          <line key={`l-${p.id}`} x1={cx} y1={cy} x2={p.x} y2={p.y} />
+        ))}
+      </g>
+
+      {/* member nodes */}
+      {ring.map((p) => (
+        <g
+          key={p.id}
+          role="button"
+          tabIndex={0}
+          aria-label={p.ariaLabel}
+          className="cursor-pointer outline-none [outline-offset:3px] focus-visible:[outline:2px_solid_#ff880b]"
+          onClick={() => open(p.id)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              open(p.id);
+            }
+          }}
         >
-          +{overflow} more
-        </Link>
-      )}
-    </div>
+          <title>{`${p.name} — ${p.quietLabel}`}</title>
+          <circle
+            cx={p.x}
+            cy={p.y}
+            r={nodeR}
+            fill={p.color}
+            stroke={p.quiet ? "#ff880b" : p.highlight ? "#21242e" : "none"}
+            strokeWidth={p.quiet ? 3 : p.highlight ? 2 : 0}
+          />
+          <text
+            x={p.x}
+            y={p.y}
+            textAnchor="middle"
+            dominantBaseline="central"
+            fill={p.textColor}
+            fontSize={13}
+            fontWeight="700"
+          >
+            {p.initials}
+          </text>
+          {showLabels && (
+            <>
+              <text
+                x={p.x}
+                y={p.y + nodeR + 16}
+                textAnchor="middle"
+                fill="#20242f"
+                fontSize="12.5"
+                fontWeight="600"
+              >
+                {p.name}
+              </text>
+              <text
+                x={p.x}
+                y={p.y + nodeR + 30}
+                textAnchor="middle"
+                fill="#6b7088"
+                fontSize="10"
+              >
+                {p.quietLabel}
+              </text>
+            </>
+          )}
+        </g>
+      ))}
+
+      {/* center hub = you */}
+      <g aria-hidden>
+        <circle cx={cx} cy={cy} r={hubR} fill="#21242e" />
+        <text
+          x={cx}
+          y={cy}
+          textAnchor="middle"
+          dominantBaseline="central"
+          fill="#fff"
+          fontSize={13}
+          fontWeight="700"
+        >
+          You
+        </text>
+      </g>
+    </svg>
   );
 }

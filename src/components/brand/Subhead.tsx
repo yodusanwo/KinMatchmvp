@@ -5,12 +5,12 @@ type SubheadProps = {
   className?: string;
 };
 
-/** Italic emotional line, Inter, ink-soft. */
+/** Italic subhead — warm slate, sits under the display heading. */
 export function Subhead({ children, className }: SubheadProps) {
   return (
     <p
       className={cn(
-        "font-inter text-base italic leading-relaxed text-ink",
+        "font-sans text-base italic leading-relaxed text-slate",
         className
       )}
     >

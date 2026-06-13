@@ -5,7 +5,7 @@ type SecondaryButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   className?: string;
 };
 
-/** Secondary action: a carbon-navy command slab, white uppercase label, sharp. */
+/** Secondary action: ghost button — transparent, carbon outline + label. */
 export function SecondaryButton({
   children,
   className,
@@ -16,9 +16,9 @@ export function SecondaryButton({
     <button
       type={type}
       className={cn(
-        "kin-halftone inline-flex w-full items-center justify-center rounded-none border-b-2 border-b-black bg-carbon px-6 py-3 font-sans text-xs font-bold uppercase tracking-[0.5px] text-white transition-colors duration-100 ease-out",
-        "hover:bg-[#2c3040] active:translate-y-px",
-        "disabled:cursor-not-allowed disabled:bg-muted-indigo disabled:text-ash",
+        "inline-flex min-h-[44px] w-full items-center justify-center rounded-sm border-[1.5px] border-carbon bg-transparent px-6 py-3 font-sans text-[13px] font-bold uppercase tracking-[0.04em] text-carbon transition-colors duration-150 ease-out",
+        "hover:bg-carbon/[0.06] active:translate-y-px",
+        "disabled:cursor-not-allowed disabled:border-hairline-strong disabled:text-stone",
         className
       )}
       {...props}

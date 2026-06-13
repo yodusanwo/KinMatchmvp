@@ -81,8 +81,8 @@ export function SendSpotlight({ state, onRefresh }: SendSpotlightProps) {
 
   if (skipping) {
     return (
-      <article className="relative rounded-sm border border-hairline bg-cream p-4">
-        <p className="font-inter text-sm italic text-ink-soft">
+      <article className="relative rounded-sm border border-hairline bg-cream-deep p-4">
+        <p className="font-sans text-sm italic text-ink-soft">
           Got it, next friend.
         </p>
       </article>
@@ -90,7 +90,11 @@ export function SendSpotlight({ state, onRefresh }: SendSpotlightProps) {
   }
 
   return (
-    <article className="relative rounded-sm border border-hairline bg-cream p-4">
+    <article className="relative overflow-hidden rounded-xl bg-hero p-5">
+      <span
+        className="pointer-events-none absolute left-0 top-0 h-[11px] w-[11px] bg-terracotta"
+        aria-hidden
+      />
       <Link
         href={`/friends/${state.friend.id}`}
         className="flex items-center gap-3 transition-opacity hover:opacity-80"
@@ -102,33 +106,33 @@ export function SendSpotlight({ state, onRefresh }: SendSpotlightProps) {
           size="md"
         />
         <div>
-          <p className="font-sans text-base font-semibold text-ink">{name}</p>
-          <p className="font-sans text-xs text-ink-soft">
+          <p className="font-sans text-base font-bold text-carbon">{name}</p>
+          <p className="font-sans text-xs text-hero-meta">
             {cadenceStatus(state.friend)}
           </p>
         </div>
       </Link>
 
-      <p className="mt-4 font-inter text-sm italic leading-relaxed text-ink">
+      <p className="mt-4 font-sans text-[15px] font-semibold italic leading-relaxed text-carbon">
         &ldquo;{question}&rdquo;
       </p>
-      <p className="mt-3 font-inter text-xs italic leading-relaxed text-ink-soft">
+      <p className="mt-2.5 font-sans text-xs italic leading-relaxed text-hero-meta">
         {whyItWorks(state)}
       </p>
 
-      <div className="mt-4 flex items-center gap-2">
+      <div className="mt-5 flex items-center gap-2.5">
         <Link
           href={voiceNoteHref}
-          className={cn(primaryButtonClassName, "flex-1 gap-2 py-2.5 text-xs")}
+          className={cn(primaryButtonClassName, "flex-1 gap-2")}
         >
-          <Mic className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
-          Send voice note
+          <Mic className="h-4 w-4" strokeWidth={2} aria-hidden />
+          Send
         </Link>
         <button
           type="button"
           onClick={() => void skipPrompt()}
           disabled={skipping}
-          className="flex-1 rounded-sm border border-hairline px-3 py-2.5 font-sans text-xs font-bold text-ink disabled:opacity-50"
+          className="inline-flex min-h-[44px] flex-1 items-center justify-center rounded-sm border-[1.5px] border-carbon bg-transparent px-4 font-sans text-[13px] font-bold uppercase tracking-[0.04em] text-carbon transition-colors hover:bg-carbon/[0.06] active:translate-y-px disabled:opacity-50"
         >
           Not now
         </button>
@@ -136,7 +140,7 @@ export function SendSpotlight({ state, onRefresh }: SendSpotlightProps) {
       <p className="mt-3 text-center">
         <Link
           href={`/friends/${state.friend.id}`}
-          className="font-inter text-xs text-terracotta underline decoration-terracotta/60 underline-offset-2"
+          className="font-sans text-xs font-semibold text-burnt-orange underline decoration-burnt-orange/50 underline-offset-2"
         >
           view {name}&apos;s profile
         </Link>
@@ -169,8 +173,8 @@ export function CaptureSpotlight({ state, onRefresh }: CaptureSpotlightProps) {
 
   if (dismissing) {
     return (
-      <article className="relative rounded-sm border border-hairline bg-cream p-4">
-        <p className="font-inter text-sm italic text-ink-soft">
+      <article className="relative rounded-sm border border-hairline bg-cream-deep p-4">
+        <p className="font-sans text-sm italic text-ink-soft">
           Got it &mdash; see you tomorrow.
         </p>
       </article>
@@ -178,7 +182,11 @@ export function CaptureSpotlight({ state, onRefresh }: CaptureSpotlightProps) {
   }
 
   return (
-    <article className="relative rounded-sm border border-hairline bg-cream p-4">
+    <article className="relative overflow-hidden rounded-xl bg-hero p-5">
+      <span
+        className="pointer-events-none absolute left-0 top-0 h-[11px] w-[11px] bg-terracotta"
+        aria-hidden
+      />
       <div className="flex items-center gap-3">
         <MiniAvatar
           name={state.friend.name}
@@ -187,26 +195,26 @@ export function CaptureSpotlight({ state, onRefresh }: CaptureSpotlightProps) {
           size="md"
         />
         <div>
-          <p className="font-sans text-base font-semibold text-ink">{name}</p>
-          <p className="font-sans text-xs text-ink-soft">
-            voice note sent {sentDaysAgo === 1 ? "yesterday" : `${sentDaysAgo} days ago`}
+          <p className="font-sans text-base font-bold text-carbon">{name}</p>
+          <p className="font-sans text-xs text-hero-meta">
+            Voice note · {sentDaysAgo === 1 ? "yesterday" : `${sentDaysAgo} days ago`}
           </p>
         </div>
       </div>
 
       {state.original_question && (
-        <p className="mt-4 font-inter text-sm italic leading-relaxed text-ink-soft">
+        <p className="mt-4 font-sans text-sm italic leading-relaxed text-hero-meta">
           You asked: &ldquo;{state.original_question}&rdquo;
         </p>
       )}
-      <p className="mt-4 font-sans text-sm font-semibold leading-relaxed text-ink">
+      <p className="mt-4 font-sans text-[15px] font-semibold leading-relaxed text-carbon">
         Anything you want to remember about this?
       </p>
 
-      <div className="mt-4 flex items-center gap-2">
+      <div className="mt-5 flex items-center gap-2.5">
         <Link
           href={`/capture/${state.voice_note.id}`}
-          className={cn(primaryButtonClassName, "flex-1 py-2.5 text-xs")}
+          className={cn(primaryButtonClassName, "flex-1")}
         >
           Capture →
         </Link>
@@ -214,7 +222,7 @@ export function CaptureSpotlight({ state, onRefresh }: CaptureSpotlightProps) {
           type="button"
           onClick={() => void skipCapture()}
           disabled={dismissing}
-          className="flex-1 rounded-sm border border-hairline px-3 py-2.5 font-sans text-xs font-bold text-ink disabled:opacity-50"
+          className="inline-flex min-h-[44px] flex-1 items-center justify-center rounded-sm border-[1.5px] border-carbon bg-transparent px-4 font-sans text-[13px] font-bold uppercase tracking-[0.04em] text-carbon transition-colors hover:bg-carbon/[0.06] active:translate-y-px disabled:opacity-50"
         >
           Not yet
         </button>

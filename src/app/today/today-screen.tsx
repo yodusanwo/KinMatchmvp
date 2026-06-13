@@ -114,7 +114,7 @@ export function TodayScreen() {
                 />
               )
             ) : (
-              <div className="rounded-2xl border border-ink/[0.12] bg-cream-deep/60 p-5">
+              <div className="rounded-lg border border-hairline bg-cream-deep p-5">
                 <Subhead>
                   Everyone in your tribe is on rhythm. Take a quiet day.
                 </Subhead>
@@ -123,8 +123,14 @@ export function TodayScreen() {
 
             {hint && (
               <section>
-                <Eyebrow className="mb-1">tomorrow</Eyebrow>
-                <p className="font-inter text-sm italic leading-relaxed text-ink-soft">
+                <div className="flex items-center gap-2">
+                  <span
+                    className="h-2 w-2 shrink-0 rounded-full bg-terracotta"
+                    aria-hidden
+                  />
+                  <Eyebrow>tomorrow</Eyebrow>
+                </div>
+                <p className="mt-1.5 font-sans text-sm italic leading-relaxed text-slate">
                   {hint}
                 </p>
               </section>
@@ -135,7 +141,7 @@ export function TodayScreen() {
                 your tribe · {tribeCount}{" "}
                 {tribeCount === 1 ? "person" : "people"}
               </Eyebrow>
-              <p className="mb-1.5 font-inter text-xs italic text-ink-soft">
+              <p className="mb-3 font-sans text-xs italic text-slate">
                 Tap a circle to open their profile.
               </p>
               <TribeCircleGraphic

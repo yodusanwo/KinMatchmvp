@@ -37,7 +37,7 @@ export function BottomNav({ heldBadge = false }: BottomNavProps) {
 
   return (
     <nav
-      className="kin-halftone fixed bottom-0 left-1/2 z-20 w-full max-w-[480px] -translate-x-1/2 border-t-2 border-t-black bg-carbon px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+      className="fixed bottom-0 left-1/2 z-20 w-full max-w-[480px] -translate-x-1/2 border-t border-t-black/30 bg-surface-dark px-3 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]"
       aria-label="Main"
     >
       <ul className="flex items-center justify-between">
@@ -48,16 +48,16 @@ export function BottomNav({ heldBadge = false }: BottomNavProps) {
               <Link
                 href={href}
                 className={cn(
-                  "relative flex flex-col items-center gap-1 px-1 py-1 min-[360px]:px-2",
-                  active ? "text-signal" : "text-nav-gold/70"
+                  "relative flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-1.5 rounded-sm px-1 py-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-nav-active min-[360px]:px-2",
+                  active ? "text-nav-active" : "text-nav-inactive"
                 )}
                 aria-current={active ? "page" : undefined}
               >
-                <Icon className="h-3.5 w-3.5 min-[360px]:h-5 min-[360px]:w-5" strokeWidth={2} aria-hidden />
-                <span className="font-pixel text-[13px] uppercase leading-none tracking-[0.5px]">{label}</span>
+                <Icon className="h-5 w-5" strokeWidth={2} aria-hidden />
+                <span className="font-sans text-[9.5px] font-semibold uppercase leading-none tracking-[0.08em]">{label}</span>
                 {label === "Held" && heldBadge && (
                   <span
-                    className="absolute right-0 top-0 h-2 w-2 rounded-full bg-signal"
+                    className="absolute right-0 top-1 h-2 w-2 rounded-full bg-nav-active"
                     aria-label="Held active"
                   />
                 )}

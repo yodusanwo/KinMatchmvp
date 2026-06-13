@@ -6,12 +6,12 @@ type HeadlineProps = {
   className?: string;
 };
 
-/** Chunky box-art title — Archivo Black, the console logotype voice. */
+/** Heavy display heading — uppercase, ink, tight line-height. */
 export function Headline({ children, as: Tag = "h1", className }: HeadlineProps) {
   return (
     <Tag
       className={cn(
-        "font-display text-[24px] uppercase leading-[1.05] tracking-[0.5px] text-ink",
+        "font-display text-[26px] uppercase leading-[1.04] tracking-[0.01em] text-ink",
         className
       )}
     >
