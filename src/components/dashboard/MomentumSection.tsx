@@ -24,20 +24,22 @@ function MomentumCategory({ label, friends, trend = false }: MomentumCategoryPro
       <p className="font-sans text-sm font-semibold text-ink">{label}</p>
       <p className="mt-1 font-sans text-sm leading-relaxed text-ink">
         {friends.map((friend, index) => (
-          <span key={friend.id} className="whitespace-nowrap">
-            <Link
-              href={`/friends/${friend.id}`}
-              className="font-medium text-ink underline decoration-transparent underline-offset-2 transition-colors hover:decoration-ink/40"
-            >
-              {formatDisplayName(friend.name)}
-            </Link>
-            {trend && (
-              <TrendingUp
-                className="mx-0.5 inline h-3.5 w-3.5 -translate-y-px text-ink-soft"
-                strokeWidth={2}
-                aria-hidden
-              />
-            )}
+          <span key={friend.id}>
+            <span className="whitespace-nowrap">
+              <Link
+                href={`/friends/${friend.id}`}
+                className="font-medium text-ink underline decoration-transparent underline-offset-2 transition-colors hover:decoration-ink/40"
+              >
+                {formatDisplayName(friend.name)}
+              </Link>
+              {trend && (
+                <TrendingUp
+                  className="mx-0.5 inline h-3.5 w-3.5 -translate-y-px text-ink-soft"
+                  strokeWidth={2}
+                  aria-hidden
+                />
+              )}
+            </span>
             {index < friends.length - 1 && <span className="text-slate">, </span>}
           </span>
         ))}

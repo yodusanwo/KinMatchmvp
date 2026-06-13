@@ -22,6 +22,7 @@ import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
 import { REACHABILITY_ERROR, fetchJson } from "@/lib/api/fetch-client";
 import { trackEvent } from "@/lib/analytics/events";
 import type { FriendCategory, FriendProfile } from "@/lib/api/types";
+import { firstName } from "@/lib/memories/categories";
 import { formatDisplayName } from "@/lib/names/format";
 import { buildSmsLink } from "@/lib/phones/sms-link";
 import { pickShareText } from "@/lib/share-text/voice-note-variants";
@@ -238,6 +239,8 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
   }
 
   const displayName = formatDisplayName(friend.name);
+  const first = firstName(friend.name);
+  const suggestedPrompt = `Hey ${first}, how's your life doing these days?`;
   const hasPhone = Boolean(friend.phone_number?.trim());
   const micReady = recorder.micStatus === "ready";
   const showRecorder = micReady && !recorder.audioBlob;
@@ -269,7 +272,7 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
       <div className="flex items-center border-b border-ink/[0.12] px-5 py-3">
         <Link
           href={`/friends/${friend.id}`}
-          className="font-inter text-sm text-terracotta underline underline-offset-2"
+          className="font-inter text-sm text-[#9c4600] underline underline-offset-2"
         >
           ← Back
         </Link>
@@ -290,6 +293,15 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
         </div>
 
         <div className="mt-10 flex flex-1 flex-col items-center justify-center">
+          {!recorder.audioBlob && (
+            <div className="mb-8 max-w-[300px] text-center">
+              <Eyebrow>a way in</Eyebrow>
+              <p className="mt-1.5 font-sans text-base italic leading-snug text-slate">
+                “{suggestedPrompt}”
+              </p>
+            </div>
+          )}
+
           {(micReady || recorder.audioBlob) && (
             <LiveWaveform
               peaks={recorder.livePeaks}
@@ -399,7 +411,7 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
                 ) : (
                   <Link
                     href={`/friends/${friend.id}`}
-                    className="font-inter text-[15px] italic text-terracotta underline decoration-terracotta/60 underline-offset-2"
+                    className="font-inter text-[15px] italic text-[#9c4600] underline decoration-[#9c4600]/60 underline-offset-2"
                   >
                     {sendMethodHint}
                   </Link>
@@ -410,7 +422,7 @@ export function VoiceNoteScreen({ friendId }: VoiceNoteScreenProps) {
                 <button
                   type="button"
                   onClick={recorder.reset}
-                  className="font-inter text-sm text-terracotta underline underline-offset-2"
+                  className="font-inter text-sm text-[#9c4600] underline underline-offset-2"
                 >
                   Record again
                 </button>
