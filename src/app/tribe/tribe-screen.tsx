@@ -8,6 +8,7 @@ import { BrandBar, Eyebrow, Headline, Subhead } from "@/components/brand";
 import { OptionalPhoneField } from "@/components/friends/OptionalPhoneField";
 import { AppShell } from "@/components/layout/AppShell";
 import { BottomNav } from "@/components/nav/BottomNav";
+import { TribeCircleGraphic } from "@/components/today/TribeCircleGraphic";
 import { TodayPageSkeleton } from "@/components/ui/Skeleton";
 import { fetchJson } from "@/lib/api/fetch-client";
 import type { FriendCategory, FriendSummary } from "@/lib/api/types";
@@ -192,27 +193,31 @@ export function TribeScreen() {
           <div className="mt-7 space-y-7">
             {tribeCount > 0 && (
               <>
+                <section>
+                  <TribeCircleGraphic tribe={activeFriends} />
+                </section>
+
                 <CategorySection
                   title="family"
                   friends={family}
-                  avatarSize={38}
-                  avatarTextSize={12}
-                  emptyCopy="Family members you want to stay connected with."
+                  avatarSize={42}
+                  avatarTextSize={13}
+                  emptyCopy="No family added yet — invite someone you want to keep close."
                 />
                 <CategorySection
                   title="inner circle"
                   friends={innerCircle}
-                  avatarSize={42}
-                  avatarTextSize={13}
-                  emptyCopy="Pick people you'd consider closest. Add them anytime."
+                  avatarSize={46}
+                  avatarTextSize={14}
+                  emptyCopy="No one in your inner circle yet — add the people you'd consider closest."
                 />
                 <CategorySection
                   title="village"
                   friends={village}
-                  avatarSize={36}
-                  avatarTextSize={11}
+                  avatarSize={40}
+                  avatarTextSize={12}
                   halo
-                  emptyCopy="Friends you check in with regularly. Add them anytime."
+                  emptyCopy="No village yet — add friends you check in with regularly."
                 />
                 <section>
                   <div className="flex items-center justify-between gap-3">
@@ -221,13 +226,13 @@ export function TribeScreen() {
                       <button
                         type="button"
                         onClick={() => setShowAcquaintances((value) => !value)}
-                        className="font-inter text-[15px] text-terracotta underline decoration-terracotta/60 underline-offset-2"
+                        className="font-sans text-[15px] font-semibold text-burnt-orange underline decoration-burnt-orange/40 underline-offset-2"
                       >
                         {showAcquaintances ? "hide" : "show"}
                       </button>
                     )}
                   </div>
-                  <p className="mt-1 font-inter text-[12px] italic text-ink-soft/70">
+                  <p className="mt-1 font-sans text-[12px] italic text-slate">
                     {acquaintances.length === 0
                       ? "Promote anyone here as friendships deepen."
                       : "Lighter ties. Hidden by default."}
@@ -249,12 +254,12 @@ export function TribeScreen() {
                       <button
                         type="button"
                         onClick={() => setShowArchived((value) => !value)}
-                        className="font-inter text-[15px] text-terracotta underline decoration-terracotta/60 underline-offset-2"
+                        className="font-sans text-[15px] font-semibold text-burnt-orange underline decoration-burnt-orange/40 underline-offset-2"
                       >
                         {showArchived ? "hide" : "show"}
                       </button>
                     </div>
-                    <p className="mt-1 font-inter text-[12px] italic text-ink-soft/70">
+                    <p className="mt-1 font-sans text-[12px] italic text-slate">
                       Hidden from active tribe. Tap to restore.
                     </p>
                     {showArchived && (
@@ -275,7 +280,7 @@ export function TribeScreen() {
               <button
                 type="button"
                 onClick={() => setAddOpen(true)}
-                className="w-full rounded-sm bg-terracotta px-6 py-3 font-sans text-sm font-bold text-white"
+                className="min-h-[44px] w-full rounded-sm bg-carbon px-6 py-3 font-sans text-[13px] font-bold uppercase tracking-[0.04em] text-white transition-colors hover:bg-ink"
               >
                 Add your first person →
               </button>
@@ -286,7 +291,7 @@ export function TribeScreen() {
                 <button
                   type="button"
                   onClick={() => setAddOpen(true)}
-                  className="font-inter text-[15px] text-terracotta underline decoration-terracotta/60 underline-offset-2"
+                  className="font-sans text-[15px] font-semibold text-burnt-orange underline decoration-burnt-orange/40 underline-offset-2"
                 >
                   + add someone to your tribe
                 </button>
@@ -304,13 +309,13 @@ export function TribeScreen() {
                       setAddError(null);
                     }}
                     placeholder="Add someone…"
-                    className="min-w-0 flex-1 rounded-xl border border-ink/[0.25] bg-cream px-4 py-3 font-inter text-sm italic text-ink placeholder:text-ink-soft/70 focus:border-terracotta focus:outline-none focus:ring-1 focus:ring-terracotta/30"
+                    className="min-w-0 flex-1 rounded-lg border border-hairline-strong bg-cream px-4 py-3 font-sans text-sm italic text-ink placeholder:text-slate/70 focus:border-carbon focus:outline-none focus:ring-1 focus:ring-carbon/20"
                     aria-label="Add someone to your tribe"
                   />
                   <button
                     type="submit"
                     disabled={adding}
-                    className="shrink-0 rounded-sm bg-terracotta px-4 py-3 font-sans text-sm font-bold text-white transition-colors hover:bg-terracotta-deep disabled:cursor-not-allowed disabled:opacity-60"
+                    className="min-h-[44px] shrink-0 rounded-sm bg-carbon px-5 font-sans text-[13px] font-bold uppercase tracking-[0.04em] text-white transition-colors hover:bg-ink disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {adding ? "Adding" : "Add"}
                   </button>
@@ -334,10 +339,10 @@ export function TribeScreen() {
                       key={category}
                       type="button"
                       onClick={() => setNewCategory(category)}
-                      className={`rounded-sm border-2 px-3 py-2 font-sans text-[15px] font-bold ${
+                      className={`rounded-sm border-[1.5px] px-3 py-2 font-sans text-[15px] font-bold ${
                         newCategory === category
-                          ? "border-terracotta bg-terracotta/10 text-ink"
-                          : "border-hairline text-ink-soft"
+                          ? "border-carbon bg-carbon/[0.06] text-ink"
+                          : "border-hairline text-slate"
                       }`}
                     >
                       {label}
@@ -385,19 +390,20 @@ function CategorySection({
   emptyCopy: string;
 }) {
   return (
-    <section>
+    <section className="space-y-3">
       <Eyebrow>{title} · {friends.length}</Eyebrow>
       {friends.length === 0 ? (
-        <p className="mt-2 font-inter text-[12px] italic text-ink-soft/70">
-          {emptyCopy}
-        </p>
+        <div className="rounded-lg border border-hairline bg-cream-deep px-4 py-4">
+          <p className="font-sans text-sm italic leading-relaxed text-slate">
+            {emptyCopy}
+          </p>
+        </div>
       ) : (
         <FriendGrid
           friends={friends}
           avatarSize={avatarSize}
           avatarTextSize={avatarTextSize}
           halo={halo}
-          className="mt-4"
         />
       )}
     </section>
@@ -449,16 +455,16 @@ function FriendGrid({
               </span>
             )}
           </div>
-          <span className="mt-2 truncate font-sans text-[12px] font-medium text-ink">
+          <span className="mt-2 truncate font-sans text-[13px] font-semibold text-ink">
             {formatDisplayName(friend.name)}
           </span>
           {isArchived && friend.archived_at ? (
-            <span className="mt-0.5 font-inter text-[9px] text-ink-soft/70">
+            <span className="mt-0.5 font-sans text-[10px] text-slate">
               {archivedDaysAgo(friend.archived_at)}
             </span>
           ) : (
             quietLabel(friend) && (
-              <span className="mt-0.5 font-inter text-[9px] text-ink-soft/70">
+              <span className="mt-0.5 font-sans text-[10px] text-slate">
                 {quietLabel(friend)}
               </span>
             )
