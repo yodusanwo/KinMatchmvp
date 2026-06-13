@@ -170,13 +170,45 @@ export function HeldScreen() {
         )}
 
         {data && !loading && (
-          <div className="mt-5 space-y-7">
-            <p className="font-inter text-sm italic leading-relaxed text-ink">
-              If you go quiet for about <strong>{data.quiet_threshold_days} days</strong>, KinMatch will let your circle know.{" "}
+          <div className="mt-5 space-y-6">
+            {holdingCount > 0 && (
+              <article className="relative overflow-hidden rounded-xl rounded-tl-none bg-hero p-5">
+                <span
+                  className="pointer-events-none absolute left-0 top-0 h-[11px] w-[11px] bg-terracotta"
+                  aria-hidden
+                />
+                {data.recent_events[0] ? (
+                  <>
+                    <p className="font-sans text-[17px] font-bold leading-snug text-carbon">
+                      Your circle last stepped in {timeAgo(data.recent_events[0].occurred_at)}.
+                    </p>
+                    <p className="mt-1.5 font-sans text-sm italic leading-relaxed text-hero-meta">
+                      They&apos;ve got your back when it&apos;s been too long.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-sans text-[17px] font-bold leading-snug text-carbon">
+                      Your circle has never had to step in.
+                    </p>
+                    <p className="mt-1.5 font-sans text-sm italic leading-relaxed text-hero-meta">
+                      You&apos;ve stayed in rhythm.
+                    </p>
+                  </>
+                )}
+              </article>
+            )}
+
+            <p className="font-sans text-sm italic leading-relaxed text-slate">
+              If you go quiet for about{" "}
+              <strong className="font-semibold not-italic text-ink">
+                {data.quiet_threshold_days} days
+              </strong>
+              , KinMatch will let your circle know.{" "}
               <button
                 type="button"
                 onClick={() => setSheetMode("threshold")}
-                className="text-terracotta underline decoration-terracotta/60 underline-offset-2"
+                className="font-semibold text-burnt-orange underline decoration-burnt-orange/40 underline-offset-2"
               >
                 adjust
               </button>
@@ -185,16 +217,13 @@ export function HeldScreen() {
             {holdingCount === 0 ? (
               <EmptyHeldState onAdd={() => setSheetMode("add")} />
             ) : (
-              <section>
-                <Eyebrow className="mb-3">
+              <section className="space-y-2.5">
+                <Eyebrow>
                   your circle · {holdingCount} of {maxWatchers}
                 </Eyebrow>
-                <ul>
-                  {data.holding.map((entry, index) => (
-                    <li
-                      key={entry.relationship_id}
-                      className={index === data.holding.length - 1 ? "" : "border-b border-ink/[0.08]"}
-                    >
+                <ul className="space-y-2">
+                  {data.holding.map((entry) => (
+                    <li key={entry.relationship_id}>
                       <WatcherRow
                         entry={entry}
                         onMore={() => {
@@ -210,19 +239,13 @@ export function HeldScreen() {
                   type="button"
                   disabled={isFull}
                   onClick={() => setSheetMode("add")}
-                  className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-ink/[0.25] px-4 py-4 font-sans text-xs font-medium text-ink-soft disabled:opacity-60"
+                  className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-hairline-strong bg-cream-deep/40 px-4 py-4 font-sans text-sm font-semibold text-slate transition-colors hover:bg-cream-deep disabled:opacity-60"
                 >
-                  <Plus className="h-4 w-4" aria-hidden />
+                  <Plus className="h-4 w-4" strokeWidth={2} aria-hidden />
                   {isFull
                     ? "Your circle is full · remove someone to make room"
                     : "Add someone to your circle"}
                 </button>
-
-                <p className="mt-6 text-center font-inter text-xs italic text-ink-soft">
-                  {data.recent_events[0]
-                    ? `Last triggered: ${timeAgo(data.recent_events[0].occurred_at)}.`
-                    : "Last triggered: never. You've stayed in rhythm."}
-                </p>
               </section>
             )}
           </div>
@@ -267,16 +290,16 @@ export function HeldScreen() {
 
 function EmptyHeldState({ onAdd }: { onAdd: () => void }) {
   return (
-    <div className="rounded-2xl border border-ink/[0.12] bg-cream-deep/40 p-5 text-center">
+    <div className="rounded-xl border border-hairline bg-cream-deep p-6 text-center">
       <Subhead className="text-center">
         Pick the small circle who should notice if you go quiet.
       </Subhead>
       <button
         type="button"
         onClick={onAdd}
-        className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-sm bg-terracotta px-6 py-3 font-sans text-sm font-bold text-white"
+        className="mt-5 inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-sm bg-carbon px-6 py-3 font-sans text-[13px] font-bold uppercase tracking-[0.04em] text-white transition-colors hover:bg-ink"
       >
-        <Plus className="h-4 w-4" aria-hidden />
+        <Plus className="h-4 w-4" strokeWidth={2} aria-hidden />
         Add someone to your circle
       </button>
     </div>
@@ -291,28 +314,28 @@ function WatcherRow({
   onMore: () => void;
 }) {
   return (
-    <div className="flex items-center gap-3 py-3.5">
+    <div className="flex items-center gap-3.5 rounded-lg border border-hairline bg-cream-deep px-4 py-3.5">
       <MiniAvatar
         name={entry.name}
         colorHex={entry.avatar_color_hex}
         initials={entry.avatar_initials}
-        size="sm"
+        size="md"
       />
       <Link href={`/friends/${entry.friend_id}`} className="min-w-0 flex-1">
-        <p className="truncate font-sans text-[15px] font-medium text-ink">
+        <p className="truncate font-sans text-base font-semibold text-ink">
           {formatDisplayName(entry.name)}
         </p>
-        <p className="font-inter text-[12px] text-ink-soft">
+        <p className="font-sans text-[13px] text-slate">
           {statusLine(entry)}
         </p>
       </Link>
       <button
         type="button"
         onClick={onMore}
-        className="flex h-10 w-10 items-center justify-center rounded-full text-ink/40"
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-slate transition-colors hover:bg-ink/[0.06]"
         aria-label={`Manage ${entry.name}`}
       >
-        <MoreHorizontal className="h-4 w-4" aria-hidden />
+        <MoreHorizontal className="h-5 w-5" aria-hidden />
       </button>
     </div>
   );
@@ -415,14 +438,14 @@ function HeldSheet({
               type="button"
               onClick={onArchive}
               disabled={saving}
-              className="w-full rounded-sm bg-terracotta-deep px-6 py-3 font-sans text-sm font-bold text-white disabled:opacity-50"
+              className="min-h-[44px] w-full rounded-sm bg-error px-6 py-3 font-sans text-[13px] font-bold uppercase tracking-[0.04em] text-white transition-opacity hover:opacity-90 disabled:opacity-50"
             >
               {saving ? "Removing…" : `Remove ${name}`}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="w-full rounded-sm border-2 border-terracotta px-6 py-3 font-sans text-sm font-bold text-ink"
+              className="min-h-[44px] w-full rounded-sm border-[1.5px] border-carbon px-6 py-3 font-sans text-[13px] font-bold uppercase tracking-[0.04em] text-carbon transition-colors hover:bg-carbon/[0.06]"
             >
               Cancel
             </button>
@@ -470,14 +493,14 @@ function HeldSheet({
               type="button"
               onClick={onInvite}
               disabled={!selectedFriendId || setupMessage.trim().length < 20 || saving}
-              className="w-full rounded-sm bg-terracotta px-6 py-3 font-sans text-sm font-bold text-white disabled:opacity-50"
+              className="min-h-[44px] w-full rounded-sm bg-carbon px-6 py-3 font-sans text-[13px] font-bold uppercase tracking-[0.04em] text-white transition-colors hover:bg-ink disabled:opacity-50"
             >
               {saving ? "Sending…" : "Send invitation →"}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="w-full rounded-sm border-2 border-terracotta px-6 py-3 font-sans text-sm font-bold text-ink"
+              className="min-h-[44px] w-full rounded-sm border-[1.5px] border-carbon px-6 py-3 font-sans text-[13px] font-bold uppercase tracking-[0.04em] text-carbon transition-colors hover:bg-carbon/[0.06]"
             >
               Cancel
             </button>
@@ -510,14 +533,14 @@ function HeldSheet({
               type="button"
               onClick={onSaveThreshold}
               disabled={saving}
-              className="w-full rounded-sm bg-terracotta px-6 py-3 font-sans text-sm font-bold text-white disabled:opacity-50"
+              className="min-h-[44px] w-full rounded-sm bg-carbon px-6 py-3 font-sans text-[13px] font-bold uppercase tracking-[0.04em] text-white transition-colors hover:bg-ink disabled:opacity-50"
             >
               {saving ? "Saving…" : "Save quiet window"}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="w-full rounded-sm border-2 border-terracotta px-6 py-3 font-sans text-sm font-bold text-ink"
+              className="min-h-[44px] w-full rounded-sm border-[1.5px] border-carbon px-6 py-3 font-sans text-[13px] font-bold uppercase tracking-[0.04em] text-carbon transition-colors hover:bg-carbon/[0.06]"
             >
               Cancel
             </button>
@@ -547,9 +570,9 @@ function FriendPill({
     <button
       type="button"
       onClick={onClick}
-      className={`flex items-center gap-2 rounded-sm border-2 px-3 py-2 font-sans text-sm font-bold ${
+      className={`flex items-center gap-2 rounded-sm border-[1.5px] px-3 py-2 font-sans text-sm font-bold ${
         selected
-          ? "border-terracotta bg-terracotta/10 text-ink"
+          ? "border-carbon bg-carbon/[0.06] text-ink"
           : "border-hairline text-ink"
       }`}
     >
