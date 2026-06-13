@@ -375,14 +375,6 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
                 <Plus className="h-4 w-4" strokeWidth={2} aria-hidden />
                 add a note about {name}
               </button>
-              <p className="pt-0.5 text-center">
-                <Link
-                  href={`/friends/${friend.id}/details`}
-                  className="font-sans text-sm font-semibold text-burnt-orange underline decoration-burnt-orange/40 underline-offset-2"
-                >
-                  See everything about {name} →
-                </Link>
-              </p>
             </>
           ) : (
             <div className="rounded-lg border border-hairline bg-cream-deep px-4 py-5 text-center">
@@ -467,6 +459,24 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
             </span>
           </Link>
         </section>
+
+        {/* Deep dive — the full record */}
+        <Link
+          href={`/friends/${friend.id}/details`}
+          className="flex items-center justify-between gap-3 rounded-lg border border-hairline bg-cream-deep px-4 py-3.5 transition-colors hover:bg-cream-deep/70"
+        >
+          <span className="min-w-0">
+            <span className="block font-sans text-sm font-semibold text-ink">
+              See everything about {name}
+            </span>
+            <span className="mt-0.5 block font-sans text-xs italic text-slate">
+              Notes, dates, shared interests &amp; more.
+            </span>
+          </span>
+          <span className="shrink-0 font-sans text-base text-burnt-orange" aria-hidden>
+            →
+          </span>
+        </Link>
       </div>
 
       <BottomNav />
