@@ -49,6 +49,8 @@ const config = {
         inter: ["Arial", "Helvetica", "Liberation Sans", "sans-serif"],
         // Archivo Black stands in for Arial Black hero box-art wordmarks.
         display: ["var(--font-archivo-black)", "Arial Black", "Arial", "sans-serif"],
+        // Silkscreen pixel face for silkscreen-legend micro labels.
+        pixel: ["var(--font-pixel)", "Arial", "sans-serif"],
       },
       // Nintendo shape vocabulary: sharp/chamfered by default, with a small
       // graded scale; full roundness reserved for pills, radio dots, arrows.

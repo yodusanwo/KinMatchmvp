@@ -140,7 +140,7 @@ export function FriendManagementSheet({
           </>
         ) : mode === "confirm-delete" ? (
           <div className="space-y-4 text-center">
-            <h2 className="font-sans text-xl font-medium text-ink">
+            <h2 className="font-display text-xl uppercase tracking-[0.5px] text-ink">
               Delete {name} permanently?
             </h2>
             <p className="font-inter text-xs italic leading-[1.5] text-ink-soft/85">
@@ -167,7 +167,7 @@ export function FriendManagementSheet({
           </div>
         ) : (
           <div className="space-y-4 text-center">
-            <h2 className="font-sans text-xl font-medium text-ink">
+            <h2 className="font-display text-xl uppercase tracking-[0.5px] text-ink">
               Archive {name}?
             </h2>
             <p className="font-inter text-xs italic leading-[1.5] text-ink-soft/85">

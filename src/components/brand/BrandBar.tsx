@@ -52,7 +52,10 @@ export function BrandBar({ className }: BrandBarProps) {
           className="flex items-center gap-2 rounded-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
           aria-label={label}
         >
-          <span className="font-sans text-base font-black uppercase tracking-[0.5px] text-white">KinMatch</span>
+          <span className="font-display text-base uppercase tracking-[0.5px]">
+            <span className="text-white">Kin</span>
+            <span className="text-signal">Match</span>
+          </span>
           <BrandMark size={24} />
         </Link>
       </header>

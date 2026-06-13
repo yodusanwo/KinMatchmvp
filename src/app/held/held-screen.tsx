@@ -404,7 +404,7 @@ function HeldSheet({
 
         {mode === "remove" && selected && (
           <div className="space-y-4 text-center">
-            <h2 className="font-sans text-xl font-medium text-ink">
+            <h2 className="font-display text-xl uppercase tracking-[0.5px] text-ink">
               Remove {name} from your Held circle?
             </h2>
             <p className="font-inter text-xs italic leading-[1.5] text-[rgba(31,26,20,0.75)]">
@@ -432,7 +432,7 @@ function HeldSheet({
         {mode === "add" && (
           <div className="space-y-5">
             <div className="space-y-2 text-center">
-              <h2 className="font-sans text-xl font-medium text-ink">
+              <h2 className="font-display text-xl uppercase tracking-[0.5px] text-ink">
                 Add to your circle
               </h2>
               <p className="font-inter text-xs italic leading-[1.5] text-ink-soft">
@@ -487,7 +487,7 @@ function HeldSheet({
         {mode === "threshold" && (
           <div className="space-y-5">
             <div className="space-y-2 text-center">
-              <h2 className="font-sans text-xl font-medium text-ink">
+              <h2 className="font-display text-xl uppercase tracking-[0.5px] text-ink">
                 Adjust quiet window
               </h2>
               <p className="font-inter text-xs italic leading-[1.5] text-ink-soft">

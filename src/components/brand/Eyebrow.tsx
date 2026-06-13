@@ -5,12 +5,12 @@ type EyebrowProps = {
   className?: string;
 };
 
-/** Silkscreen-legend chrome label: uppercase Arial bold, 0.5px tracking. */
+/** Silkscreen-legend chrome label — pixel face, uppercase, tight tracking. */
 export function Eyebrow({ children, className }: EyebrowProps) {
   return (
     <p
       className={cn(
-        "font-sans text-[11px] font-bold uppercase tracking-[0.5px] text-ink-soft",
+        "font-pixel text-[14px] uppercase tracking-[1px] text-ink-soft",
         className
       )}
     >

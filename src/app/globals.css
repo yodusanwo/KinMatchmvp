@@ -116,6 +116,7 @@
   --font-sans: Arial, Helvetica, "Liberation Sans", sans-serif;
   --font-inter: Arial, Helvetica, "Liberation Sans", sans-serif;
   --font-display: var(--font-archivo-black), "Arial Black", Arial, sans-serif;
+  --font-pixel: var(--font-pixel), Arial, sans-serif;
 }
 
 body {

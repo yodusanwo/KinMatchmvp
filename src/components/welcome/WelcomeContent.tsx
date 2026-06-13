@@ -23,7 +23,7 @@ export function WelcomeContent({ auth }: { auth: WelcomeAuthState }) {
         <header className="kin-halftone flex items-center justify-between border-b-2 border-b-black bg-carbon px-5 py-3">
           <Link href={isGuest ? "/" : "/today"} className="flex items-center gap-2">
             <BrandMark size={26} />
-            <span className="font-sans text-base font-black uppercase tracking-[0.5px]">
+            <span className="font-display text-base uppercase tracking-[0.5px]">
               <span className="text-white">Kin</span>
               <span className="text-signal">Match</span>
             </span>
