@@ -43,11 +43,17 @@ export function ProfileHeader({ friend, onEditAvatar }: ProfileHeaderProps) {
         )}
       </div>
       <Headline className="mt-2 text-2xl">{friend.name}</Headline>
-      <p className="mt-0.5 font-inter text-xs italic text-terracotta">
+      <p className="mt-1 font-sans text-xs italic text-burnt-orange">
         {friend.vibe_label}
       </p>
-      <p className="mt-1 flex flex-wrap items-center justify-center gap-x-1 font-sans text-[15px] text-ink-soft">
+      <p className="mt-1.5 flex flex-wrap items-center justify-center gap-x-1.5 font-sans text-[15px] text-slate">
         <span>{friend.cadence_label} ·</span>
+        {friend.is_drifting && (
+          <span
+            className="h-1.5 w-1.5 shrink-0 rounded-full bg-terracotta"
+            aria-hidden
+          />
+        )}
         <DriftIndicator
           daysQuiet={friend.days_quiet}
           isDrifting={friend.is_drifting}

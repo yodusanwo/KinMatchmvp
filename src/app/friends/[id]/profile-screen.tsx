@@ -3,23 +3,26 @@
 import Link from "next/link";
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { CalendarHeart, Mic, Plus } from "lucide-react";
+import { Eyebrow } from "@/components/brand";
+import { primaryButtonClassName } from "@/components/brand/primary-button-styles";
 import { AppShell } from "@/components/layout/AppShell";
 import { BottomNav } from "@/components/nav/BottomNav";
 import {
   AvatarColorPicker,
   FriendManagementSheet,
   MemoryCaptureModal,
-  MemorySection,
   ProfileHeader,
   ProfileTopBar,
-  SuggestedNextStepCard,
 } from "@/components/profile";
 import { VoiceNoteSentToast } from "@/components/profile/VoiceNoteSentToast";
 import { ProfilePageSkeleton } from "@/components/ui/Skeleton";
+import { cn } from "@/lib/cn";
 import { fetchJson } from "@/lib/api/fetch-client";
 import type {
   FriendCategory,
   FriendProfile,
+  Interaction,
   MemoryCategory,
   MemoryNote,
 } from "@/lib/api/types";
@@ -35,6 +38,29 @@ import { cadenceLabel } from "@/lib/friends/utils";
 type ProfileScreenProps = {
   friendId: string;
 };
+
+function timeAgo(value: string | null) {
+  if (!value) return "";
+  const diff = Math.max(0, Date.now() - new Date(value).getTime());
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  if (hours < 1) return "just now";
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}d ago`;
+  const weeks = Math.floor(days / 7);
+  return weeks < 5 ? `${weeks}w ago` : `${Math.floor(days / 30)}mo ago`;
+}
+
+function interactionLabel(interaction: Interaction) {
+  if (interaction.type === "voice_note_sent") return "Voice note sent";
+  return "Reached out";
+}
+
+function formatEventDate(iso: string) {
+  const date = new Date(`${iso}T12:00:00`);
+  if (Number.isNaN(date.getTime())) return iso;
+  return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
 
 export function ProfileScreen({ friendId }: ProfileScreenProps) {
   const router = useRouter();
@@ -226,6 +252,12 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
   }
 
   const name = formatDisplayName(friend.name);
+  const prompt = friend.profile_prompt;
+
+  function openAddNote() {
+    setMemoryModalCategory("current");
+    setMemoryModalOpen(true);
+  }
 
   return (
     <AppShell>
@@ -237,94 +269,204 @@ export function ProfileScreen({ friendId }: ProfileScreenProps) {
         }}
       />
 
-      <div className="px-5 pb-24 pt-4">
-        <ProfileHeader
-          friend={friend}
-          onEditAvatar={() => setAvatarEditorOpen((open) => !open)}
-        />
-
-        <div className="flex justify-center">
-          <AvatarColorPicker
-            friendId={friend.id}
-            friendName={friend.name}
-            colorHex={friend.avatar_color_hex}
-            initials={friend.avatar_initials}
-            phoneNumber={friend.phone_number}
-            open={avatarEditorOpen}
-            onClose={() => setAvatarEditorOpen(false)}
-            onSaved={(patch) =>
-              setFriend((current) =>
-                current ? { ...current, ...patch } : current
-              )
-            }
+      <div className="space-y-8 px-5 pb-24 pt-5">
+        {/* 1 — Profile header */}
+        <section>
+          <ProfileHeader
+            friend={friend}
+            onEditAvatar={() => setAvatarEditorOpen((open) => !open)}
           />
-        </div>
-
-        {friend.memories.length > 0 && (
-          <div className="mt-5">
-            <MemorySection
+          <div className="flex justify-center">
+            <AvatarColorPicker
+              friendId={friend.id}
               friendName={friend.name}
-              memories={friend.memories}
-              showAddControls={false}
-              onAddCategory={(category) => {
-                setMemoryModalCategory(category);
-                setMemoryModalOpen(true);
-              }}
+              colorHex={friend.avatar_color_hex}
+              initials={friend.avatar_initials}
+              phoneNumber={friend.phone_number}
+              open={avatarEditorOpen}
+              onClose={() => setAvatarEditorOpen(false)}
+              onSaved={(patch) =>
+                setFriend((current) =>
+                  current ? { ...current, ...patch } : current
+                )
+              }
             />
           </div>
-        )}
+        </section>
 
-        <p className="mt-4 text-center">
-          <Link
-            href={`/friends/${friend.id}/details`}
-            className="font-inter text-sm text-terracotta underline decoration-terracotta/60 underline-offset-2"
-          >
-            See everything about {name} →
-          </Link>
-        </p>
+        {/* 2 — Hero: send a voice note */}
+        <section>
+          <article className="relative overflow-hidden rounded-xl rounded-tl-none bg-hero p-5">
+            <span
+              className="pointer-events-none absolute left-0 top-0 h-[11px] w-[11px] bg-terracotta"
+              aria-hidden
+            />
+            {prompt.kind === "capture" ? (
+              <>
+                <p className="font-sans text-[15px] italic leading-relaxed text-hero-meta">
+                  {prompt.quote}
+                </p>
+                <p className="mt-3 font-sans text-[15px] font-semibold leading-relaxed text-carbon">
+                  {prompt.prompt}
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="font-sans text-[15px] font-semibold leading-relaxed text-carbon">
+                  {prompt.quote}
+                </p>
+                {prompt.why_this_works && (
+                  <p className="mt-2.5 font-sans text-xs italic leading-relaxed text-hero-meta">
+                    {prompt.why_this_works}
+                  </p>
+                )}
+              </>
+            )}
 
-        <div className="mt-8">
-          <SuggestedNextStepCard
-            href={`/friends/${friend.id}/voice-note`}
-            quote={
-              friend.category === "family"
-                ? `"Hey ${name}, how are you doing these days?"`
-                : `"Hey ${name}, how's your ${friend.category === "inner_circle" ? "world" : "life"} doing these days?"`
-            }
-            whyThisWorks={
-              friend.category === "family"
-                ? "Simple and caring. Family always appreciates being checked on."
-                : "An easy way in. Most people love being asked about their people."
-            }
-            ctaLabel="Send a voice note"
-            sendMethodHint={
-              friend.phone_number ? (
-                "→ Opens in Messages"
+            <Link
+              href={prompt.cta_href}
+              className={cn(primaryButtonClassName, "mt-4 gap-2")}
+            >
+              {prompt.kind !== "capture" && (
+                <Mic className="h-4 w-4" strokeWidth={2} aria-hidden />
+              )}
+              {prompt.cta_label}
+            </Link>
+
+            <p className="mt-2.5 text-center font-sans text-xs italic text-hero-meta">
+              {friend.phone_number ? (
+                "Opens in Messages"
               ) : (
                 <button
                   type="button"
                   onClick={() => setAvatarEditorOpen(true)}
-                  className="text-terracotta underline decoration-terracotta/60 underline-offset-2"
+                  className="font-semibold not-italic text-carbon underline decoration-carbon/40 underline-offset-2"
                 >
                   Add a number for one-tap sending →
                 </button>
-              )
-            }
-          />
-        </div>
+              )}
+            </p>
+          </article>
+        </section>
 
-        <p className="mt-8 text-center">
-          <button
-            type="button"
-            onClick={() => {
-              setMemoryModalCategory("current");
-              setMemoryModalOpen(true);
-            }}
-            className="font-inter text-sm text-terracotta underline decoration-terracotta/60 underline-offset-2"
+        {/* 3 — Notes */}
+        <section className="space-y-2.5">
+          <Eyebrow>notes</Eyebrow>
+          {friend.memories.length > 0 ? (
+            <>
+              <ul className="space-y-2">
+                {friend.memories.slice(0, 5).map((note) => (
+                  <li
+                    key={note.id}
+                    className="rounded-lg border border-hairline bg-cream-deep px-4 py-3 font-sans text-sm leading-relaxed text-ink"
+                  >
+                    {note.text}
+                    {note.event_date && note.category === "dates" && (
+                      <span className="text-slate"> · {formatEventDate(note.event_date)}</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+              <button
+                type="button"
+                onClick={openAddNote}
+                className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-hairline-strong bg-cream-deep/40 px-4 py-3 font-sans text-sm font-semibold text-slate transition-colors hover:bg-cream-deep"
+              >
+                <Plus className="h-4 w-4" strokeWidth={2} aria-hidden />
+                add a note about {name}
+              </button>
+              <p className="pt-0.5 text-center">
+                <Link
+                  href={`/friends/${friend.id}/details`}
+                  className="font-sans text-sm font-semibold text-burnt-orange underline decoration-burnt-orange/40 underline-offset-2"
+                >
+                  See everything about {name} →
+                </Link>
+              </p>
+            </>
+          ) : (
+            <div className="rounded-lg border border-hairline bg-cream-deep px-4 py-5 text-center">
+              <p className="font-sans text-sm italic leading-relaxed text-slate">
+                Nothing saved yet &mdash; jot down what matters about {name}.
+              </p>
+              <button
+                type="button"
+                onClick={openAddNote}
+                className="mt-3 inline-flex items-center justify-center gap-2 rounded-sm border-[1.5px] border-carbon px-4 py-2.5 font-sans text-[13px] font-bold uppercase tracking-[0.04em] text-carbon transition-colors hover:bg-carbon/[0.06]"
+              >
+                <Plus className="h-4 w-4" strokeWidth={2} aria-hidden />
+                Add a note
+              </button>
+            </div>
+          )}
+        </section>
+
+        {/* 4 — Recent history */}
+        {(friend.interactions.length > 0 || friend.rituals.length > 0) && (
+          <section className="space-y-2.5">
+            <Eyebrow>recent</Eyebrow>
+            <ul className="space-y-2">
+              {friend.interactions.map((interaction) => (
+                <li
+                  key={interaction.id}
+                  className="flex items-center justify-between gap-3 rounded-lg border border-hairline bg-cream-deep px-4 py-3"
+                >
+                  <span className="flex items-center gap-2.5 font-sans text-sm text-ink">
+                    <Mic
+                      className="h-4 w-4 shrink-0 text-slate"
+                      strokeWidth={1.75}
+                      aria-hidden
+                    />
+                    {interactionLabel(interaction)}
+                  </span>
+                  <span className="shrink-0 font-sans text-xs text-slate">
+                    {timeAgo(interaction.occurred_at)}
+                  </span>
+                </li>
+              ))}
+              {friend.rituals.map((ritual) => (
+                <li
+                  key={ritual.id}
+                  className="flex items-center justify-between gap-3 rounded-lg border border-hairline bg-cream-deep px-4 py-3"
+                >
+                  <span className="flex min-w-0 items-center gap-2.5 font-sans text-sm text-ink">
+                    <CalendarHeart
+                      className="h-4 w-4 shrink-0 text-slate"
+                      strokeWidth={1.75}
+                      aria-hidden
+                    />
+                    <span className="truncate">{ritual.label}</span>
+                  </span>
+                  <span className="shrink-0 font-sans text-xs text-slate">
+                    {ritual.cadence}
+                    {ritual.streak_count > 0 && ` · ${ritual.streak_count} in a row`}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {/* 5 — Their place in your tribe */}
+        <section className="space-y-2.5">
+          <Eyebrow>their place in your tribe</Eyebrow>
+          <Link
+            href="/today"
+            className="flex items-center justify-between gap-3 rounded-lg border border-hairline bg-cream-deep px-4 py-3.5 transition-colors hover:bg-cream-deep/70"
           >
-            + add a note about {name}
-          </button>
-        </p>
+            <span className="min-w-0">
+              <span className="block font-sans text-sm font-semibold text-ink">
+                {name} is part of {categoryToastLabel(friend.category)}.
+              </span>
+              <span className="mt-0.5 block font-sans text-xs italic text-slate">
+                See where {name} sits in your constellation.
+              </span>
+            </span>
+            <span className="shrink-0 font-sans text-base text-burnt-orange" aria-hidden>
+              →
+            </span>
+          </Link>
+        </section>
       </div>
 
       <BottomNav />
