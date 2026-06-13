@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { FriendSummary } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
@@ -18,6 +19,14 @@ type TribeCircleGraphicProps = {
 };
 
 const SIZE = 360;
+// Above this many in the ring, initials get tight — so we constellation only
+// the most relevant inner ring and link out to the full tribe list.
+const MAX_RING = 14;
+
+// Surface whoever needs attention first: drifting, then longest quiet.
+function byPriority(a: FriendSummary, b: FriendSummary) {
+  return Number(b.is_drifting) - Number(a.is_drifting) || b.days_quiet - a.days_quiet;
+}
 
 type RingNode = {
   friend: FriendSummary;
@@ -55,13 +64,20 @@ export function TribeCircleGraphic({
   const layout = useMemo(() => {
     const cx = SIZE / 2;
     const cy = SIZE / 2 - 8;
-    const n = tribe.length;
+
+    // Once the tribe is big, only the inner ring orbits the hub; the rest
+    // live one tap away under "show all".
+    const overflow = tribe.length > MAX_RING ? tribe.length - MAX_RING : 0;
+    const members =
+      overflow > 0 ? [...tribe].sort(byPriority).slice(0, MAX_RING) : tribe;
+
+    const n = members.length;
     const ringRadius = n <= 6 ? 120 : n <= 10 ? 132 : 140;
     const nodeR = n <= 6 ? 25 : n <= 12 ? 19 : 14;
     const hubR = nodeR + 7;
     const showLabels = n <= 7; // hide labels past 7 to avoid collisions
 
-    const ring: RingNode[] = tribe.map((friend, i) => {
+    const ring: RingNode[] = members.map((friend, i) => {
       const a = ((-90 + (360 / n) * i) * Math.PI) / 180; // start at top, clockwise
       const color = resolveFriendColor(friend.name, friend.avatar_color_hex);
       return {
@@ -80,7 +96,7 @@ export function TribeCircleGraphic({
       };
     });
 
-    return { cx, cy, ring, ringRadius, nodeR, hubR, showLabels };
+    return { cx, cy, ring, ringRadius, nodeR, hubR, showLabels, overflow };
   }, [tribe, highlightFriendId]);
 
   if (tribe.length === 0) {
@@ -91,19 +107,22 @@ export function TribeCircleGraphic({
     );
   }
 
-  const { cx, cy, ring, ringRadius, nodeR, hubR, showLabels } = layout;
+  const { cx, cy, ring, ringRadius, nodeR, hubR, showLabels, overflow } = layout;
+  const hasToday = ring.some((p) => p.highlight);
+  const hasQuiet = ring.some((p) => p.quiet);
 
   function open(id: string) {
     router.push(`/friends/${id}`);
   }
 
   return (
+    <div className={cn("mx-auto w-full max-w-[360px]", className)}>
     <svg
       viewBox={`0 0 ${SIZE} ${SIZE}`}
       width="100%"
       role="img"
       aria-label={`Your tribe of ${tribe.length} ${tribe.length === 1 ? "person" : "people"}`}
-      className={cn("mx-auto block max-w-[360px] font-sans", className)}
+      className="block font-sans"
     >
       <rect x="2" y="2" width={SIZE - 4} height={SIZE - 4} rx="20" fill="#e7eafb" />
 
@@ -147,9 +166,19 @@ export function TribeCircleGraphic({
             cy={p.y}
             r={nodeR}
             fill={p.color}
-            stroke={p.quiet ? "#ff880b" : p.highlight ? "#21242e" : "none"}
-            strokeWidth={p.quiet ? 3 : p.highlight ? 2 : 0}
+            stroke={p.quiet ? "#ff880b" : "none"}
+            strokeWidth={p.quiet ? 3 : 0}
           />
+          {p.highlight && (
+            <circle
+              cx={p.x}
+              cy={p.y}
+              r={nodeR + 4.5}
+              fill="none"
+              stroke="#21242e"
+              strokeWidth={2.5}
+            />
+          )}
           <text
             x={p.x}
             y={p.y}
@@ -203,5 +232,40 @@ export function TribeCircleGraphic({
         </text>
       </g>
     </svg>
+
+      {(hasToday || hasQuiet) && (
+        <div className="mt-1.5 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5">
+          {hasToday && (
+            <span className="inline-flex items-center gap-1.5 font-sans text-[11px] text-slate">
+              <span
+                className="h-3.5 w-3.5 shrink-0 rounded-full border-[2.5px] border-carbon"
+                aria-hidden
+              />
+              today&apos;s nudge
+            </span>
+          )}
+          {hasQuiet && (
+            <span className="inline-flex items-center gap-1.5 font-sans text-[11px] text-slate">
+              <span
+                className="h-3.5 w-3.5 shrink-0 rounded-full border-2 border-terracotta"
+                aria-hidden
+              />
+              gone quiet
+            </span>
+          )}
+        </div>
+      )}
+
+      {overflow > 0 && (
+        <div className="mt-2 text-center">
+          <Link
+            href="/tribe"
+            className="inline-flex min-h-[44px] items-center justify-center font-sans text-[13px] font-semibold text-burnt-orange underline decoration-burnt-orange/40 underline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-terracotta"
+          >
+            Show all {tribe.length} →
+          </Link>
+        </div>
+      )}
+    </div>
   );
 }

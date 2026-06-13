@@ -90,7 +90,7 @@ export function SendSpotlight({ state, onRefresh }: SendSpotlightProps) {
   }
 
   return (
-    <article className="relative overflow-hidden rounded-xl bg-hero p-5">
+    <article className="relative overflow-hidden rounded-xl rounded-tl-none bg-hero p-5">
       <span
         className="pointer-events-none absolute left-0 top-0 h-[11px] w-[11px] bg-terracotta"
         aria-hidden
@@ -182,7 +182,7 @@ export function CaptureSpotlight({ state, onRefresh }: CaptureSpotlightProps) {
   }
 
   return (
-    <article className="relative overflow-hidden rounded-xl bg-hero p-5">
+    <article className="relative overflow-hidden rounded-xl rounded-tl-none bg-hero p-5">
       <span
         className="pointer-events-none absolute left-0 top-0 h-[11px] w-[11px] bg-terracotta"
         aria-hidden
