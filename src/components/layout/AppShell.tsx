@@ -8,8 +8,13 @@ type AppShellProps = {
 /** Mobile-first phone-width container. */
 export function AppShell({ children, className }: AppShellProps) {
   return (
-    <div className="min-h-screen bg-cream-deep">
-      <div className={cn("mx-auto min-h-screen max-w-[480px] bg-cream", className)}>
+    <div className="min-h-screen overflow-x-hidden bg-cream-deep">
+      <div
+        className={cn(
+          "mx-auto min-h-screen max-w-[480px] overflow-x-hidden bg-cream",
+          className,
+        )}
+      >
         {children}
       </div>
     </div>

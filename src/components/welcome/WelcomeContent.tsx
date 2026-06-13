@@ -33,7 +33,7 @@ export function WelcomeContent({ auth }: { auth: WelcomeAuthState }) {
         <div className="flex flex-1 flex-col px-6 pt-10">
           {isGuest ? (
             <>
-              <h1 className="font-display text-[46px] uppercase leading-[0.95]">
+              <h1 className="font-display text-[clamp(30px,10vw,46px)] uppercase leading-[0.95] break-words">
                 <span className="kin-boxart">Turn your connections into </span>
                 <span className="kin-boxart-accent">community.</span>
               </h1>
@@ -68,7 +68,7 @@ export function WelcomeContent({ auth }: { auth: WelcomeAuthState }) {
             </>
           ) : auth.status === "onboarding" ? (
             <>
-              <h1 className="font-display text-[46px] uppercase leading-[0.95]">
+              <h1 className="font-display text-[clamp(30px,10vw,46px)] uppercase leading-[0.95] break-words">
                 <span className="kin-boxart">Welcome </span>
                 <span className="kin-boxart-accent">back.</span>
               </h1>
